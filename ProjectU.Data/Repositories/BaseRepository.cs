@@ -6,10 +6,10 @@ namespace ProjectU.Data.Repositories
     // Базова реалізація generic репозиторію
     public class BaseRepository<T> : IRepository<T> where T : class
     {
-        protected readonly AppDbContext _context;
+        protected readonly ApplicationDbContext _context;
         protected readonly DbSet<T> _dbSet;
 
-        public BaseRepository(AppDbContext context)
+        public BaseRepository(ApplicationDbContext context)
         {
             _context = context;
             _dbSet = context.Set<T>();

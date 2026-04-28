@@ -7,7 +7,7 @@ namespace ProjectU.Data.Repositories
     // Реалізація репозиторію для курсів
     public class CourseRepository : BaseRepository<Course>, ICourseRepository
     {
-        public CourseRepository(AppDbContext context) : base(context) { }
+        public CourseRepository(ApplicationDbContext context) : base(context) { }
 
         public async Task<IEnumerable<Course>> GetCoursesByGroupAsync(int groupId)
             => await _context.Courses

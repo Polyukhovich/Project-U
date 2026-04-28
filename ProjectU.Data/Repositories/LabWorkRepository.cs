@@ -7,7 +7,7 @@ namespace ProjectU.Data.Repositories
     // Реалізація репозиторію для лабораторних робіт
     public class LabWorkRepository : BaseRepository<LabWork>, ILabWorkRepository
     {
-        public LabWorkRepository(AppDbContext context) : base(context) { }
+        public LabWorkRepository(ApplicationDbContext context) : base(context) { }
 
         public async Task<IEnumerable<LabWork>> GetLabWorksByCourseAsync(int courseId)
             => await _context.LabWorks

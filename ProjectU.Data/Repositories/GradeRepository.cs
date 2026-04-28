@@ -7,7 +7,7 @@ namespace ProjectU.Data.Repositories
     // Реалізація репозиторію для оцінок
     public class GradeRepository : BaseRepository<Grade>, IGradeRepository
     {
-        public GradeRepository(AppDbContext context) : base(context) { }
+        public GradeRepository(ApplicationDbContext context) : base(context) { }
 
         public async Task<IEnumerable<Grade>> GetGradesByStudentAsync(string studentId)
             => await _context.Grades

@@ -7,13 +7,11 @@ using ProjectU.Data.Repositories;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// ϳ��������� ���� �����
-builder.Services.AddDbContext<AppDbContext>(options =>
+// Підключення бази даних
+builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
-builder.Services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = true).AddEntityFrameworkStores<AppDbContext>();
-
-// ������������ Identity
+// Налаштування Identity
 builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options =>
 {
     options.Password.RequireDigit = true;
@@ -21,17 +19,18 @@ builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options =>
     options.Password.RequireUppercase = false;
     options.Password.RequireNonAlphanumeric = false;
 })
-.AddEntityFrameworkStores<AppDbContext>()
+.AddEntityFrameworkStores<ApplicationDbContext>()
 .AddDefaultTokenProviders();
 
-// ��������� ���������� � DI
+// Реєстрація репозиторіїв в DI
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<ICourseRepository, CourseRepository>();
 builder.Services.AddScoped<ILabWorkRepository, LabWorkRepository>();
 builder.Services.AddScoped<IGradeRepository, GradeRepository>();
 
-// MVC
+// MVC + Razor Pages (для Identity Scaffolding)
 builder.Services.AddControllersWithViews();
+builder.Services.AddRazorPages();
 
 var app = builder.Build();
 
@@ -45,7 +44,7 @@ app.UseHttpsRedirection();
 app.UseStaticFiles();
 app.UseRouting();
 
-// �������������� �� �����������
+// Автентифікація та авторизація
 app.UseAuthentication();
 app.UseAuthorization();
 
@@ -53,11 +52,15 @@ app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}");
 
-// ������ ����� ����� ��� �����
+// Маршрут для Razor Pages (Identity)
+app.MapRazorPages();
+
+// Запуск сідера ролей при старті
 using (var scope = app.Services.CreateScope())
 {
     var userManager = scope.ServiceProvider.GetRequiredService<UserManager<ApplicationUser>>();
     var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
     await RoleSeeder.SeedAsync(userManager, roleManager);
 }
+
 app.Run();

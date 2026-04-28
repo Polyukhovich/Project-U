@@ -7,7 +7,7 @@ namespace ProjectU.Data.Repositories
     // Реалізація репозиторію для користувачів
     public class UserRepository : BaseRepository<ApplicationUser>, IUserRepository
     {
-        public UserRepository(AppDbContext context) : base(context) { }
+        public UserRepository(ApplicationDbContext context) : base(context) { }
 
         public async Task<IEnumerable<ApplicationUser>> GetStudentsByGroupAsync(int groupId)
             => await _context.Users
