@@ -1,12 +1,20 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using Microsoft.AspNetCore.Identity;
 
 namespace ProjectU.Core.Models
 {
-    internal class ApplicationUser
+    // Розширений користувач системи на базі ASP.NET Core Identity
+    public class ApplicationUser : IdentityUser
     {
+        // Ім'я користувача
+        public string FirstName { get; set; } = string.Empty;
+
+        // Прізвище користувача
+        public string LastName { get; set; } = string.Empty;
+
+        // Зовнішній ключ до групи (тільки для студентів)
+        public int? GroupId { get; set; }
+
+        // Навігаційна властивість до групи
+        public Group? Group { get; set; }
     }
 }

@@ -1,12 +1,17 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace ProjectU.Core.Models
+﻿namespace ProjectU.Core.Models
 {
-    internal class Group
+    // Навчальна група (наприклад МІТ-41)
+    public class Group
     {
+        public int Id { get; set; }
+
+        // Назва групи
+        public string Name { get; set; } = string.Empty;
+
+        // Список студентів що належать до групи
+        public ICollection<ApplicationUser> Students { get; set; } = new List<ApplicationUser>();
+
+        // Список курсів що викладаються для групи
+        public ICollection<Course> Courses { get; set; } = new List<Course>();
     }
 }
