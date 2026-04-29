@@ -1,0 +1,13 @@
+﻿using Microsoft.AspNetCore.Identity.UI.Services;
+
+namespace Project_U.Services
+{
+    // Заглушка для відправки email
+    public class EmailSender : IEmailSender
+    {
+        public Task SendEmailAsync(string email, string subject, string htmlMessage)
+        {
+            return Task.CompletedTask;
+        }
+    }
+}

@@ -33,7 +33,9 @@ builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<ICourseRepository, CourseRepository>();
 builder.Services.AddScoped<ILabWorkRepository, LabWorkRepository>();
 builder.Services.AddScoped<IGradeRepository, GradeRepository>();
-
+// Заглушка для EmailSender
+builder.Services.AddTransient<Microsoft.AspNetCore.Identity.UI.Services.IEmailSender,
+    Project_U.Services.EmailSender>();
 // MVC + Razor Pages (для Identity Scaffolding)
 builder.Services.AddControllersWithViews();
 builder.Services.AddRazorPages();
@@ -60,6 +62,8 @@ app.MapControllerRoute(
 
 // Маршрут для Razor Pages (Identity)
 app.MapRazorPages();
+
+
 
 // Запуск сідера ролей при старті
 using (var scope = app.Services.CreateScope())
