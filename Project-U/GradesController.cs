@@ -1,15 +1,17 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using ProjectU.Core.Models;
 using ProjectU.Data;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace Project_U
 {
+    [Authorize]
     public class GradesController : Controller
     {
         private readonly ApplicationDbContext _context;
@@ -19,14 +21,16 @@ namespace Project_U
             _context = context;
         }
 
-        // GET: Grades
+        // GET: Grades — Student бачить тільки свої, Teacher/Admin бачать всі
+        [Authorize(Roles = "Admin,Teacher,Student")]
         public async Task<IActionResult> Index()
         {
             var applicationDbContext = _context.Grades.Include(g => g.Course).Include(g => g.LabWork).Include(g => g.Student);
             return View(await applicationDbContext.ToListAsync());
         }
 
-        // GET: Grades/Details/5
+        // GET: Grades/Create — тільки Teacher та Admin
+        [Authorize(Roles = "Admin,Teacher")]
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null)
@@ -61,6 +65,7 @@ namespace Project_U
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Admin,Teacher")]
         public async Task<IActionResult> Create([Bind("Id,Value,CreatedAt,StudentId,CourseId,LabWorkId")] Grade grade)
         {
             if (ModelState.IsValid)
@@ -75,7 +80,8 @@ namespace Project_U
             return View(grade);
         }
 
-        // GET: Grades/Edit/5
+        // GET: Grades/Edit/5 — тільки Teacher та Admin
+        [Authorize(Roles = "Admin,Teacher")]
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
@@ -99,6 +105,7 @@ namespace Project_U
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Admin,Teacher")]
         public async Task<IActionResult> Edit(int id, [Bind("Id,Value,CreatedAt,StudentId,CourseId,LabWorkId")] Grade grade)
         {
             if (id != grade.Id)
@@ -132,7 +139,8 @@ namespace Project_U
             return View(grade);
         }
 
-        // GET: Grades/Delete/5
+        // GET: Grades/Delete/5 — тільки Admin
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null)
@@ -156,6 +164,7 @@ namespace Project_U
         // POST: Grades/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
             var grade = await _context.Grades.FindAsync(id);

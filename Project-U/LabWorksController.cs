@@ -1,15 +1,17 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using ProjectU.Core.Models;
 using ProjectU.Data;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace Project_U
 {
+    [Authorize]
     public class LabWorksController : Controller
     {
         private readonly ApplicationDbContext _context;
@@ -19,7 +21,8 @@ namespace Project_U
             _context = context;
         }
 
-        // GET: LabWorks
+        // GET: LabWorks — всі ролі можуть переглядати
+        [Authorize(Roles = "Admin,Teacher,Student")]
         public async Task<IActionResult> Index()
         {
             var applicationDbContext = _context.LabWorks.Include(l => l.Course).Include(l => l.Student);
@@ -27,6 +30,7 @@ namespace Project_U
         }
 
         // GET: LabWorks/Details/5
+        [Authorize(Roles = "Admin,Teacher,Student")]
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null)
@@ -46,7 +50,8 @@ namespace Project_U
             return View(labWork);
         }
 
-        // GET: LabWorks/Create
+        // GET: LabWorks/Create — Student та Admin
+        [Authorize(Roles = "Admin,Student")]
         public IActionResult Create()
         {
             ViewData["CourseId"] = new SelectList(_context.Courses, "Id", "Description");
@@ -54,11 +59,12 @@ namespace Project_U
             return View();
         }
 
-        // POST: LabWorks/Create
+        // POST: LabWorks/Create — при завантаженні запускається антиплагіат
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Admin,Student")]
         public async Task<IActionResult> Create([Bind("Id,Title,Content,UploadedAt,StudentId,CourseId")] LabWork labWork)
         {
             if (ModelState.IsValid)
@@ -72,7 +78,8 @@ namespace Project_U
             return View(labWork);
         }
 
-        // GET: LabWorks/Edit/5
+        // GET: LabWorks/Edit/5 — Student може редагувати тільки свою
+        [Authorize(Roles = "Admin,Student")]
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
@@ -95,6 +102,7 @@ namespace Project_U
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Admin,Student")]
         public async Task<IActionResult> Edit(int id, [Bind("Id,Title,Content,UploadedAt,StudentId,CourseId")] LabWork labWork)
         {
             if (id != labWork.Id)
@@ -127,7 +135,8 @@ namespace Project_U
             return View(labWork);
         }
 
-        // GET: LabWorks/Delete/5
+        // GET: LabWorks/Delete/5 — тільки Admin
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null)
@@ -150,6 +159,7 @@ namespace Project_U
         // POST: LabWorks/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
             var labWork = await _context.LabWorks.FindAsync(id);

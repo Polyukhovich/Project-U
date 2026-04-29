@@ -1,15 +1,17 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using ProjectU.Core.Models;
 using ProjectU.Data;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace Project_U
 {
+    [Authorize]
     public class CoursesController : Controller
     {
         private readonly ApplicationDbContext _context;
@@ -19,7 +21,8 @@ namespace Project_U
             _context = context;
         }
 
-        // GET: Courses
+        // GET: Courses — всі ролі можуть переглядати
+        [Authorize(Roles = "Admin,Teacher,Student")]
         public async Task<IActionResult> Index()
         {
             var applicationDbContext = _context.Courses.Include(c => c.Group).Include(c => c.Teacher);
@@ -27,6 +30,7 @@ namespace Project_U
         }
 
         // GET: Courses/Details/5
+        [Authorize(Roles = "Admin,Teacher,Student")]
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null)
@@ -46,7 +50,8 @@ namespace Project_U
             return View(course);
         }
 
-        // GET: Courses/Create
+        // GET: Courses/Create — Admin та Teacher
+        [Authorize(Roles = "Admin,Teacher")]
         public IActionResult Create()
         {
             ViewData["GroupId"] = new SelectList(_context.Groups, "Id", "Name");
@@ -59,6 +64,7 @@ namespace Project_U
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Admin,Teacher")]
         public async Task<IActionResult> Create([Bind("Id,Name,Description,TeacherId,GroupId")] Course course)
         {
             if (ModelState.IsValid)
@@ -72,7 +78,8 @@ namespace Project_U
             return View(course);
         }
 
-        // GET: Courses/Edit/5
+        // GET: Courses/Edit/5 — Admin та Teacher
+        [Authorize(Roles = "Admin,Teacher")]
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
@@ -95,6 +102,7 @@ namespace Project_U
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Admin,Teacher")]
         public async Task<IActionResult> Edit(int id, [Bind("Id,Name,Description,TeacherId,GroupId")] Course course)
         {
             if (id != course.Id)
@@ -127,7 +135,8 @@ namespace Project_U
             return View(course);
         }
 
-        // GET: Courses/Delete/5
+        // GET: Courses/Delete/5 — тільки Admin
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null)
@@ -150,6 +159,7 @@ namespace Project_U
         // POST: Courses/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
             var course = await _context.Courses.FindAsync(id);

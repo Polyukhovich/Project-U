@@ -1,15 +1,17 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using ProjectU.Core.Models;
 using ProjectU.Data;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace Project_U
 {
+    [Authorize]
     public class SchedulesController : Controller
     {
         private readonly ApplicationDbContext _context;
@@ -19,7 +21,8 @@ namespace Project_U
             _context = context;
         }
 
-        // GET: Schedules
+        // GET: Schedules — всі ролі можуть переглядати
+        [Authorize(Roles = "Admin,Teacher,Student")]
         public async Task<IActionResult> Index()
         {
             var applicationDbContext = _context.Schedules.Include(s => s.Course).Include(s => s.Group);
@@ -27,6 +30,7 @@ namespace Project_U
         }
 
         // GET: Schedules/Details/5
+        [Authorize(Roles = "Admin,Teacher,Student")]
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null)
@@ -46,7 +50,8 @@ namespace Project_U
             return View(schedule);
         }
 
-        // GET: Schedules/Create
+        // GET: Schedules/Create — Admin та Teacher
+        [Authorize(Roles = "Admin,Teacher")]
         public IActionResult Create()
         {
             ViewData["CourseId"] = new SelectList(_context.Courses, "Id", "Description");
@@ -59,6 +64,7 @@ namespace Project_U
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Admin,Teacher")]
         public async Task<IActionResult> Create([Bind("Id,DayOfWeek,StartTime,EndTime,Room,CourseId,GroupId")] Schedule schedule)
         {
             if (ModelState.IsValid)
@@ -72,7 +78,8 @@ namespace Project_U
             return View(schedule);
         }
 
-        // GET: Schedules/Edit/5
+        // GET: Schedules/Edit/5 — Admin та Teacher
+        [Authorize(Roles = "Admin,Teacher")]
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
@@ -95,6 +102,7 @@ namespace Project_U
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Admin,Teacher")]
         public async Task<IActionResult> Edit(int id, [Bind("Id,DayOfWeek,StartTime,EndTime,Room,CourseId,GroupId")] Schedule schedule)
         {
             if (id != schedule.Id)
@@ -127,7 +135,8 @@ namespace Project_U
             return View(schedule);
         }
 
-        // GET: Schedules/Delete/5
+        // GET: Schedules/Delete/5 — тільки Admin
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null)
@@ -150,6 +159,7 @@ namespace Project_U
         // POST: Schedules/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
             var schedule = await _context.Schedules.FindAsync(id);
