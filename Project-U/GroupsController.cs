@@ -8,6 +8,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using X.PagedList.Extensions;
 
 namespace Project_U
 {
@@ -23,9 +24,12 @@ namespace Project_U
 
         // GET: Groups — всі ролі можуть переглядати
         [Authorize(Roles = "Admin,Teacher,Student")]
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(int page = 1)
         {
-            return View(await _context.Groups.ToListAsync());
+            int pageSize = 10;
+            var groups = await _context.Groups.ToListAsync();
+            var pagedGroups = groups.ToPagedList(page, pageSize);
+            return View(pagedGroups);
         }
 
         // GET: Groups/Details/5

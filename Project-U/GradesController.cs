@@ -8,6 +8,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using X.PagedList.Extensions;
 
 namespace Project_U
 {
@@ -23,8 +24,14 @@ namespace Project_U
 
         // GET: Grades — Student бачить тільки свої, Teacher/Admin бачать всі
         [Authorize(Roles = "Admin,Teacher,Student")]
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(int page = 1)
         {
+            int pageSize = 10;
+            var grades = await _context.Grades
+                .Include(g => g.Student)
+                .Include(g => g.Course)
+                .Include(g => g.LabWork)
+                .ToListAsync();
             var applicationDbContext = _context.Grades.Include(g => g.Course).Include(g => g.LabWork).Include(g => g.Student);
             return View(await applicationDbContext.ToListAsync());
         }

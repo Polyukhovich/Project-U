@@ -8,6 +8,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using X.PagedList.Extensions;
 
 namespace Project_U
 {
@@ -23,8 +24,13 @@ namespace Project_U
 
         // GET: Schedules — всі ролі можуть переглядати
         [Authorize(Roles = "Admin,Teacher,Student")]
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(int page = 1)
         {
+            int pageSize = 10;
+            var schedules = await _context.Schedules
+                .Include(s => s.Course)
+                .Include(s => s.Group)
+                .ToListAsync();
             var applicationDbContext = _context.Schedules.Include(s => s.Course).Include(s => s.Group);
             return View(await applicationDbContext.ToListAsync());
         }
