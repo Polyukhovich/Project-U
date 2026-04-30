@@ -1,0 +1,43 @@
+﻿@model IEnumerable<ProjectU.Core.Models.ApplicationUser>
+@{
+    ViewData["Title"] = "Управління користувачами";
+}
+
+<h2>Управління користувачами</h2>
+
+<a asp-action="CreateUser" class="btn btn-primary mb-3">➕ Додати користувача</a>
+
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>Ім'я</th>
+            <th>Прізвище</th>
+            <th>Email</th>
+            <th>Роль</th>
+            <th>Група</th>
+            <th>Дії</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var user in Model)
+        {
+            <tr>
+                <td>@user.FirstName</td>
+                <td>@user.LastName</td>
+                <td>@user.Email</td>
+                <td>@(((Dictionary<string, IList<string>>)ViewBag.UserRoles)[user.Id].FirstOrDefault() ?? "—")</td>
+                <td>@(user.Group?.Name ?? "—")</td>
+                <td>
+                    <a asp-action="EditRole" asp-route-id="@user.Id" class="btn btn-sm btn-warning">Роль</a>
+                    <form asp-action="DeleteUser" method="post" style="display:inline">
+                        <input type="hidden" name="id" value="@user.Id" />
+                        <button type="submit" class="btn btn-sm btn-danger"
+                                onclick="return confirm('Видалити користувача?')">
+                            Видалити
+                        </button>
+                    </form>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

@@ -19,9 +19,9 @@ using System.Text;
 using System.Text.Encodings.Web;
 using System.Threading;
 using System.Threading.Tasks;
-
 namespace Project_U.Areas.Identity.Pages.Account
-{
+{using Microsoft.AspNetCore.Authorization;
+    [Authorize(Roles = "Admin")]
     public class RegisterModel : PageModel
     {
         private readonly SignInManager<ApplicationUser> _signInManager;

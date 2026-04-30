@@ -1,0 +1,28 @@
+﻿@model ProjectU.Core.Models.ApplicationUser
+@{
+    ViewData["Title"] = "Змінити роль";
+}
+
+<h2>Змінити роль користувача</h2>
+
+<div class="row">
+    <div class="col-md-4">
+        <p><strong>Ім'я:</strong> @Model.FirstName @Model.LastName</p>
+        <p><strong>Email:</strong> @Model.Email</p>
+        <p><strong>Поточна роль:</strong> @ViewBag.CurrentRole</p>
+
+        <form asp-action="EditRole" method="post">
+            <input type="hidden" name="id" value="@Model.Id" />
+
+            <div class="mb-3">
+                <label class="form-label">Нова роль</label>
+                <select name="role" asp-items="ViewBag.Roles" class="form-select">
+                    <option value="">— Оберіть роль —</option>
+                </select>
+            </div>
+
+            <button type="submit" class="btn btn-warning">Зберегти</button>
+            <a asp-action="Index" class="btn btn-secondary">Назад</a>
+        </form>
+    </div>
+</div>
