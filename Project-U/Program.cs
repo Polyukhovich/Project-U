@@ -36,8 +36,20 @@ builder.Services.AddScoped<IGradeRepository, GradeRepository>();
 // Заглушка для EmailSender
 builder.Services.AddTransient<Microsoft.AspNetCore.Identity.UI.Services.IEmailSender,
     Project_U.Services.EmailSender>();
+
+builder.Services.AddLocalization(options => options.ResourcesPath = "Resources");
+// Підтримувані культури
+var supportedCultures = new[] { "uk-UA", "en-US" };
+builder.Services.Configure<RequestLocalizationOptions>(options =>
+{
+    options.SetDefaultCulture("uk-UA")
+           .AddSupportedCultures(supportedCultures)
+           .AddSupportedUICultures(supportedCultures);
+});
 // MVC + Razor Pages (для Identity Scaffolding)
-builder.Services.AddControllersWithViews();
+builder.Services.AddControllersWithViews()
+    .AddViewLocalization()
+    .AddDataAnnotationsLocalization();
 builder.Services.AddRazorPages();
 
 var app = builder.Build();
@@ -50,6 +62,9 @@ if (!app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 app.UseStaticFiles();
+// Middleware локалізаці
+app.UseRequestLocalization();
+
 app.UseRouting();
 
 // Автентифікація та авторизація

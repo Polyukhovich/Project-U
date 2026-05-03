@@ -1,4 +1,7 @@
-﻿<!DOCTYPE html>
+﻿@using Microsoft.AspNetCore.Mvc.Localization
+@inject IViewLocalizer Localizer
+
+<!DOCTYPE html>
 <html lang="uk">
 <head>
     <meta charset="utf-8" />
@@ -7,92 +10,142 @@
     <script type="importmap"></script>
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/sidebar.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/Project_U.styles.css" asp-append-version="true" />
 </head>
 <body>
-    <header>
-        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-dark bg-primary border-bottom box-shadow mb-3">
-            <div class="container-fluid">
-                <a class="navbar-brand fw-bold" asp-area="" asp-controller="Home" asp-action="Index">🎓 Project U</a>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse"
-                        aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-                    <span class="navbar-toggler-icon"></span>
-                </button>
-                <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
-                    <ul class="navbar-nav flex-grow-1">
-                        <li class="nav-item">
-                            <a class="nav-link text-white" asp-controller="Home" asp-action="Index">Головна</a>
-                        </li>
-                        @if (User.Identity!.IsAuthenticated)
-                        {
-                            <li class="nav-item">
-                                <a class="nav-link text-white" asp-controller="Groups" asp-action="Index">Групи</a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link text-white" asp-controller="Courses" asp-action="Index">Курси</a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link text-white" asp-controller="Schedules" asp-action="Index">Розклад</a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link text-white" asp-controller="Grades" asp-action="Index">Оцінки</a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link text-white" asp-controller="LabWorks" asp-action="Index">Лабораторні</a>
-                            </li>
-                        }
-                        @if (User.IsInRole("Admin"))
-                        {
-                            <li class="nav-item">
-                                <a class="nav-link text-white" asp-controller="Admin" asp-action="Index">⚙️ Адмін</a>
-                            </li>
-                        }
-                    </ul>
-                    <ul class="navbar-nav">
-                        @if (User.Identity!.IsAuthenticated)
-                        {
-                            <li class="nav-item">
-                                <span class="nav-link text-white">👤 @User.Identity.Name</span>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link text-white" asp-area="Identity" asp-page="/Account/Manage/Index">Профіль</a>
-                            </li>
-                            <li class="nav-item">
-                                <form asp-area="Identity" asp-page="/Account/Logout" method="post">
-                                    <button type="submit" class="nav-link btn btn-link text-white">Вийти</button>
-                                </form>
-                            </li>
-                        }
-                        else
-                        {
-                            <li class="nav-item">
-                                <a class="nav-link text-white" asp-area="Identity" asp-page="/Account/Login">Увійти</a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link text-white" asp-area="Identity" asp-page="/Account/Register">Реєстрація</a>
-                            </li>
-                        }
-                    </ul>
-                </div>
-            </div>
-        </nav>
-    </header>
 
-    <div class="container">
-        <main role="main" class="pb-3">
-            @RenderBody()
-        </main>
+    <!-- Боковий бар -->
+    <div class="sidebar" id="sidebar">
+        <a class="sidebar-brand" asp-controller="Home" asp-action="Index">
+            🎓 Project U
+        </a>
+
+        @if (User.Identity!.IsAuthenticated)
+        {
+            <div class="sidebar-section">@Localizer["Navigation"]</div>
+            <ul class="nav flex-column">
+                <li class="nav-item">
+                    <a class="nav-link" asp-controller="Home" asp-action="Index">🏠 @Localizer["Home"]</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" asp-controller="Groups" asp-action="Index">👥 @Localizer["Groups"]</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" asp-controller="Courses" asp-action="Index">📚 @Localizer["Courses"]</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" asp-controller="Schedules" asp-action="Index">📅 @Localizer["Schedules"]</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" asp-controller="Grades" asp-action="Index">📊 @Localizer["Grades"]</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" asp-controller="LabWorks" asp-action="Index">🔬 @Localizer["LabWorks"]</a>
+                </li>
+            </ul>
+
+            @if (User.IsInRole("Admin"))
+            {
+                <div class="sidebar-section">@Localizer["Administration"]</div>
+                <ul class="nav flex-column">
+                    <li class="nav-item">
+                        <a class="nav-link" asp-controller="Admin" asp-action="Index">⚙️ @Localizer["Admin"]</a>
+                    </li>
+                </ul>
+            }
+
+            <div class="sidebar-section">@Localizer["Account"]</div>
+            <ul class="nav flex-column">
+                <li class="nav-item">
+                    <a class="nav-link" asp-area="Identity" asp-page="/Account/Manage/Index">👤 @User.Identity.Name</a>
+                </li>
+                <li class="nav-item">
+                    <form asp-area="Identity" asp-page="/Account/Logout" method="post">
+                        <button type="submit" class="nav-link btn btn-link text-start w-100">🚪 @Localizer["Logout"]</button>
+                    </form>
+                </li>
+            </ul>
+        }
+        else
+        {
+            <ul class="nav flex-column mt-3">
+                <li class="nav-item">
+                    <a class="nav-link" asp-area="Identity" asp-page="/Account/Login">🔑 @Localizer["Login"]</a>
+                </li>
+            </ul>
+        }
+
+        <div class="sidebar-section">@Localizer["Language"]</div>
+        <ul class="nav flex-column mb-3">
+            <li class="nav-item">
+                <form asp-controller="SelectLanguage" asp-action="SetLanguage" method="post">
+                    <input type="hidden" name="cultureName" value="uk-UA" />
+                    <input type="hidden" name="returnUrl" value="@Context.Request.Path" />
+                    <button type="submit" class="nav-link btn btn-link text-start w-100">🇺🇦 Українська</button>
+                </form>
+            </li>
+            <li class="nav-item">
+                <form asp-controller="SelectLanguage" asp-action="SetLanguage" method="post">
+                    <input type="hidden" name="cultureName" value="en-US" />
+                    <input type="hidden" name="returnUrl" value="@Context.Request.Path" />
+                    <button type="submit" class="nav-link btn btn-link text-start w-100">🇺🇸 English</button>
+                </form>
+            </li>
+        </ul>
     </div>
 
-    <footer class="border-top footer text-muted mt-4">
-        <div class="container py-2">
+    <!-- Основний контент -->
+    <div class="main-content" id="mainContent">
+        <div class="topbar">
+            <button class="toggle-btn" onclick="toggleSidebar()">☰</button>
+            <span class="text-muted">@ViewData["Title"]</span>
+            <span></span>
+        </div>
+
+        <div class="content-area">
+            @RenderBody()
+        </div>
+
+        <div class="footer">
             &copy; 2026 - Project U
         </div>
-    </footer>
+    </div>
 
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
+    <script>
+            function toggleSidebar() {
+                const sidebar = document.getElementById('sidebar');
+                const mainContent = document.getElementById('mainContent');
+
+                if (window.innerWidth <= 768) {
+                    sidebar.classList.toggle('mobile-open');
+                } else {
+                    sidebar.classList.toggle('collapsed');
+                    mainContent.classList.toggle('expanded');
+                }
+            }
+
+            document.addEventListener('click', function(e) {
+                const sidebar = document.getElementById('sidebar');
+                const toggleBtn = document.querySelector('.toggle-btn');
+
+                if (window.innerWidth <= 768 &&
+                    !sidebar.contains(e.target) &&
+                    !toggleBtn.contains(e.target)) {
+                    sidebar.classList.remove('mobile-open');
+                }
+            });
+
+            document.querySelectorAll('.sidebar .nav-link').forEach(link => {
+                if (link.href === window.location.href) {
+                    link.classList.add('active');
+                }
+            });
+    </script>
+
     @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>

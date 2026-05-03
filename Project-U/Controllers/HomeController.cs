@@ -1,32 +1,26 @@
-using System.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
-using Project_U.Models;
+using Microsoft.Extensions.Localization;
 
 namespace Project_U.Controllers
 {
     public class HomeController : Controller
     {
-        private readonly ILogger<HomeController> _logger;
+        private readonly IStringLocalizer<HomeController> _localizer;
 
-        public HomeController(ILogger<HomeController> logger)
+        public HomeController(IStringLocalizer<HomeController> localizer)
         {
-            _logger = logger;
+            _localizer = localizer;
         }
 
         public IActionResult Index()
         {
+            ViewBag.WelcomeMessage = _localizer["WelcomeMessage"];
             return View();
         }
 
         public IActionResult Privacy()
         {
             return View();
-        }
-
-        [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
-        public IActionResult Error()
-        {
-            return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
         }
     }
 }

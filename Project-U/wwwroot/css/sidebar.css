@@ -1,0 +1,121 @@
+/* ===== БОКОВИЙ БАР ===== */
+.sidebar {
+    width: 250px;
+    min-height: 100vh;
+    background: #1a1a2e;
+    color: white;
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 1000;
+    transition: all 0.3s;
+    overflow-y: auto;
+}
+
+    .sidebar.collapsed {
+        width: 0;
+        overflow: hidden;
+    }
+
+.sidebar-brand {
+    padding: 20px 15px;
+    font-size: 1.3rem;
+    font-weight: bold;
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+    color: white;
+    text-decoration: none;
+    display: block;
+}
+
+    .sidebar-brand:hover {
+        color: #a29bfe;
+    }
+
+.sidebar .nav-link {
+    color: rgba(255,255,255,0.8);
+    padding: 12px 20px;
+    border-radius: 8px;
+    margin: 2px 8px;
+    transition: all 0.2s;
+}
+
+    .sidebar .nav-link:hover {
+        background: rgba(255,255,255,0.1);
+        color: white;
+    }
+
+    .sidebar .nav-link.active {
+        background: #6c5ce7;
+        color: white;
+    }
+
+.sidebar-section {
+    padding: 10px 20px 5px;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.4);
+    letter-spacing: 1px;
+}
+
+/* ===== ОСНОВНИЙ КОНТЕНТ ===== */
+.main-content {
+    margin-left: 250px;
+    min-height: 100vh;
+    transition: all 0.3s;
+    background: #f8f9fa;
+}
+
+    .main-content.expanded {
+        margin-left: 0;
+    }
+
+/* ===== ВЕРХНЯ ПАНЕЛЬ ===== */
+.topbar {
+    background: white;
+    padding: 10px 20px;
+    border-bottom: 1px solid #dee2e6;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: sticky;
+    top: 0;
+    z-index: 999;
+}
+
+.toggle-btn {
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    cursor: pointer;
+    color: #333;
+}
+
+/* ===== FOOTER ===== */
+.footer {
+    background: white;
+    border-top: 1px solid #dee2e6;
+    padding: 10px 20px;
+    text-align: center;
+    color: #6c757d;
+    font-size: 0.85rem;
+}
+
+/* ===== АДАПТИВНІСТЬ ===== */
+@media (max-width: 768px) {
+    .sidebar {
+        width: 0;
+        overflow: hidden;
+    }
+
+        .sidebar.mobile-open {
+            width: 250px;
+        }
+
+    .main-content {
+        margin-left: 0;
+    }
+}
+
+.content-area {
+    padding: 20px;
+}
