@@ -31,8 +31,8 @@ namespace Project_U
                 .Include(c => c.Teacher)
                 .Include(c => c.Group)
                 .ToListAsync();
-            var applicationDbContext = _context.Courses.Include(c => c.Group).Include(c => c.Teacher);
-            return View(await applicationDbContext.ToListAsync());
+            var pagedCourses = courses.ToPagedList(page, pageSize);
+            return View(pagedCourses);
         }
 
         // GET: Courses/Details/5

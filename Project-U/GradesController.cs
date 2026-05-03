@@ -32,8 +32,8 @@ namespace Project_U
                 .Include(g => g.Course)
                 .Include(g => g.LabWork)
                 .ToListAsync();
-            var applicationDbContext = _context.Grades.Include(g => g.Course).Include(g => g.LabWork).Include(g => g.Student);
-            return View(await applicationDbContext.ToListAsync());
+            var pagedSchedules = grades.ToPagedList(page, pageSize);
+            return View(pagedSchedules);
         }
 
         // GET: Grades/Create — тільки Teacher та Admin

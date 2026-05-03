@@ -1,25 +1,27 @@
 ﻿@model X.PagedList.IPagedList<ProjectU.Core.Models.Group>
 @using X.PagedList.Mvc.Core
 @using X.PagedList
+@using Microsoft.AspNetCore.Mvc.Localization
+@inject IViewLocalizer Localizer
 
 @{
-    ViewData["Title"] = "Групи";
+    ViewData["Title"] = Localizer["Title"].Value;
 }
 
-<h2>Групи</h2>
+<h2>@Localizer["Title"]</h2>
 
 <p>
     @if (User.IsInRole("Admin"))
     {
-        <a asp-action="Create" class="btn btn-primary">➕ Додати групу</a>
+        <a asp-action="Create" class="btn btn-primary">➕ @Localizer["AddGroup"]</a>
     }
 </p>
 
 <table class="table table-striped">
     <thead>
         <tr>
-            <th>Назва групи</th>
-            <th>Дії</th>
+            <th>@Localizer["GroupName"]</th>
+            <th>@Localizer["Actions"]</th>
         </tr>
     </thead>
     <tbody>
@@ -28,11 +30,11 @@
             <tr>
                 <td>@item.Name</td>
                 <td>
-                    <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-sm btn-info">Деталі</a>
+                    <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-sm btn-info">@Localizer["Details"]</a>
                     @if (User.IsInRole("Admin"))
                     {
-                        <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-sm btn-warning">Редагувати</a>
-                        <a asp-action="Delete" asp-route-id="@item.Id" class="btn btn-sm btn-danger">Видалити</a>
+                        <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-sm btn-warning">@Localizer["Edit"]</a>
+                        <a asp-action="Delete" asp-route-id="@item.Id" class="btn btn-sm btn-danger">@Localizer["Delete"]</a>
                     }
                 </td>
             </tr>
@@ -42,9 +44,9 @@
 
 <div class="d-flex justify-content-center mt-3">
     @Html.PagedListPager(Model, page => Url.Action("Index", new { page }),
-    new PagedListRenderOptions
-    {
-        LiElementClasses = new[] { "page-item" },
-        PageClasses = new[] { "page-link" }
-    })
+        new PagedListRenderOptions
+        {
+            LiElementClasses = new[] { "page-item" },
+            PageClasses = new[] { "page-link" }
+        })
 </div>

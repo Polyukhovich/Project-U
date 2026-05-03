@@ -31,8 +31,8 @@ namespace Project_U
                 .Include(l => l.Student)
                 .Include(l => l.Course)
                 .ToListAsync();
-            var applicationDbContext = _context.LabWorks.Include(l => l.Course).Include(l => l.Student);
-            return View(await applicationDbContext.ToListAsync());
+            var pagedSchedules = labWorks.ToPagedList(page, pageSize);
+            return View(pagedSchedules);
         }
 
         // GET: LabWorks/Details/5

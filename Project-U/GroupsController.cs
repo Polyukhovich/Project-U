@@ -28,8 +28,8 @@ namespace Project_U
         {
             int pageSize = 10;
             var groups = await _context.Groups.ToListAsync();
-            var pagedGroups = groups.ToPagedList(page, pageSize);
-            return View(pagedGroups);
+            var pagedSchedules = groups.ToPagedList(page, pageSize);
+            return View(pagedSchedules);
         }
 
         // GET: Groups/Details/5

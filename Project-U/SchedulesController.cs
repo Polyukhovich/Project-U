@@ -31,8 +31,8 @@ namespace Project_U
                 .Include(s => s.Course)
                 .Include(s => s.Group)
                 .ToListAsync();
-            var applicationDbContext = _context.Schedules.Include(s => s.Course).Include(s => s.Group);
-            return View(await applicationDbContext.ToListAsync());
+            var pagedSchedules = schedules.ToPagedList(page, pageSize);
+            return View(pagedSchedules);
         }
 
         // GET: Schedules/Details/5
