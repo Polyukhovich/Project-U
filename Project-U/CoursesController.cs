@@ -58,10 +58,17 @@ namespace Project_U
 
         // GET: Courses/Create — Admin та Teacher
         [Authorize(Roles = "Admin,Teacher")]
-        public IActionResult Create()
+        public async Task<IActionResult> Create()
         {
+            // Отримуємо поточного викладача
+            var currentUser = await _context.Users
+                .FirstOrDefaultAsync(u => u.UserName == User.Identity!.Name);
+
+            if (currentUser == null) return NotFound();
+
+            ViewData["CurrentUserId"] = currentUser.Id;
+            ViewData["CurrentUserName"] = $"{currentUser.FirstName} {currentUser.LastName}";
             ViewData["GroupId"] = new SelectList(_context.Groups, "Id", "Name");
-            ViewData["TeacherId"] = new SelectList(_context.Users, "Id", "Id");
             return View();
         }
 

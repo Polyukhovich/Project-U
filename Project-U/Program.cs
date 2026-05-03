@@ -6,6 +6,10 @@ using ProjectU.Data;
 using ProjectU.Data.Repositories;
 
 var builder = WebApplication.CreateBuilder(args);
+// Реєстрація сервісу антиплагіату
+builder.Services.AddScoped<ProjectU.Core.Services.PlagiarismService>();
+// Реєстрація сервісу витягування тексту з файлів
+builder.Services.AddScoped<ProjectU.Core.Services.FileTextExtractorService>();
 
 // Підключення бази даних
 builder.Services.AddDbContext<ApplicationDbContext>(options =>

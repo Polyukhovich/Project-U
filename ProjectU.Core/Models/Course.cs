@@ -8,9 +8,6 @@
         // Назва курсу
         public string Name { get; set; } = string.Empty;
 
-        // Опис курсу
-        public string Description { get; set; } = string.Empty;
-
         // Зовнішній ключ до викладача
         public string TeacherId { get; set; } = string.Empty;
 

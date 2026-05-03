@@ -1,48 +1,80 @@
 ﻿@model ProjectU.Core.Models.LabWork
+@using Microsoft.AspNetCore.Mvc.Localization
+@inject IViewLocalizer Localizer
 
 @{
-    ViewData["Title"] = "Details";
+    ViewData["Title"] = "Деталі роботи";
 }
 
-<h1>Details</h1>
+<h2>@Model.Title</h2>
 
-<div>
-    <h4>LabWork</h4>
-    <hr />
-    <dl class="row">
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Title)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Title)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Content)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Content)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.UploadedAt)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.UploadedAt)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Student)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Student.Id)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Course)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Course.Description)
-        </dd>
-    </dl>
+<div class="card mb-3">
+    <div class="card-body">
+        <dl class="row">
+            <dt class="col-sm-3">Студент</dt>
+            <dd class="col-sm-9">@(Model.Student?.Email ?? "—")</dd>
+
+            <dt class="col-sm-3">Курс</dt>
+            <dd class="col-sm-9">@(Model.Course?.Name ?? "—")</dd>
+
+            <dt class="col-sm-3">Дата завантаження</dt>
+            <dd class="col-sm-9">@Model.UploadedAt.ToShortDateString()</dd>
+
+            <dt class="col-sm-3">Текст роботи</dt>
+            <dd class="col-sm-9">@Model.Content</dd>
+        </dl>
+    </div>
 </div>
-<div>
-    <a asp-action="Edit" asp-route-id="@Model?.Id">Edit</a> |
-    <a asp-action="Index">Back to List</a>
+
+<!-- Результати перевірки антиплагіату -->
+@if (Model.PlagiarismResults != null && Model.PlagiarismResults.Any())
+{
+    <h4>🔍 Результати перевірки антиплагіату</h4>
+    <table class="table table-bordered">
+        <thead>
+            <tr>
+                <th>Порівняно з роботою</th>
+                <th>Відсоток схожості</th>
+                <th>Дата перевірки</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var result in Model.PlagiarismResults)
+            {
+                <tr class="@(result.SimilarityPercent > 50 ? "table-danger" : result.SimilarityPercent > 20 ? "table-warning" : "table-success")">
+                    <td>@(result.ComparedWith?.Title ?? "—")</td>
+                    <td>
+                        <strong>@result.SimilarityPercent.ToString("F1")%</strong>
+                        @if (result.SimilarityPercent > 50)
+                        {
+                            <span class="badge bg-danger">Високий плагіат</span>
+                        }
+                        else if (result.SimilarityPercent > 20)
+                        {
+                            <span class="badge bg-warning">Середній</span>
+                        }
+                        else
+                        {
+                            <span class="badge bg-success">Низький</span>
+                        }
+                    </td>
+                    <td>@result.CheckedAt.ToShortDateString()</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+else
+{
+    <div class="alert alert-info">
+        🔍 Результати перевірки антиплагіату відсутні
+    </div>
+}
+
+<div class="mt-3">
+    @if (User.IsInRole("Admin") || User.IsInRole("Student"))
+    {
+        <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-warning">Редагувати</a>
+    }
+    <a asp-action="Index" class="btn btn-secondary">Назад</a>
 </div>

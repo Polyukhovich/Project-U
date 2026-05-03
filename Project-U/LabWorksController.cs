@@ -9,6 +9,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using X.PagedList.Extensions;
+using ProjectU.Core.Services;
+
 
 namespace Project_U
 {
@@ -16,10 +18,19 @@ namespace Project_U
     public class LabWorksController : Controller
     {
         private readonly ApplicationDbContext _context;
+        private readonly PlagiarismService _plagiarismService;
+        private readonly FileTextExtractorService _fileExtractor;
+        private readonly IWebHostEnvironment _environment;
 
-        public LabWorksController(ApplicationDbContext context)
+        public LabWorksController(ApplicationDbContext context,
+               PlagiarismService plagiarismService, 
+               FileTextExtractorService fileExtractor,
+               IWebHostEnvironment environment)
         {
             _context = context;
+            _plagiarismService = plagiarismService;
+            _fileExtractor = fileExtractor;
+            _environment = environment;
         }
 
         // GET: LabWorks — всі ролі можуть переглядати
@@ -58,29 +69,98 @@ namespace Project_U
 
         // GET: LabWorks/Create — Student та Admin
         [Authorize(Roles = "Admin,Student")]
-        public IActionResult Create()
+        public async Task<IActionResult> Create()
         {
-            ViewData["CourseId"] = new SelectList(_context.Courses, "Id", "Description");
-            ViewData["StudentId"] = new SelectList(_context.Users, "Id", "Id");
+            // Отримуємо поточного користувача
+            var currentUser = await _context.Users
+                .FirstOrDefaultAsync(u => u.UserName == User.Identity!.Name);
+
+            if (currentUser == null) return NotFound();
+
+            // Показуємо тільки курси групи студента
+            var courses = await _context.Courses
+                .Where(c => c.GroupId == currentUser.GroupId)
+                .ToListAsync();
+
+            ViewData["CourseId"] = new SelectList(courses, "Id", "Name");
+            ViewData["CurrentUserId"] = currentUser.Id;
             return View();
         }
 
         // POST: LabWorks/Create — при завантаженні запускається антиплагіат
         // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
         [Authorize(Roles = "Admin,Student")]
-        public async Task<IActionResult> Create([Bind("Id,Title,Content,UploadedAt,StudentId,CourseId")] LabWork labWork)
+        public async Task<IActionResult> Create([Bind("Id,Title,StudentId,CourseId")] LabWork labWork, IFormFile? uploadedFile)
         {
             if (ModelState.IsValid)
-            {
+            {        // Обробка завантаженого файлу
+                if (uploadedFile != null && uploadedFile.Length > 0)
+                {
+                    var allowedExtensions = new[] { ".docx", ".pdf" };
+                    var extension = Path.GetExtension(uploadedFile.FileName).ToLower();
+
+                    if (!allowedExtensions.Any(e => e == extension))
+                    {
+                        ModelState.AddModelError("", "Дозволені лише файли .docx та .pdf");
+                        ViewData["StudentId"] = new SelectList(_context.Users, "Id", "Email", labWork.StudentId);
+                        ViewData["CourseId"] = new SelectList(_context.Courses, "Id", "Name", labWork.CourseId);
+                        return View(labWork);
+                    }
+
+                    // Зберігаємо файл в папку uploads
+                    var uploadsFolder = Path.Combine(_environment.WebRootPath, "uploads", "labworks");
+                    Directory.CreateDirectory(uploadsFolder);
+
+                    var uniqueFileName = $"{Guid.NewGuid()}{extension}";
+                    var filePath = Path.Combine(uploadsFolder, uniqueFileName);
+
+                    using (var stream = new FileStream(filePath, FileMode.Create))
+                    {
+                        await uploadedFile.CopyToAsync(stream);
+                    }
+
+                    labWork.FilePath = filePath;
+                    labWork.FileName = uploadedFile.FileName;
+
+                    // Витягуємо текст з файлу для антиплагіату
+                    labWork.Content = _fileExtractor.ExtractText(filePath);
+                }
+
+                labWork.UploadedAt = DateTime.UtcNow;
                 _context.Add(labWork);
+                await _context.SaveChangesAsync();
+
+                // Автоматична перевірка на плагіат
+                var otherWorks = await _context.LabWorks
+                    .Where(l => l.CourseId == labWork.CourseId
+                             && l.StudentId != labWork.StudentId
+                             && l.Id != labWork.Id)
+                    .ToListAsync();
+
+                foreach (var otherWork in otherWorks)
+                {
+                    var similarity = _plagiarismService.CompareTexts(
+                        labWork.Content, otherWork.Content);
+
+                    var result = new PlagiarismResult
+                    {
+                        LabWorkId = labWork.Id,
+                        ComparedWithId = otherWork.Id,
+                        SimilarityPercent = similarity,
+                        CheckedAt = DateTime.UtcNow
+                    };
+
+                    _context.PlagiarismResults.Add(result);
+                }
+
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["CourseId"] = new SelectList(_context.Courses, "Id", "Description", labWork.CourseId);
-            ViewData["StudentId"] = new SelectList(_context.Users, "Id", "Id", labWork.StudentId);
+
+            ViewData["StudentId"] = new SelectList(_context.Users, "Id", "Email", labWork.StudentId);
+            ViewData["CourseId"] = new SelectList(_context.Courses, "Id", "Name", labWork.CourseId);
             return View(labWork);
         }
 
