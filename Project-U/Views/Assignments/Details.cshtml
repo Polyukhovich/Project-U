@@ -1,0 +1,103 @@
+﻿@model ProjectU.Core.Models.Assignment
+@{
+    ViewData["Title"] = "Деталі завдання";
+}
+
+<h2>@Model.Title</h2>
+
+<div class="card mb-4">
+    <div class="card-body">
+        <dl class="row">
+            <dt class="col-sm-3">Курс</dt>
+            <dd class="col-sm-9">@(Model.Course?.Name ?? "—")</dd>
+
+            <dt class="col-sm-3">Опис</dt>
+            <dd class="col-sm-9">@Model.Description</dd>
+
+            <dt class="col-sm-3">Дедлайн</dt>
+            <dd class="col-sm-9">
+                @if (Model.Deadline < DateTime.Now)
+                {
+                    <span class="badge bg-danger">@Model.Deadline.ToString("dd.MM.yyyy HH:mm") (прострочено)</span>
+                }
+                else
+                {
+                    <span class="badge bg-success">@Model.Deadline.ToString("dd.MM.yyyy HH:mm")</span>
+                }
+            </dd>
+
+            <dt class="col-sm-3">Дата створення</dt>
+            <dd class="col-sm-9">@Model.CreatedAt.ToShortDateString()</dd>
+        </dl>
+    </div>
+</div>
+
+<!-- Здачі студентів -->
+<h4>📋 Здачі студентів (@(Model.Submissions?.Count ?? 0))</h4>
+
+@if (Model.Submissions != null && Model.Submissions.Any())
+{
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Студент</th>
+                <th>Файл</th>
+                <th>Дата здачі</th>
+                <th>Плагіат</th>
+                <th>Оцінено</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var submission in Model.Submissions)
+            {
+                <tr>
+                    <td>@(submission.Student?.Email ?? "—")</td>
+                    <td>@submission.FileName</td>
+                    <td>@submission.UploadedAt.ToShortDateString()</td>
+                    <td>
+                        @if (submission.PlagiarismResults.Any())
+                        {
+                            var maxSimilarity = submission.PlagiarismResults.Max(p => p.SimilarityPercent);
+                            <span class="badge @(maxSimilarity > 50 ? "bg-danger" : maxSimilarity > 20 ? "bg-warning" : "bg-success")">
+                                @maxSimilarity.ToString("F1")%
+                            </span>
+                        }
+                        else
+                        {
+                            <span class="badge bg-secondary">—</span>
+                        }
+                    </td>
+                    <td>
+                        @if (submission.IsGraded)
+                        {
+                            <span class="badge bg-success">✅ Так</span>
+                        }
+                        else
+                        {
+                            <span class="badge bg-warning">⏳ Ні</span>
+                        }
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+else
+{
+    <div class="alert alert-info">📭 Жодної здачі ще немає</div>
+}
+
+@if (User.IsInRole("Student"))
+{
+    <a asp-controller="LabWorks" asp-action="Create" asp-route-assignmentId="@Model.Id" class="btn btn-primary mt-3">
+        📤 Здати роботу
+    </a>
+}
+
+<div class="mt-3">
+    @if (User.IsInRole("Admin") || User.IsInRole("Teacher"))
+    {
+        <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-warning">Редагувати</a>
+    }
+    <a asp-action="Index" class="btn btn-secondary">Назад</a>
+</div>

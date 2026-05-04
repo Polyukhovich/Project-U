@@ -126,6 +126,9 @@
   <data name="Administration" xml:space="preserve">
     <value>Administration</value>
   </data>
+  <data name="Assignments" xml:space="preserve">
+    <value>Assignments</value>
+  </data>
   <data name="Courses" xml:space="preserve">
     <value>Courses</value>
   </data>

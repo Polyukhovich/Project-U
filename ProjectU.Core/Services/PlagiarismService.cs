@@ -10,7 +10,7 @@ namespace ProjectU.Core.Services
     public class PlagiarismService
     {
         // Розмір шинглу (кількість слів)
-        private const int ShingleSize = 5;
+        private const int ShingleSize = 3;
 
         // Нормалізація тексту — видалення пунктуації, lowercase
         private string NormalizeText(string text)

@@ -1,0 +1,49 @@
+﻿@model ProjectU.Core.Models.Assignment
+@{
+    ViewData["Title"] = "Створити завдання";
+}
+
+<h2>Створити завдання</h2>
+
+<div class="row">
+    <div class="col-md-5">
+        <form asp-action="Create" method="post">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+            <div class="mb-3">
+                <label asp-for="Title" class="form-label">Назва завдання</label>
+                <input asp-for="Title" class="form-control" placeholder="Наприклад: Лабораторна робота №1" />
+                <span asp-validation-for="Title" class="text-danger"></span>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="Description" class="form-label">Опис завдання</label>
+                <textarea asp-for="Description" class="form-control" rows="4" placeholder="Опишіть завдання для студентів"></textarea>
+                <span asp-validation-for="Description" class="text-danger"></span>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="Deadline" class="form-label">Дедлайн</label>
+                <input asp-for="Deadline" class="form-control" type="datetime-local" />
+                <span asp-validation-for="Deadline" class="text-danger"></span>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="CourseId" class="form-label">Курс</label>
+                <select asp-for="CourseId" asp-items="ViewBag.CourseId" class="form-select">
+                    <option value="">— Оберіть курс —</option>
+                </select>
+                <span asp-validation-for="CourseId" class="text-danger"></span>
+            </div>
+
+            <button type="submit" class="btn btn-primary">Створити</button>
+            <a asp-action="Index" class="btn btn-secondary">Назад</a>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

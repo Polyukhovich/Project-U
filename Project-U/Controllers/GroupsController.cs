@@ -10,7 +10,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using X.PagedList.Extensions;
 
-namespace Project_U
+namespace Controllers
 {
     [Authorize] // Тільки авторизовані користувачі
     public class GroupsController : Controller
@@ -132,19 +132,18 @@ namespace Project_U
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Delete(int? id)
         {
-            if (id == null)
-            {
-                return NotFound();
-            }
+            if (id == null) return NotFound();
 
-            var @group = await _context.Groups
+            var group = await _context.Groups
                 .FirstOrDefaultAsync(m => m.Id == id);
-            if (@group == null)
-            {
-                return NotFound();
-            }
 
-            return View(@group);
+            if (group == null) return NotFound();
+
+            // Перевіряємо чи є студенти в групі
+            var hasStudents = await _context.Users.AnyAsync(u => u.GroupId == id);
+            ViewBag.HasStudents = hasStudents;
+
+            return View(group);
         }
 
         // POST: Groups/Delete/5 — тільки Admin

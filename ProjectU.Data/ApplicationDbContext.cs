@@ -17,6 +17,7 @@ namespace ProjectU.Data
         public DbSet<LabWork> LabWorks { get; set; }
         public DbSet<PlagiarismResult> PlagiarismResults { get; set; }
         public DbSet<Notification> Notifications { get; set; }
+        public DbSet<Assignment> Assignments { get; set; }
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
@@ -53,6 +54,13 @@ namespace ProjectU.Data
                 .HasOne(s => s.Group)
                 .WithMany()
                 .HasForeignKey(s => s.GroupId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            // Налаштування зв'язку Assignment з LabWork
+            builder.Entity<LabWork>()
+                .HasOne(l => l.Assignment)
+                .WithMany(a => a.Submissions)
+                .HasForeignKey(l => l.AssignmentId)
                 .OnDelete(DeleteBehavior.Restrict);
         }
     }

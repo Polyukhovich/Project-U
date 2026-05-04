@@ -12,7 +12,7 @@ using X.PagedList.Extensions;
 using ProjectU.Core.Services;
 
 
-namespace Project_U
+namespace Controllers
 {
     [Authorize]
     public class LabWorksController : Controller
@@ -50,39 +50,36 @@ namespace Project_U
         [Authorize(Roles = "Admin,Teacher,Student")]
         public async Task<IActionResult> Details(int? id)
         {
-            if (id == null)
-            {
-                return NotFound();
-            }
+            if (id == null) return NotFound();
 
             var labWork = await _context.LabWorks
-                .Include(l => l.Course)
                 .Include(l => l.Student)
+                .Include(l => l.Course)
+                .Include(l => l.PlagiarismResults)
+                    .ThenInclude(p => p.ComparedWith)
                 .FirstOrDefaultAsync(m => m.Id == id);
-            if (labWork == null)
-            {
-                return NotFound();
-            }
+
+            if (labWork == null) return NotFound();
 
             return View(labWork);
         }
 
         // GET: LabWorks/Create — Student та Admin
         [Authorize(Roles = "Admin,Student")]
-        public async Task<IActionResult> Create()
+        public async Task<IActionResult> Create(int? assignmentId = null)
         {
-            // Отримуємо поточного користувача
             var currentUser = await _context.Users
                 .FirstOrDefaultAsync(u => u.UserName == User.Identity!.Name);
 
             if (currentUser == null) return NotFound();
 
-            // Показуємо тільки курси групи студента
-            var courses = await _context.Courses
-                .Where(c => c.GroupId == currentUser.GroupId)
+            // Показуємо завдання для групи студента
+            var assignments = await _context.Assignments
+                .Include(a => a.Course)
+                .Where(a => a.Course.GroupId == currentUser.GroupId && a.Deadline > DateTime.UtcNow)
                 .ToListAsync();
 
-            ViewData["CourseId"] = new SelectList(courses, "Id", "Name");
+            ViewData["AssignmentId"] = new SelectList(assignments, "Id", "Title", assignmentId);
             ViewData["CurrentUserId"] = currentUser.Id;
             return View();
         }
@@ -92,10 +89,15 @@ namespace Project_U
         [HttpPost]
         [ValidateAntiForgeryToken]
         [Authorize(Roles = "Admin,Student")]
-        public async Task<IActionResult> Create([Bind("Id,Title,StudentId,CourseId")] LabWork labWork, IFormFile? uploadedFile)
+        public async Task<IActionResult> Create([Bind("Id,Title,StudentId,CourseId,AssignmentId")] LabWork labWork, IFormFile? uploadedFile)
         {
             if (ModelState.IsValid)
-            {        // Обробка завантаженого файлу
+
+            {    // Отримуємо CourseId з завдання
+                var assignment = await _context.Assignments.FindAsync(labWork.AssignmentId);
+                if (assignment != null)
+                    labWork.CourseId = assignment.CourseId;
+                // Обробка завантаженого файлу
                 if (uploadedFile != null && uploadedFile.Length > 0)
                 {
                     var allowedExtensions = new[] { ".docx", ".pdf" };

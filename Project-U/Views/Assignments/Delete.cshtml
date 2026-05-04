@@ -1,0 +1,26 @@
+﻿@model ProjectU.Core.Models.Assignment
+@{
+    ViewData["Title"] = "Видалити завдання";
+}
+
+<h2>Видалити завдання</h2>
+
+<div class="alert alert-warning">
+    ⚠️ Ви впевнені що хочете видалити це завдання?
+</div>
+
+<dl class="row">
+    <dt class="col-sm-3">Назва</dt>
+    <dd class="col-sm-9">@Model.Title</dd>
+
+    <dt class="col-sm-3">Курс</dt>
+    <dd class="col-sm-9">@(Model.Course?.Name ?? "—")</dd>
+
+    <dt class="col-sm-3">Дедлайн</dt>
+    <dd class="col-sm-9">@Model.Deadline.ToShortDateString()</dd>
+</dl>
+
+<form asp-action="Delete" method="post">
+    <button type="submit" class="btn btn-danger">🗑️ Видалити</button>
+    <a asp-action="Index" class="btn btn-secondary">Скасувати</a>
+</form>

@@ -10,32 +10,32 @@ using System.Linq;
 using System.Threading.Tasks;
 using X.PagedList.Extensions;
 
-namespace Project_U
+namespace Controllers
 {
     [Authorize]
-    public class CoursesController : Controller
+    public class SchedulesController : Controller
     {
         private readonly ApplicationDbContext _context;
 
-        public CoursesController(ApplicationDbContext context)
+        public SchedulesController(ApplicationDbContext context)
         {
             _context = context;
         }
 
-        // GET: Courses — всі ролі можуть переглядати
+        // GET: Schedules — всі ролі можуть переглядати
         [Authorize(Roles = "Admin,Teacher,Student")]
         public async Task<IActionResult> Index(int page = 1)
         {
             int pageSize = 10;
-            var courses = await _context.Courses
-                .Include(c => c.Teacher)
-                .Include(c => c.Group)
+            var schedules = await _context.Schedules
+                .Include(s => s.Course)
+                .Include(s => s.Group)
                 .ToListAsync();
-            var pagedCourses = courses.ToPagedList(page, pageSize);
-            return View(pagedCourses);
+            var pagedSchedules = schedules.ToPagedList(page, pageSize);
+            return View(pagedSchedules);
         }
 
-        // GET: Courses/Details/5
+        // GET: Schedules/Details/5
         [Authorize(Roles = "Admin,Teacher,Student")]
         public async Task<IActionResult> Details(int? id)
         {
@@ -44,54 +44,47 @@ namespace Project_U
                 return NotFound();
             }
 
-            var course = await _context.Courses
-                .Include(c => c.Group)
-                .Include(c => c.Teacher)
+            var schedule = await _context.Schedules
+                .Include(s => s.Course)
+                .Include(s => s.Group)
                 .FirstOrDefaultAsync(m => m.Id == id);
-            if (course == null)
+            if (schedule == null)
             {
                 return NotFound();
             }
 
-            return View(course);
+            return View(schedule);
         }
 
-        // GET: Courses/Create — Admin та Teacher
+        // GET: Schedules/Create — Admin та Teacher
         [Authorize(Roles = "Admin,Teacher")]
-        public async Task<IActionResult> Create()
+        public IActionResult Create()
         {
-            // Отримуємо поточного викладача
-            var currentUser = await _context.Users
-                .FirstOrDefaultAsync(u => u.UserName == User.Identity!.Name);
-
-            if (currentUser == null) return NotFound();
-
-            ViewData["CurrentUserId"] = currentUser.Id;
-            ViewData["CurrentUserName"] = $"{currentUser.FirstName} {currentUser.LastName}";
+            ViewData["CourseId"] = new SelectList(_context.Courses, "Id", "Description");
             ViewData["GroupId"] = new SelectList(_context.Groups, "Id", "Name");
             return View();
         }
 
-        // POST: Courses/Create
+        // POST: Schedules/Create
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
         [Authorize(Roles = "Admin,Teacher")]
-        public async Task<IActionResult> Create([Bind("Id,Name,Description,TeacherId,GroupId")] Course course)
+        public async Task<IActionResult> Create([Bind("Id,DayOfWeek,StartTime,EndTime,Room,CourseId,GroupId")] Schedule schedule)
         {
             if (ModelState.IsValid)
             {
-                _context.Add(course);
+                _context.Add(schedule);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["GroupId"] = new SelectList(_context.Groups, "Id", "Name", course.GroupId);
-            ViewData["TeacherId"] = new SelectList(_context.Users, "Id", "Id", course.TeacherId);
-            return View(course);
+            ViewData["CourseId"] = new SelectList(_context.Courses, "Id", "Description", schedule.CourseId);
+            ViewData["GroupId"] = new SelectList(_context.Groups, "Id", "Name", schedule.GroupId);
+            return View(schedule);
         }
 
-        // GET: Courses/Edit/5 — Admin та Teacher
+        // GET: Schedules/Edit/5 — Admin та Teacher
         [Authorize(Roles = "Admin,Teacher")]
         public async Task<IActionResult> Edit(int? id)
         {
@@ -100,25 +93,25 @@ namespace Project_U
                 return NotFound();
             }
 
-            var course = await _context.Courses.FindAsync(id);
-            if (course == null)
+            var schedule = await _context.Schedules.FindAsync(id);
+            if (schedule == null)
             {
                 return NotFound();
             }
-            ViewData["GroupId"] = new SelectList(_context.Groups, "Id", "Name", course.GroupId);
-            ViewData["TeacherId"] = new SelectList(_context.Users, "Id", "Id", course.TeacherId);
-            return View(course);
+            ViewData["CourseId"] = new SelectList(_context.Courses, "Id", "Description", schedule.CourseId);
+            ViewData["GroupId"] = new SelectList(_context.Groups, "Id", "Name", schedule.GroupId);
+            return View(schedule);
         }
 
-        // POST: Courses/Edit/5
+        // POST: Schedules/Edit/5
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
         [Authorize(Roles = "Admin,Teacher")]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,Name,Description,TeacherId,GroupId")] Course course)
+        public async Task<IActionResult> Edit(int id, [Bind("Id,DayOfWeek,StartTime,EndTime,Room,CourseId,GroupId")] Schedule schedule)
         {
-            if (id != course.Id)
+            if (id != schedule.Id)
             {
                 return NotFound();
             }
@@ -127,12 +120,12 @@ namespace Project_U
             {
                 try
                 {
-                    _context.Update(course);
+                    _context.Update(schedule);
                     await _context.SaveChangesAsync();
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!CourseExists(course.Id))
+                    if (!ScheduleExists(schedule.Id))
                     {
                         return NotFound();
                     }
@@ -143,12 +136,12 @@ namespace Project_U
                 }
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["GroupId"] = new SelectList(_context.Groups, "Id", "Name", course.GroupId);
-            ViewData["TeacherId"] = new SelectList(_context.Users, "Id", "Id", course.TeacherId);
-            return View(course);
+            ViewData["CourseId"] = new SelectList(_context.Courses, "Id", "Description", schedule.CourseId);
+            ViewData["GroupId"] = new SelectList(_context.Groups, "Id", "Name", schedule.GroupId);
+            return View(schedule);
         }
 
-        // GET: Courses/Delete/5 — тільки Admin
+        // GET: Schedules/Delete/5 — тільки Admin
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Delete(int? id)
         {
@@ -157,37 +150,37 @@ namespace Project_U
                 return NotFound();
             }
 
-            var course = await _context.Courses
-                .Include(c => c.Group)
-                .Include(c => c.Teacher)
+            var schedule = await _context.Schedules
+                .Include(s => s.Course)
+                .Include(s => s.Group)
                 .FirstOrDefaultAsync(m => m.Id == id);
-            if (course == null)
+            if (schedule == null)
             {
                 return NotFound();
             }
 
-            return View(course);
+            return View(schedule);
         }
 
-        // POST: Courses/Delete/5
+        // POST: Schedules/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var course = await _context.Courses.FindAsync(id);
-            if (course != null)
+            var schedule = await _context.Schedules.FindAsync(id);
+            if (schedule != null)
             {
-                _context.Courses.Remove(course);
+                _context.Schedules.Remove(schedule);
             }
 
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
 
-        private bool CourseExists(int id)
+        private bool ScheduleExists(int id)
         {
-            return _context.Courses.Any(e => e.Id == id);
+            return _context.Schedules.Any(e => e.Id == id);
         }
     }
 }

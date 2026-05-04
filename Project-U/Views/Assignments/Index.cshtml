@@ -1,0 +1,65 @@
+﻿@model X.PagedList.IPagedList<ProjectU.Core.Models.Assignment>
+@using X.PagedList.Mvc.Core
+@using X.PagedList
+
+@{
+    ViewData["Title"] = "Завдання";
+}
+
+<h2>Завдання</h2>
+
+<p>
+    @if (User.IsInRole("Admin") || User.IsInRole("Teacher"))
+    {
+        <a asp-action="Create" class="btn btn-primary">➕ Створити завдання</a>
+    }
+</p>
+
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>Назва</th>
+            <th>Курс</th>
+            <th>Дедлайн</th>
+            <th>Дата створення</th>
+            <th>Дії</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>@item.Title</td>
+                <td>@(item.Course?.Name ?? "—")</td>
+                <td>
+                    @if (item.Deadline < DateTime.Now)
+                    {
+                        <span class="badge bg-danger">@item.Deadline.ToShortDateString() (прострочено)</span>
+                    }
+                    else
+                    {
+                        <span class="badge bg-success">@item.Deadline.ToShortDateString()</span>
+                    }
+                </td>
+                <td>@item.CreatedAt.ToShortDateString()</td>
+                <td>
+                    <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-sm btn-info">Деталі</a>
+                    @if (User.IsInRole("Admin") || User.IsInRole("Teacher"))
+                    {
+                        <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-sm btn-warning">Редагувати</a>
+                        <a asp-action="Delete" asp-route-id="@item.Id" class="btn btn-sm btn-danger">Видалити</a>
+                    }
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<div class="d-flex justify-content-center mt-3">
+    @Html.PagedListPager(Model, page => Url.Action("Index", new { page }),
+    new PagedListRenderOptions
+    {
+        LiElementClasses = new[] { "page-item" },
+        PageClasses = new[] { "page-link" }
+    })
+</div>

@@ -1,24 +1,23 @@
 ﻿@model ProjectU.Core.Models.LabWork
 @{
-    ViewData["Title"] = "Завантажити лабораторну";
+    ViewData["Title"] = "Здати лабораторну";
 }
 
-<h2>Завантажити лабораторну роботу</h2>
+<h2>Здати лабораторну роботу</h2>
 
 <div class="row">
     <div class="col-md-6">
         <form asp-action="Create" method="post" enctype="multipart/form-data">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
 
-            <!-- Прихований StudentId — поточний користувач -->
             <input type="hidden" name="StudentId" value="@ViewData["CurrentUserId"]" />
 
             <div class="mb-3">
-                <label asp-for="CourseId" class="form-label">Дисципліна</label>
-                <select asp-for="CourseId" asp-items="ViewBag.CourseId" class="form-select">
-                    <option value="">— Оберіть дисципліну —</option>
+                <label asp-for="AssignmentId" class="form-label">Завдання</label>
+                <select asp-for="AssignmentId" asp-items="ViewBag.AssignmentId" class="form-select">
+                    <option value="">— Оберіть завдання —</option>
                 </select>
-                <span asp-validation-for="CourseId" class="text-danger"></span>
+                <span asp-validation-for="AssignmentId" class="text-danger"></span>
             </div>
 
             <div class="mb-3">
@@ -32,7 +31,7 @@
                 <input type="file" name="uploadedFile" class="form-control" accept=".docx,.pdf" />
             </div>
 
-            <button type="submit" class="btn btn-primary">Завантажити</button>
+            <button type="submit" class="btn btn-primary">📤 Здати</button>
             <a asp-action="Index" class="btn btn-secondary">Назад</a>
         </form>
     </div>
