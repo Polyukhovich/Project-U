@@ -45,6 +45,7 @@
                 <th>Дата здачі</th>
                 <th>Плагіат</th>
                 <th>Оцінено</th>
+                <th>Дії</th>
             </tr>
         </thead>
         <tbody>
@@ -75,6 +76,12 @@
                         else
                         {
                             <span class="badge bg-warning">⏳ Ні</span>
+                        }
+                    </td>
+                    <td>
+                        @if (!submission.IsGraded && (User.IsInRole("Admin") || User.IsInRole("Teacher")))
+                        {
+                            <a asp-action="Grade" asp-route-id="@submission.Id" class="btn btn-sm btn-success">✅ Оцінити</a>
                         }
                     </td>
                 </tr>

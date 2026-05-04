@@ -6,10 +6,15 @@ using ProjectU.Data;
 using ProjectU.Data.Repositories;
 
 var builder = WebApplication.CreateBuilder(args);
+
+// SignalR
+builder.Services.AddSignalR();
 // Реєстрація сервісу антиплагіату
 builder.Services.AddScoped<ProjectU.Core.Services.PlagiarismService>();
 // Реєстрація сервісу витягування тексту з файлів
 builder.Services.AddScoped<ProjectU.Core.Services.FileTextExtractorService>();
+// Фоновий сервіс для дедлайнів
+builder.Services.AddHostedService<Project_U.Services.DeadlineNotificationService>();
 
 // Підключення бази даних
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
@@ -81,7 +86,7 @@ app.MapControllerRoute(
 
 // Маршрут для Razor Pages (Identity)
 app.MapRazorPages();
-
+app.MapHub<Project_U.Hubs.NotificationHub>("/hubs/notifications");
 
 
 // Запуск сідера ролей при старті

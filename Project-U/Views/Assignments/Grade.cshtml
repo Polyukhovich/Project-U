@@ -1,0 +1,72 @@
+﻿@using System.IO
+@model ProjectU.Core.Models.LabWork
+@{
+    ViewData["Title"] = "Оцінити роботу";
+}
+
+<h2>Оцінити роботу</h2>
+
+<div class="card mb-4">
+    <div class="card-body">
+        <dl class="row">
+            <dt class="col-sm-3">Студент</dt>
+            <dd class="col-sm-9">@(Model.Student?.Email ?? "—")</dd>
+
+            <dt class="col-sm-3">Назва роботи</dt>
+            <dd class="col-sm-9">@Model.Title</dd>
+
+            <dt class="col-sm-3">Завдання</dt>
+            <dd class="col-sm-9">@(Model.Assignment?.Title ?? "—")</dd>
+
+            <dt class="col-sm-3">Дата здачі</dt>
+            <dd class="col-sm-9">@Model.UploadedAt.ToString("dd.MM.yyyy HH:mm")</dd>
+
+            <dt class="col-sm-3">Файл</dt>
+            <dd class="col-sm-9">
+                @if (!string.IsNullOrEmpty(Model.FileName))
+                {
+                    <a href="/uploads/labworks/@Model.FileName"
+                       download="@Model.FileName"
+                       class="btn btn-sm btn-outline-primary">
+                        📥 @Model.FileName
+                    </a>
+                }
+            </dd>
+        </dl>
+    </div>
+</div>
+
+<!-- Результати антиплагіату -->
+@if (Model.PlagiarismResults != null && Model.PlagiarismResults.Any())
+{
+    <div class="card mb-4">
+        <div class="card-header">🔍 Результати антиплагіату</div>
+        <div class="card-body">
+            @foreach (var result in Model.PlagiarismResults)
+            {
+                <span class="badge @(result.SimilarityPercent > 50 ? "bg-danger" : result.SimilarityPercent > 20 ? "bg-warning" : "bg-success")">
+                    @(result.ComparedWith?.Title ?? "—"): @result.SimilarityPercent.ToString("F1")%
+                </span>
+            }
+        </div>
+    </div>
+}
+
+<!-- Форма оцінювання -->
+<div class="card">
+    <div class="card-header">📊 Виставити оцінку</div>
+    <div class="card-body">
+        <form asp-action="Grade" method="post">
+            <input type="hidden" name="labWorkId" value="@Model.Id" />
+
+            <div class="mb-3">
+                <label class="form-label">Оцінка (0-100)</label>
+                <input type="number" name="value" class="form-control"
+                       min="0" max="100" required style="max-width: 150px;" />
+            </div>
+
+            <button type="submit" class="btn btn-success">✅ Виставити оцінку</button>
+            <a asp-action="Details" asp-route-id="@Model.Assignment!.Id" class="btn btn-secondary">Назад</a>
+        </form>
+    </div>
+</div>

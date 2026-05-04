@@ -9,6 +9,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using X.PagedList.Extensions;
+using Microsoft.AspNetCore.SignalR;
+using Project_U.Hubs;
 
 namespace Controllers
 {
@@ -16,10 +18,12 @@ namespace Controllers
     public class GradesController : Controller
     {
         private readonly ApplicationDbContext _context;
+        private readonly IHubContext<NotificationHub> _hubContext;
 
-        public GradesController(ApplicationDbContext context)
+        public GradesController(ApplicationDbContext context, IHubContext<NotificationHub> hubContext)
         {
             _context = context;
+            _hubContext = hubContext;
         }
 
         // GET: Grades — Student бачить тільки свої, Teacher/Admin бачать всі
@@ -79,6 +83,27 @@ namespace Controllers
             {
                 _context.Add(grade);
                 await _context.SaveChangesAsync();
+                // Надсилаємо сповіщення студенту через SignalR
+                var student = await _context.Users.FindAsync(grade.StudentId);
+                var course = await _context.Courses.FindAsync(grade.CourseId);
+
+                if (student != null && course != null)
+                {
+                    var message = $"Вам виставлено оцінку {grade.Value} з курсу {course.Name}";
+                    await _hubContext.Clients
+                        .Group($"user_{student.Id}")
+                        .SendAsync("ReceiveNotification", message);
+
+                    // Зберігаємо сповіщення в БД
+                    _context.Notifications.Add(new Notification
+                    {
+                        UserId = student.Id,
+                        Message = message,
+                        IsRead = false,
+                        CreatedAt = DateTime.UtcNow
+                    });
+                    await _context.SaveChangesAsync();
+                }
                 return RedirectToAction(nameof(Index));
             }
             ViewData["CourseId"] = new SelectList(_context.Courses, "Id", "Description", grade.CourseId);

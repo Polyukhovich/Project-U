@@ -1,10 +1,13 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
 using ProjectU.Core.Models;
 using ProjectU.Data;
 using X.PagedList.Extensions;
+using Microsoft.AspNetCore.SignalR;
+using Project_U.Hubs;
 
 namespace Controllers
 {
@@ -12,10 +15,13 @@ namespace Controllers
     public class AssignmentsController : Controller
     {
         private readonly ApplicationDbContext _context;
+        private readonly IHubContext<NotificationHub> _hubContext;
 
-        public AssignmentsController(ApplicationDbContext context)
+        public AssignmentsController(ApplicationDbContext context, IHubContext<NotificationHub> hubContext )
         {
-            _context = context;
+            _context = context;           
+            _hubContext = hubContext;
+    
         }
 
         // GET: Assignments — всі ролі можуть переглядати
@@ -140,7 +146,72 @@ namespace Controllers
             ViewData["CourseId"] = new SelectList(courses, "Id", "Name", assignment.CourseId);
             return View(assignment);
         }
+        // GET: Assignments/Grade/5 — оцінити здачу
+        [Authorize(Roles = "Admin,Teacher")]
+        public async Task<IActionResult> Grade(int? id)
+        {
+            if (id == null) return NotFound();
 
+            var submission = await _context.LabWorks
+                .Include(l => l.Student)
+                .Include(l => l.Assignment)
+                .FirstOrDefaultAsync(l => l.Id == id);
+
+            if (submission == null) return NotFound();
+
+            return View(submission);
+        }
+
+        // POST: Assignments/Grade
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Admin,Teacher")]
+        public async Task<IActionResult> Grade(int labWorkId, int value)
+        {
+            var labWork = await _context.LabWorks
+                .Include(l => l.Assignment)
+                .FirstOrDefaultAsync(l => l.Id == labWorkId);
+
+            if (labWork == null) return NotFound();
+
+            // Зберігаємо оцінку
+            var grade = new Grade
+            {
+                Value = value,
+                StudentId = labWork.StudentId,
+                CourseId = labWork.Assignment!.CourseId,
+                LabWorkId = labWork.Id,
+                CreatedAt = DateTime.UtcNow
+            };
+
+            _context.Grades.Add(grade);
+
+            // Позначаємо роботу як оцінену
+            labWork.IsGraded = true;
+            _context.Update(labWork);
+
+            await _context.SaveChangesAsync();
+
+            // Надсилаємо сповіщення через SignalR
+            var course = await _context.Courses.FindAsync(labWork.Assignment.CourseId);
+            var message = $"Вам виставлено оцінку {value} з курсу {course?.Name}";
+
+            await _hubContext.Clients
+                .Group($"user_{labWork.StudentId}")
+                .SendAsync("ReceiveNotification", message);
+
+            _context.Notifications.Add(new Notification
+            {
+                UserId = labWork.StudentId,
+                Message = message,
+                IsRead = false,
+                CreatedAt = DateTime.UtcNow
+            });
+
+            await _context.SaveChangesAsync();
+
+            return RedirectToAction(nameof(Details), new { id = labWork.Assignment.Id });
+        }
         // GET: Assignments/Delete/5 — тільки Admin та Teacher
         [Authorize(Roles = "Admin,Teacher")]
         public async Task<IActionResult> Delete(int? id)

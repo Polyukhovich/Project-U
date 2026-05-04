@@ -1,15 +1,17 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
+using Project_U.Hubs;
 using ProjectU.Core.Models;
+using ProjectU.Core.Services;
 using ProjectU.Data;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using X.PagedList.Extensions;
-using ProjectU.Core.Services;
 
 
 namespace Controllers
@@ -21,16 +23,19 @@ namespace Controllers
         private readonly PlagiarismService _plagiarismService;
         private readonly FileTextExtractorService _fileExtractor;
         private readonly IWebHostEnvironment _environment;
+        private readonly IHubContext<NotificationHub> _hubContext;
 
         public LabWorksController(ApplicationDbContext context,
                PlagiarismService plagiarismService, 
                FileTextExtractorService fileExtractor,
-               IWebHostEnvironment environment)
+               IWebHostEnvironment environment,
+               IHubContext<NotificationHub> hubContext)
         {
             _context = context;
             _plagiarismService = plagiarismService;
             _fileExtractor = fileExtractor;
             _environment = environment;
+            _hubContext = hubContext;
         }
 
         // GET: LabWorks — всі ролі можуть переглядати
@@ -158,6 +163,63 @@ namespace Controllers
                 }
 
                 await _context.SaveChangesAsync();
+                // Сповіщення студенту про результат антиплагіату
+                if (otherWorks.Any())
+                {
+                    var maxSimilarity = otherWorks
+                        .Select(w => _plagiarismService.CompareTexts(labWork.Content, w.Content))
+                        .Max();
+
+                    string plagMessage;
+                    if (maxSimilarity > 50)
+                        plagMessage = $"⚠️ Висока схожість ({maxSimilarity:F1}%) виявлена у вашій роботі '{labWork.Title}'";
+                    else if (maxSimilarity > 20)
+                        plagMessage = $"⚡ Середня схожість ({maxSimilarity:F1}%) виявлена у вашій роботі '{labWork.Title}'";
+                    else
+                        plagMessage = $"✅ Робота '{labWork.Title}' пройшла перевірку ({maxSimilarity:F1}% схожості)";
+
+                    await _hubContext.Clients
+                        .Group($"user_{labWork.StudentId}")
+                        .SendAsync("ReceiveNotification", plagMessage);
+
+                    _context.Notifications.Add(new Notification
+                    {
+                        UserId = labWork.StudentId,
+                        Message = plagMessage,
+                        IsRead = false,
+                        CreatedAt = DateTime.UtcNow
+                    });
+                    await _context.SaveChangesAsync();
+                }
+                // Сповіщення викладачу про здачу роботи
+                var submittedAssignment = await _context.Assignments
+                    .Include(a => a.Course)
+                    .FirstOrDefaultAsync(a => a.Id == labWork.AssignmentId);
+
+                if (submittedAssignment?.Course != null)
+                {
+                    var teacher = await _context.Users
+                        .FirstOrDefaultAsync(u => u.Id == submittedAssignment.Course.TeacherId);
+
+                    if (teacher != null)
+                    {
+                        var student = await _context.Users.FindAsync(labWork.StudentId);
+                        var message = $"Студент {student?.Email} здав роботу '{labWork.Title}' до завдання '{submittedAssignment.Title}'";
+
+                        await _hubContext.Clients
+                            .Group($"user_{teacher.Id}")
+                            .SendAsync("ReceiveNotification", message);
+
+                        _context.Notifications.Add(new Notification
+                        {
+                            UserId = teacher.Id,
+                            Message = message,
+                            IsRead = false,
+                            CreatedAt = DateTime.UtcNow
+                        });
+                        await _context.SaveChangesAsync();
+                    }
+                }
                 return RedirectToAction(nameof(Index));
             }
 

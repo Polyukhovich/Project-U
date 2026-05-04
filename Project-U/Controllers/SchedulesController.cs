@@ -1,7 +1,9 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
+using Project_U.Hubs;
 using ProjectU.Core.Models;
 using ProjectU.Data;
 using System;
@@ -16,10 +18,13 @@ namespace Controllers
     public class SchedulesController : Controller
     {
         private readonly ApplicationDbContext _context;
+        private readonly IHubContext<NotificationHub> _hubContext;
 
-        public SchedulesController(ApplicationDbContext context)
+        public SchedulesController(ApplicationDbContext context,
+               IHubContext<NotificationHub> hubContext)
         {
             _context = context;
+            _hubContext = hubContext;
         }
 
         // GET: Schedules — всі ролі можуть переглядати
@@ -122,6 +127,33 @@ namespace Controllers
                 {
                     _context.Update(schedule);
                     await _context.SaveChangesAsync();
+                    // Сповіщення всім студентам групи про зміну розкладу
+                    var updatedSchedule = await _context.Schedules
+                        .Include(s => s.Course)
+                        .Include(s => s.Group)
+                            .ThenInclude(g => g.Students)
+                        .FirstOrDefaultAsync(s => s.Id == schedule.Id);
+
+                    if (updatedSchedule?.Group?.Students != null)
+                    {
+                        var message = $"Змінено розклад: {updatedSchedule.Course?.Name} — {updatedSchedule.DayOfWeek} {updatedSchedule.StartTime}";
+
+                        foreach (var student in updatedSchedule.Group.Students)
+                        {
+                            await _hubContext.Clients
+                                .Group($"user_{student.Id}")
+                                .SendAsync("ReceiveNotification", message);
+
+                            _context.Notifications.Add(new Notification
+                            {
+                                UserId = student.Id,
+                                Message = message,
+                                IsRead = false,
+                                CreatedAt = DateTime.UtcNow
+                            });
+                        }
+                        await _context.SaveChangesAsync();
+                    }
                 }
                 catch (DbUpdateConcurrencyException)
                 {
@@ -134,6 +166,7 @@ namespace Controllers
                         throw;
                     }
                 }
+
                 return RedirectToAction(nameof(Index));
             }
             ViewData["CourseId"] = new SelectList(_context.Courses, "Id", "Description", schedule.CourseId);
