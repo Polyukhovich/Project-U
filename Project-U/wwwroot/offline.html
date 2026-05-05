@@ -1,0 +1,90 @@
+﻿<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Project U — Офлайн</title>
+    <style>
+        body {
+            font-family: 'Times New Roman', sans-serif;
+            background: #1a1a2e;
+            color: white;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+        }
+
+        .container {
+            text-align: center;
+            padding: 40px;
+        }
+
+        .icon {
+            font-size: 5rem;
+            margin-bottom: 20px;
+        }
+
+        h1 {
+            font-size: 2rem;
+            margin-bottom: 10px;
+        }
+
+        p {
+            color: rgba(255,255,255,0.7);
+            margin-bottom: 30px;
+        }
+
+        .btn {
+            background: #6c5ce7;
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 8px;
+            font-size: 1rem;
+            cursor: pointer;
+            text-decoration: none;
+        }
+
+            .btn:hover {
+                background: #5a4bd1;
+            }
+
+        .available {
+            margin-top: 30px;
+            padding: 20px;
+            background: rgba(255,255,255,0.05);
+            border-radius: 10px;
+        }
+
+            .available h3 {
+                margin-bottom: 10px;
+            }
+
+            .available a {
+                display: inline-block;
+                margin: 5px;
+                padding: 8px 15px;
+                background: rgba(108,92,231,0.3);
+                border-radius: 6px;
+                color: white;
+                text-decoration: none;
+            }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="icon">📡</div>
+        <h1>Немає підключення до інтернету</h1>
+        <p>Перевірте підключення та спробуйте знову</p>
+        <a href="/" class="btn" onclick="window.location.reload()">🔄 Спробувати знову</a>
+
+        <div class="available">
+            <h3>📋 Доступно офлайн:</h3>
+            <a href="/Schedules">📅 Розклад</a>
+            <a href="/Grades">📊 Оцінки</a>
+        </div>
+    </div>
+</body>
+</html>
