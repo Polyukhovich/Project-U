@@ -83,6 +83,32 @@ namespace Controllers
                 assignment.CreatedAt = DateTime.UtcNow;
                 _context.Add(assignment);
                 await _context.SaveChangesAsync();
+                // Сповіщення студентам групи про нове завдання
+                var course = await _context.Courses
+                    .Include(c => c.Group)
+                        .ThenInclude(g => g.Students)
+                    .FirstOrDefaultAsync(c => c.Id == assignment.CourseId);
+
+                if (course?.Group?.Students != null)
+                {
+                    var message = $"📋 Новe завдання: '{assignment.Title}' з курсу '{course.Name}'. Дедлайн: {assignment.Deadline:dd.MM.yyyy HH:mm}";
+
+                    foreach (var student in course.Group.Students)
+                    {
+                        await _hubContext.Clients
+                            .Group($"user_{student.Id}")
+                            .SendAsync("ReceiveNotification", message);
+
+                        _context.Notifications.Add(new Notification
+                        {
+                            UserId = student.Id,
+                            Message = message,
+                            IsRead = false,
+                            CreatedAt = DateTime.UtcNow
+                        });
+                    }
+                    await _context.SaveChangesAsync();
+                }
                 return RedirectToAction(nameof(Index));
             }
 
@@ -128,6 +154,32 @@ namespace Controllers
                     assignment.CreatedAt = DateTime.UtcNow;
                     _context.Update(assignment);
                     await _context.SaveChangesAsync();
+                    // Сповіщення студентам про зміну завдання
+                    var editedCourse = await _context.Courses
+                        .Include(c => c.Group)
+                            .ThenInclude(g => g.Students)
+                        .FirstOrDefaultAsync(c => c.Id == assignment.CourseId);
+
+                    if (editedCourse?.Group?.Students != null)
+                    {
+                        var message = $"✏️ Завдання '{assignment.Title}' було оновлено. Новий дедлайн: {assignment.Deadline:dd.MM.yyyy HH:mm}";
+
+                        foreach (var student in editedCourse.Group.Students)
+                        {
+                            await _hubContext.Clients
+                                .Group($"user_{student.Id}")
+                                .SendAsync("ReceiveNotification", message);
+
+                            _context.Notifications.Add(new Notification
+                            {
+                                UserId = student.Id,
+                                Message = message,
+                                IsRead = false,
+                                CreatedAt = DateTime.UtcNow
+                            });
+                        }
+                        await _context.SaveChangesAsync();
+                    }
                 }
                 catch (DbUpdateConcurrencyException)
                 {
@@ -233,6 +285,35 @@ namespace Controllers
         [Authorize(Roles = "Admin,Teacher")]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
+            // Сповіщення студентам про видалення завдання
+            var deletedAssignment = await _context.Assignments
+                .Include(a => a.Course)
+                    .ThenInclude(c => c.Group)
+                        .ThenInclude(g => g.Students)
+                .FirstOrDefaultAsync(a => a.Id == id);
+
+            if (deletedAssignment?.Course?.Group?.Students != null)
+            {
+                var message = $"❌ Завдання '{deletedAssignment.Title}' з курсу '{deletedAssignment.Course.Name}' було видалено";
+
+                foreach (var student in deletedAssignment.Course.Group.Students)
+                {
+                    await _hubContext.Clients
+                        .Group($"user_{student.Id}")
+                        .SendAsync("ReceiveNotification", message);
+
+                    _context.Notifications.Add(new Notification
+                    {
+                        UserId = student.Id,
+                        Message = message,
+                        IsRead = false,
+                        CreatedAt = DateTime.UtcNow
+                    });
+                }
+                await _context.SaveChangesAsync();
+            }
+
+            // Тепер видаляємо
             var assignment = await _context.Assignments.FindAsync(id);
             if (assignment != null)
             {

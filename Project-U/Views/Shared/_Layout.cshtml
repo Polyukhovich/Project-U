@@ -214,16 +214,27 @@
                     document.getElementById('notificationDropdown').style.display = 'none';
                 }
             });
+           
+                        function getNotificationUrl(message) {
+                if (message.includes('оцінку')) return '/Grades';
+                if (message.includes('здав роботу') || message.includes('роботу')) return '/Assignments';
+                if (message.includes('розклад')) return '/Schedules';
+                if (message.includes('дедлайн') || message.includes('Дедлайн')) return '/Assignments';
+                if (message.includes('схожість') || message.includes('перевірку')) return '/LabWorks';
+                return '/';
+            }
             // ===== Генерація HTML сповіщення =====
             function buildNotificationHtml(n) {
                 var bg = n.isRead ? 'white' : '#f0eeff';
                 var badge = n.isRead ? '' : '<span style="float:right; background:#6c5ce7; color:white; border-radius:10px; padding:1px 8px; font-size:0.7rem;">Нове</span>';
-                return '<div style="padding:12px 15px; border-bottom:1px solid #f0f0f0; background:' + bg + '; cursor:pointer;" onclick="readAndGo(' + n.id + ', \'/Grades\')">'
+                var url = getNotificationUrl(n.message);
+                return '<div style="padding:12px 15px; border-bottom:1px solid #f0f0f0; background:' + bg + '; cursor:pointer;" onclick="readAndGo(' + n.id + ', \'' + url + '\')">'
                     + '<div style="font-size:0.85rem; color:#333;">' + n.message + '</div>'
                     + '<div style="font-size:0.75rem; color:#999; margin-top:3px;">🕐 ' + n.createdAt + '</div>'
                     + badge
                     + '</div>';
             }
+            
             // ===== Завантаження сповіщень =====
             function loadNotifications() {
                 fetch('/Notifications/GetNotifications')

@@ -34,11 +34,11 @@
                 <td>
                     @if (item.Deadline < DateTime.Now)
                     {
-                        <span class="badge bg-danger">@item.Deadline.ToShortDateString() (прострочено)</span>
+                        <span class="badge bg-danger">@item.Deadline.ToString("dd.MM.yyyy HH:mm") (прострочено)</span>
                     }
                     else
                     {
-                        <span class="badge bg-success">@item.Deadline.ToShortDateString()</span>
+                        <span class="badge bg-success">@item.Deadline.ToString("dd.MM.yyyy HH:mm")</span>
                     }
                 </td>
                 <td>@item.CreatedAt.ToShortDateString()</td>

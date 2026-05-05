@@ -28,8 +28,8 @@ namespace Project_U.Services
             while (!stoppingToken.IsCancellationRequested)
             {
                 await CheckDeadlines();
-                // Перевіряємо кожну годину
-                await Task.Delay(TimeSpan.FromHours(1), stoppingToken);
+                // Перевіряємо кожні 15 хв
+                await Task.Delay(TimeSpan.FromMinutes(15), stoppingToken);
             }
         }
 
@@ -63,6 +63,11 @@ namespace Project_U.Services
                     var alreadySubmitted = await context.LabWorks
                         .AnyAsync(l => l.AssignmentId == assignment.Id && l.StudentId == student.Id);
 
+                    // Перевіряємо чи вже надсилали сповіщення про цей дедлайн
+                    var alreadyNotified = await context.Notifications
+                        .AnyAsync(n => n.UserId == student.Id
+                                    && n.Message.Contains(assignment.Title)
+                                    && n.Message.Contains("дедлайну"));
                     if (!alreadySubmitted)
                     {
                         await _hubContext.Clients
