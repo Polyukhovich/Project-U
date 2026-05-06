@@ -18,6 +18,9 @@
     <link rel="apple-touch-icon" href="/icons/icon-192.png" />
 </head>
 <body>
+    <!-- Overlay для мобільних -->
+    <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
+
     <!-- Боковий бар -->
     <div class="sidebar" id="sidebar">
         <a class="sidebar-brand" asp-controller="Home" asp-action="Index">
@@ -155,34 +158,55 @@
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
     <script>
-            function toggleSidebar() {
-                const sidebar = document.getElementById('sidebar');
-                const mainContent = document.getElementById('mainContent');
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            const mainContent = document.getElementById('mainContent');
+            const overlay = document.getElementById('sidebarOverlay');
 
-                if (window.innerWidth <= 768) {
-                    sidebar.classList.toggle('mobile-open');
-                } else {
-                    sidebar.classList.toggle('collapsed');
-                    mainContent.classList.toggle('expanded');
-                }
+            if (window.innerWidth <= 991) {
+                sidebar.classList.toggle('mobile-open');
+                overlay.classList.toggle('active');
+            } else {
+                sidebar.classList.toggle('collapsed');
+                mainContent.classList.toggle('expanded');
             }
+        }
 
-            document.addEventListener('click', function(e) {
-                const sidebar = document.getElementById('sidebar');
-                const toggleBtn = document.querySelector('.toggle-btn');
+        // Закриття при кліку поза меню (на мобільних)
+        document.addEventListener('click', function(e) {
+            const sidebar = document.getElementById('sidebar');
+            const toggleBtn = document.querySelector('.toggle-btn');
+            const overlay = document.getElementById('sidebarOverlay');
 
-                if (window.innerWidth <= 768 &&
-                    !sidebar.contains(e.target) &&
-                    !toggleBtn.contains(e.target)) {
-                    sidebar.classList.remove('mobile-open');
+            if (window.innerWidth <= 991 &&
+                !sidebar.contains(e.target) &&
+                !toggleBtn.contains(e.target)) {
+
+                sidebar.classList.remove('mobile-open');
+                overlay.classList.remove('active'); // Важливо: ховаємо і оверлей теж
+           
+                // Розблоковуємо скрол, якщо клікнули повз меню
+                document.body.classList.remove('no-scroll');
                 }
-            });
+        });
 
-            document.querySelectorAll('.sidebar .nav-link').forEach(link => {
-                if (link.href === window.location.href) {
-                    link.classList.add('active');
-                }
-            });
+        // Підсвічування активного посилання
+        document.querySelectorAll('.sidebar .nav-link').forEach(link => {
+            if (link.href === window.location.href) {
+                link.classList.add('active');
+            }
+        });
+
+        // Обробник зміни розміру вікна (очищений)
+        window.addEventListener('resize', function() {
+            // Просто скидаємо мобільні класи, якщо екран став великим
+            if (window.innerWidth > 991) {
+                document.getElementById('sidebar').classList.remove('mobile-open');
+                document.getElementById('sidebarOverlay').classList.remove('active');
+            // Точно розблоковуємо скрол, якщо перевернули телефон або розтягнули вікно
+        document.body.classList.remove('no-scroll');
+            }
+        });
     </script>
     <!-- SignalR клієнт -->
     <script src="~/lib/signalr/dist/browser/signalr.js"></script>

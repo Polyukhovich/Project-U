@@ -78,7 +78,7 @@
         <div class="icon">📡</div>
         <h1>Немає підключення до інтернету</h1>
         <p>Перевірте підключення та спробуйте знову</p>
-        <a href="/" class="btn" onclick="window.location.reload()">🔄 Спробувати знову</a>
+        <a href="/" class="btn" onclick="checkConnection(event)">🔄 Спробувати знову</a>
 
         <div class="available">
             <h3>📋 Доступно офлайн:</h3>
@@ -86,5 +86,22 @@
             <a href="/Grades">📊 Оцінки</a>
         </div>
     </div>
+    <script>
+        function checkConnection(e) {
+            e.preventDefault();
+            if (navigator.onLine) {
+                window.location.href = '/';
+            } else {
+                const btn = document.querySelector('.btn');
+                btn.textContent = '❌ Немає з\'єднання';
+                setTimeout(() => btn.textContent = '🔄 Спробувати знову', 2000);
+            }
+        }
+
+        // Автоматично перенаправляємо коли з'явиться інтернет
+        window.addEventListener('online', function () {
+            window.location.href = '/';
+        });
+    </script>
 </body>
 </html>
