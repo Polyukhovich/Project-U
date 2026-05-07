@@ -6,21 +6,13 @@
 <h2>⚙️ Налаштування</h2>
 
 <div class="row">
-    <!-- Профіль -->
+    <!-- Акаунт -->
     <div class="col-md-6 mb-4">
         <div class="card">
-            <div class="card-header">👤 Профіль</div>
+            <div class="card-header">👤 Акаунт</div>
             <div class="card-body">
-                <dl class="row">
-                    <dt class="col-sm-4">Ім'я</dt>
-                    <dd class="col-sm-8">@Model?.FirstName</dd>
-                    <dt class="col-sm-4">Прізвище</dt>
-                    <dd class="col-sm-8">@Model?.LastName</dd>
-                    <dt class="col-sm-4">Email</dt>
-                    <dd class="col-sm-8">@Model?.Email</dd>
-                </dl>
-                <a asp-area="Identity" asp-page="/Account/Manage/Index" class="btn btn-outline-primary btn-sm">✏️ Редагувати профіль</a>
-                <a asp-area="Identity" asp-page="/Account/Manage/ChangePassword" class="btn btn-outline-warning btn-sm">🔑 Змінити пароль</a>
+                <a asp-area="Identity" asp-page="/Account/Manage/Index" class="btn btn-outline-primary w-100 mb-2">✏️ Редагувати профіль</a>
+                <a asp-area="Identity" asp-page="/Account/Manage/ChangePassword" class="btn btn-outline-warning w-100">🔑 Змінити пароль</a>
             </div>
         </div>
     </div>
@@ -33,12 +25,8 @@
                 <form asp-controller="SelectLanguage" asp-action="SetLanguage" method="post">
                     <input type="hidden" name="returnUrl" value="/Settings" />
                     <div class="d-grid gap-2">
-                        <button type="submit" name="cultureName" value="uk-UA" class="btn btn-outline-primary">
-                            🇺🇦 Українська
-                        </button>
-                        <button type="submit" name="cultureName" value="en-US" class="btn btn-outline-secondary">
-                            🇺🇸 English
-                        </button>
+                        <button type="submit" name="cultureName" value="uk-UA" class="btn btn-outline-primary">🇺🇦 Українська</button>
+                        <button type="submit" name="cultureName" value="en-US" class="btn btn-outline-secondary">🇺🇸 English</button>
                     </div>
                 </form>
             </div>
@@ -50,38 +38,20 @@
         <div class="card">
             <div class="card-header">🎨 Тема оформлення</div>
             <div class="card-body">
-                <div class="d-grid gap-2">
-                    <button onclick="setTheme('dark')" class="btn btn-outline-dark">🌙 Темна тема</button>
-                    <button onclick="setTheme('light')" class="btn btn-outline-secondary">☀️ Світла тема</button>
-                    <button onclick="setTheme('purple')" class="btn btn-outline-primary" style="background:#6c5ce7; color:white;">💜 Фіолетова</button>
-                    <button onclick="setTheme('green')" class="btn btn-outline-success">💚 Зелена</button>
-                    <button onclick="setTheme('blue')" class="btn btn-outline-info">💙 Синя</button>
+                <div class="d-flex flex-wrap gap-2">
+                    <button onclick="setTheme('default')" class="btn btn-sm btn-outline-secondary">⚪ Стандартна</button>
+                    <button onclick="setTheme('dark')" class="btn btn-sm btn-dark">🌙 Темна</button>
+                    <button onclick="setTheme('green')" class="btn btn-sm btn-success">💚 Зелена</button>
+                    <button onclick="setTheme('blue')" class="btn btn-sm btn-primary">💙 Синя</button>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Сповіщення -->
-    <div class="col-md-6 mb-4">
-        <div class="card">
-            <div class="card-header">🔔 Сповіщення</div>
-            <div class="card-body">
-                <div class="form-check form-switch mb-2">
-                    <input class="form-check-input" type="checkbox" id="browserNotif" onchange="toggleBrowserNotif(this)">
-                    <label class="form-check-label" for="browserNotif">Browser сповіщення</label>
-                </div>
-                <div class="form-check form-switch mb-2">
-                    <input class="form-check-input" type="checkbox" id="soundNotif" onchange="toggleSound(this)" checked>
-                    <label class="form-check-label" for="soundNotif">Звук сповіщень</label>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Акаунт -->
+    <!-- Вихід -->
     <div class="col-md-6 mb-4">
         <div class="card border-danger">
-            <div class="card-header text-danger">⚠️ Акаунт</div>
+            <div class="card-header text-danger">⚠️ Небезпечна зона</div>
             <div class="card-body">
                 <form asp-area="Identity" asp-page="/Account/Logout" method="post">
                     <button type="submit" class="btn btn-danger w-100">🚪 Вийти з акаунту</button>
@@ -93,55 +63,14 @@
 
 @section Scripts {
     <script>
-        // ===== Тема =====
-                function setTheme(theme) {
-            // Видаляємо всі теми
-            document.body.classList.remove('theme-dark', 'theme-green', 'theme-blue', 'theme-purple');
-
-            // Додаємо нову
-            if (theme !== 'default') {
-                document.body.classList.add(`theme-${theme}`);
-            }
-
-            // Оновлюємо sidebar accent
-            const accent = {
-                dark: '#6c5ce7',
-                green: '#38a169',
-                blue: '#3182ce',
-                purple: '#6c5ce7',
-                default: '#6c5ce7'
-            }[theme] || '#6c5ce7';
-
-            document.querySelector('.sidebar').style.background =
-                getComputedStyle(document.documentElement).getPropertyValue('--sidebar-bg');
-
+        function setTheme(theme) {
+            document.body.classList.remove('theme-dark', 'theme-green', 'theme-blue');
+            if (theme !== 'default') document.body.classList.add('theme-' + theme);
             localStorage.setItem('theme', theme);
-        }
-
-        // Завантажуємо тему при старті
-        const savedTheme = localStorage.getItem('theme');
-        if (savedTheme) setTheme(savedTheme);
-
-        // ===== Browser сповіщення =====
-        const browserNotifCheckbox = document.getElementById('browserNotif');
-        browserNotifCheckbox.checked = Notification.permission === 'granted';
-
-        function toggleBrowserNotif(checkbox) {
-            if (checkbox.checked) {
-                Notification.requestPermission().then(p => {
-                    checkbox.checked = p === 'granted';
-                });
-            }
-        }
-
-        // ===== Звук =====
-        function toggleSound(checkbox) {
-            localStorage.setItem('soundEnabled', checkbox.checked);
-        }
-
-        const soundEnabled = localStorage.getItem('soundEnabled');
-        if (soundEnabled !== null) {
-            document.getElementById('soundNotif').checked = soundEnabled === 'true';
+            const btn = event.target;
+            const original = btn.textContent;
+            btn.textContent = '✅ Застосовано!';
+            setTimeout(() => btn.textContent = original, 1500);
         }
     </script>
 }

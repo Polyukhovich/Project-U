@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using ProjectU.Core.Models;
 
-namespace Controllers
+namespace Project_U.Controllers
 {
     [Authorize]
     public class SettingsController : Controller
