@@ -6,7 +6,6 @@ using Microsoft.EntityFrameworkCore;
 using ProjectU.Core.Models;
 using ProjectU.Data;
 using X.PagedList.Extensions;
-using Microsoft.AspNetCore.SignalR;
 using Project_U.Hubs;
 
 namespace Controllers
@@ -16,15 +15,19 @@ namespace Controllers
     {
         private readonly ApplicationDbContext _context;
         private readonly IHubContext<NotificationHub> _hubContext;
+        private readonly IWebHostEnvironment _environment;
 
-        public AssignmentsController(ApplicationDbContext context, IHubContext<NotificationHub> hubContext )
+        public AssignmentsController(ApplicationDbContext context,
+            IHubContext<NotificationHub> hubContext, 
+            IWebHostEnvironment environment)
         {
-            _context = context;           
+            _context = context;
             _hubContext = hubContext;
-    
+            _environment = environment;
         }
 
         // GET: Assignments — всі ролі можуть переглядати
+        [HttpGet]
         [Authorize(Roles = "Admin,Teacher,Student")]
         public async Task<IActionResult> Index(int page = 1)
         {
@@ -37,6 +40,7 @@ namespace Controllers
         }
 
         // GET: Assignments/Details/5
+        [HttpGet]
         [Authorize(Roles = "Admin,Teacher,Student")]
         public async Task<IActionResult> Details(int? id)
         {
@@ -57,6 +61,7 @@ namespace Controllers
         }
 
         // GET: Assignments/Create — тільки Teacher та Admin
+        [HttpGet]
         [Authorize(Roles = "Admin,Teacher")]
         public async Task<IActionResult> Create()
         {
@@ -76,14 +81,34 @@ namespace Controllers
         [HttpPost]
         [ValidateAntiForgeryToken]
         [Authorize(Roles = "Admin,Teacher")]
-        public async Task<IActionResult> Create([Bind("Id,Title,Description,Deadline,CourseId")] Assignment assignment)
+        public async Task<IActionResult> Create([Bind("Id,Title,Description,Deadline,CourseId,MaterialType,MaterialUrl,AllowDownload")] Assignment assignment, IFormFile? materialFile)
         {
             if (ModelState.IsValid)
             {
                 assignment.CreatedAt = DateTime.UtcNow;
+
+                // Обробка файлу матеріалу
+                if (assignment.MaterialType == "File" && materialFile != null && materialFile.Length > 0)
+                {
+                    var uploadsFolder = Path.Combine(_environment.WebRootPath, "uploads", "materials");
+                    Directory.CreateDirectory(uploadsFolder);
+
+                    var uniqueFileName = $"{Guid.NewGuid()}{Path.GetExtension(materialFile.FileName)}";
+                    var filePath = Path.Combine(uploadsFolder, uniqueFileName);
+
+                    using (var stream = new FileStream(filePath, FileMode.Create))
+                    {
+                        await materialFile.CopyToAsync(stream);
+                    }
+
+                    assignment.MaterialFilePath = filePath;
+                    assignment.MaterialFileName = materialFile.FileName;
+                }
+
                 _context.Add(assignment);
                 await _context.SaveChangesAsync();
-                // Сповіщення студентам групи про нове завдання
+
+                // Сповіщення студентам
                 var course = await _context.Courses
                     .Include(c => c.Group)
                         .ThenInclude(g => g.Students)
@@ -91,7 +116,7 @@ namespace Controllers
 
                 if (course?.Group?.Students != null)
                 {
-                    var message = $"📋 Новe завдання: '{assignment.Title}' з курсу '{course.Name}'. Дедлайн: {assignment.Deadline:dd.MM.yyyy HH:mm}";
+                    var message = $"📋 Нове завдання: '{assignment.Title}' з курсу '{course.Name}'. Дедлайн: {assignment.Deadline:dd.MM.yyyy HH:mm}";
 
                     foreach (var student in course.Group.Students)
                     {
@@ -109,6 +134,7 @@ namespace Controllers
                     }
                     await _context.SaveChangesAsync();
                 }
+
                 return RedirectToAction(nameof(Index));
             }
 
@@ -122,6 +148,7 @@ namespace Controllers
         }
 
         // GET: Assignments/Edit/5 — тільки Teacher та Admin
+        [HttpGet]
         [Authorize(Roles = "Admin,Teacher")]
         public async Task<IActionResult> Edit(int? id)
         {
@@ -143,17 +170,38 @@ namespace Controllers
         [HttpPost]
         [ValidateAntiForgeryToken]
         [Authorize(Roles = "Admin,Teacher")]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,Title,Description,Deadline,CourseId")] Assignment assignment)
+        public async Task<IActionResult> Edit(int id, [Bind("Id,Title,Description,Deadline,CourseId,MaterialType,MaterialUrl,MaterialFilePath,MaterialFileName,AllowDownload")] Assignment assignment, IFormFile? materialFile)
         {
             if (id != assignment.Id) return NotFound();
+            // Прибираємо валідацію дедлайну при редагуванні
+            ModelState.Remove("Deadline");
 
             if (ModelState.IsValid)
             {
                 try
                 {
+                    // Обробка нового файлу матеріалу
+                    if (assignment.MaterialType == "File" && materialFile != null && materialFile.Length > 0)
+                    {
+                        var uploadsFolder = Path.Combine(_environment.WebRootPath, "uploads", "materials");
+                        Directory.CreateDirectory(uploadsFolder);
+
+                        var uniqueFileName = $"{Guid.NewGuid()}{Path.GetExtension(materialFile.FileName)}";
+                        var filePath = Path.Combine(uploadsFolder, uniqueFileName);
+
+                        using (var stream = new FileStream(filePath, FileMode.Create))
+                        {
+                            await materialFile.CopyToAsync(stream);
+                        }
+
+                        assignment.MaterialFilePath = filePath;
+                        assignment.MaterialFileName = materialFile.FileName;
+                    }
+
                     assignment.CreatedAt = DateTime.UtcNow;
                     _context.Update(assignment);
                     await _context.SaveChangesAsync();
+
                     // Сповіщення студентам про зміну завдання
                     var editedCourse = await _context.Courses
                         .Include(c => c.Group)
@@ -198,7 +246,9 @@ namespace Controllers
             ViewData["CourseId"] = new SelectList(courses, "Id", "Name", assignment.CourseId);
             return View(assignment);
         }
+
         // GET: Assignments/Grade/5 — оцінити здачу
+        [HttpGet]
         [Authorize(Roles = "Admin,Teacher")]
         public async Task<IActionResult> Grade(int? id)
         {
@@ -264,7 +314,51 @@ namespace Controllers
 
             return RedirectToAction(nameof(Details), new { id = labWork.Assignment.Id });
         }
+        // Перегляд матеріалу
+        [Authorize(Roles = "Admin,Teacher,Student")]
+        public async Task<IActionResult> ViewMaterial(int? id)
+        {
+            if (id == null) return NotFound();
+
+            var assignment = await _context.Assignments.FindAsync(id);
+            if (assignment == null) return NotFound();
+
+            if (string.IsNullOrEmpty(assignment.MaterialFilePath) ||
+                !System.IO.File.Exists(assignment.MaterialFilePath))
+                return NotFound("Файл не знайдено");
+
+            var fileBytes = await System.IO.File.ReadAllBytesAsync(assignment.MaterialFilePath);
+            var contentType = assignment.MaterialFileName!.EndsWith(".pdf")
+                ? "application/pdf"
+                : "application/vnd.openxmlformats-officedocument.wordprocessingml.document";
+
+            // Для перегляду без завантаження
+            Response.Headers.Add("Content-Disposition", "inline; filename=" + assignment.MaterialFileName);
+            return File(fileBytes, contentType);
+        }
+
+        // Завантаження матеріалу
+        [Authorize(Roles = "Admin,Teacher,Student")]
+        public async Task<IActionResult> DownloadMaterial(int? id)
+        {
+            if (id == null) return NotFound();
+
+            var assignment = await _context.Assignments.FindAsync(id);
+            if (assignment == null || !assignment.AllowDownload) return NotFound();
+
+            if (string.IsNullOrEmpty(assignment.MaterialFilePath) ||
+                !System.IO.File.Exists(assignment.MaterialFilePath))
+                return NotFound("Файл не знайдено");
+
+            var fileBytes = await System.IO.File.ReadAllBytesAsync(assignment.MaterialFilePath);
+            var contentType = assignment.MaterialFileName!.EndsWith(".pdf")
+                ? "application/pdf"
+                : "application/vnd.openxmlformats-officedocument.wordprocessingml.document";
+
+            return File(fileBytes, contentType, assignment.MaterialFileName);
+        }
         // GET: Assignments/Delete/5 — тільки Admin та Teacher
+        [HttpGet]
         [Authorize(Roles = "Admin,Teacher")]
         public async Task<IActionResult> Delete(int? id)
         {

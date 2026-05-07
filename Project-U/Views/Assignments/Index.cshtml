@@ -14,7 +14,7 @@
         <a asp-action="Create" class="btn btn-primary">➕ Створити завдання</a>
     }
 </p>
-
+<div class="table-responsive">
 <table class="table table-striped">
     <thead>
         <tr>
@@ -54,7 +54,7 @@
         }
     </tbody>
 </table>
-
+</div>
 <div class="d-flex justify-content-center mt-3">
     @Html.PagedListPager(Model, page => Url.Action("Index", new { page }),
     new PagedListRenderOptions

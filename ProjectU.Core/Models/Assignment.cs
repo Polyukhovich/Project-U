@@ -30,6 +30,19 @@ namespace ProjectU.Core.Models
         // Дата створення
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
+        // Тип матеріалу: None, File, Link
+        public string MaterialType { get; set; } = "None";
+
+        // Посилання на матеріал
+        public string? MaterialUrl { get; set; }
+
+        // Файл матеріалу
+        public string? MaterialFilePath { get; set; }
+        public string? MaterialFileName { get; set; }
+
+        // Дозволити завантаження
+        public bool AllowDownload { get; set; } = true;
+
         // Зовнішній ключ до курсу
         [Required(ErrorMessage = "Оберіть курс")]
         public int CourseId { get; set; }

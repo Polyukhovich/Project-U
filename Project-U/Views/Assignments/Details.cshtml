@@ -13,7 +13,38 @@
 
             <dt class="col-sm-3">Опис</dt>
             <dd class="col-sm-9">@Model.Description</dd>
+            <tr>
+                <th>📎 Матеріал</th>
+                <td>
+                    @if (Model.MaterialType == "Link" && !string.IsNullOrEmpty(Model.MaterialUrl))
+                    {
+                        <a href="@Model.MaterialUrl" target="_blank" class="btn btn-sm btn-outline-info">🔗 Відкрити посилання</a>
+                    }
+                    else if (Model.MaterialType == "File" && !string.IsNullOrEmpty(Model.MaterialFilePath))
+                    {
+                        @if (Model.MaterialFileName!.EndsWith(".pdf"))
+                        {
+                            <a asp-controller="Assignments" asp-action="ViewMaterial" asp-route-id="@Model.Id"
+                               target="_blank" class="btn btn-sm btn-outline-primary">👁️ Переглянути PDF</a>
+                        }
+                        else
+                        {
+                            <a asp-controller="Assignments" asp-action="ViewMaterial" asp-route-id="@Model.Id"
+                               class="btn btn-sm btn-outline-primary">👁️ Переглянути файл</a>
+                        }
 
+                        @if (Model.AllowDownload)
+                        {
+                            <a asp-controller="Assignments" asp-action="DownloadMaterial" asp-route-id="@Model.Id"
+                               class="btn btn-sm btn-outline-secondary ms-1">📥 Завантажити</a>
+                        }
+                    }
+                    else
+                    {
+                        <span class="text-muted">—</span>
+                    }
+                </td>
+            </tr>
             <dt class="col-sm-3">Дедлайн</dt>
             <dd class="col-sm-9">
                 @if (Model.Deadline < DateTime.Now)
@@ -36,23 +67,29 @@
 <h4>📋 Здачі студентів (@(Model.Submissions?.Count ?? 0))</h4>
 
 @if (Model.Submissions != null && Model.Submissions.Any())
-{
+{<div class="table-responsive">
     <table class="table table-striped">
         <thead>
             <tr>
-                <th>Студент</th>
-                <th>Файл</th>
-                <th>Дата здачі</th>
-                <th>Плагіат</th>
-                <th>Оцінено</th>
-                <th>Дії</th>
+            @if (!User.IsInRole("Student"))
+            {
+             <th>Студент</th>
+            }
+            <th>Файл</th>
+            <th>Дата здачі</th>
+            <th>Плагіат</th>
+            <th>Оцінено</th>
+            <th>Дії</th>
             </tr>
         </thead>
         <tbody>
             @foreach (var submission in Model.Submissions)
             {
                 <tr>
+                    @if (!User.IsInRole("Student"))
+                    {
                     <td>@(submission.Student?.Email ?? "—")</td>
+                    }
                     <td>@submission.FileName</td>
                     <td>@submission.UploadedAt.ToShortDateString()</td>
                     <td>
@@ -87,7 +124,8 @@
                 </tr>
             }
         </tbody>
-    </table>
+        </table>
+    </div>
 }
 else
 {

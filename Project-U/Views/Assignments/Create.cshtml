@@ -7,7 +7,7 @@
 
 <div class="row">
     <div class="col-md-5">
-        <form asp-action="Create" method="post">
+        <form asp-action="Create" method="post" enctype="multipart/form-data">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
 
             <div class="mb-3">
@@ -21,7 +21,29 @@
                 <textarea asp-for="Description" class="form-control" rows="4" placeholder="Опишіть завдання для студентів"></textarea>
                 <span asp-validation-for="Description" class="text-danger"></span>
             </div>
+            <!-- Матеріали до завдання -->
+            <div class="mb-3">
+                <label class="form-label">📎 Матеріал до завдання</label>
+                <select id="materialType" name="MaterialType" class="form-select" onchange="toggleMaterial(this.value)">
+                    <option value="None">— Без матеріалу —</option>
+                    <option value="Link">🔗 Посилання</option>
+                    <option value="File">📄 Файл (.pdf або .docx)</option>
+                </select>
+            </div>
 
+            <div id="materialLink" class="mb-3" style="display:none">
+                <label class="form-label">Посилання</label>
+                <input type="url" name="MaterialUrl" class="form-control" placeholder="https://..." />
+            </div>
+
+            <div id="materialFile" class="mb-3" style="display:none">
+                <label class="form-label">Файл</label>
+                <input type="file" name="materialFile" class="form-control" accept=".pdf,.docx" />
+                <div class="form-check mt-2">
+                    <input type="checkbox" name="AllowDownload" value="true" class="form-check-input" id="allowDownload" checked />
+                    <label class="form-check-label" for="allowDownload">Дозволити завантаження</label>
+                </div>
+            </div>
             <div class="mb-3">
                 <label asp-for="Deadline" class="form-label">Дедлайн</label>
                 <input asp-for="Deadline" class="form-control" type="datetime-local" />
@@ -43,6 +65,12 @@
 </div>
 
 @section Scripts {
+    <script>
+        function toggleMaterial(value) {
+            document.getElementById('materialLink').style.display = value === 'Link' ? 'block' : 'none';
+            document.getElementById('materialFile').style.display = value === 'File' ? 'block' : 'none';
+        }
+    </script>
     @{
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
     }

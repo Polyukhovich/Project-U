@@ -7,7 +7,7 @@
 
 <div class="row">
     <div class="col-md-5">
-        <form asp-action="Edit" method="post">
+        <form asp-action="Edit" method="post" enctype="multipart/form-data">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <input type="hidden" asp-for="Id" />
 
@@ -28,7 +28,49 @@
                 <input asp-for="Deadline" class="form-control" type="datetime-local" />
                 <span asp-validation-for="Deadline" class="text-danger"></span>
             </div>
+            <!-- Поточний матеріал -->
+@if (Model.MaterialType != "None")
+{
+    <div class="alert alert-info mb-3">
+        <strong>Поточний матеріал:</strong>
+        @if (Model.MaterialType == "Link")
+        {
+            <a href="@Model.MaterialUrl" target="_blank">🔗 @Model.MaterialUrl</a>
+        }
+        else if (Model.MaterialType == "File")
+        {
+            <span>📄 @Model.MaterialFileName</span>
+        }
+    </div>
+}
 
+<input type="hidden" name="MaterialFilePath" value="@Model.MaterialFilePath" />
+<input type="hidden" name="MaterialFileName" value="@Model.MaterialFileName" />
+
+<!-- Новий матеріал -->
+<div class="mb-3">
+    <label class="form-label">📎 Матеріал до завдання</label>
+                <select id="materialType" name="MaterialType" class="form-select" onchange="toggleMaterial(this.value)">
+                    <option value="None" selected="@(Model.MaterialType == "None")">— Без матеріалу —</option>
+                    <option value="Link" selected="@(Model.MaterialType == "Link")">🔗 Посилання</option>
+                    <option value="File" selected="@(Model.MaterialType == "File")">📄 Файл (.pdf або .docx)</option>
+                </select>
+</div>
+
+<div id="materialLink" class="mb-3" style="display:@(Model.MaterialType == "Link" ? "block" : "none")">
+    <label class="form-label">Посилання</label>
+    <input type="url" name="MaterialUrl" class="form-control" value="@Model.MaterialUrl" placeholder="https://..." />
+</div>
+
+<div id="materialFile" class="mb-3" style="display:@(Model.MaterialType == "File" ? "block" : "none")">
+    <label class="form-label">Новий файл (залиш порожнім щоб не змінювати)</label>
+    <input type="file" name="materialFile" class="form-control" accept=".pdf,.docx" />
+    <div class="form-check mt-2">
+        <input type="checkbox" name="AllowDownload" value="true" class="form-check-input" id="allowDownload" 
+               @(Model.AllowDownload ? "checked" : "") />
+        <label class="form-check-label" for="allowDownload">Дозволити завантаження</label>
+    </div>
+</div>
             <div class="mb-3">
                 <label asp-for="CourseId" class="form-label">Курс</label>
                 <select asp-for="CourseId" asp-items="ViewBag.CourseId" class="form-select">
@@ -44,6 +86,12 @@
 </div>
 
 @section Scripts {
+    <script>
+        function toggleMaterial(value) {
+            document.getElementById('materialLink').style.display = value === 'Link' ? 'block' : 'none';
+            document.getElementById('materialFile').style.display = value === 'File' ? 'block' : 'none';
+        }
+    </script>
     @{
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
     }

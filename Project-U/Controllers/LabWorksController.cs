@@ -43,12 +43,22 @@ namespace Controllers
         public async Task<IActionResult> Index(int page = 1)
         {
             int pageSize = 10;
-            var labWorks = await _context.LabWorks
+            IQueryable<LabWork> query = _context.LabWorks
                 .Include(l => l.Student)
                 .Include(l => l.Course)
-                .ToListAsync();
-            var pagedSchedules = labWorks.ToPagedList(page, pageSize);
-            return View(pagedSchedules);
+                .Include(l => l.Assignment);
+
+            // Студент бачить тільки свої роботи
+            if (User.IsInRole("Student"))
+            {
+                var currentUser = await _context.Users
+                    .FirstOrDefaultAsync(u => u.UserName == User.Identity!.Name);
+                query = query.Where(l => l.StudentId == currentUser!.Id);
+            }
+
+            var labWorks = await query.ToListAsync();
+            var paged = labWorks.ToPagedList(page, pageSize);
+            return View(paged);
         }
 
         // GET: LabWorks/Details/5

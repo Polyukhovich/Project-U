@@ -16,11 +16,14 @@
         <a asp-action="Create" class="btn btn-primary">➕ @Localizer["AddGrade"]</a>
     }
 </p>
-
+<div class="table-responsive">
 <table class="table table-striped">
     <thead>
-        <tr>
+        <tr>       
+            @if (!User.IsInRole("Student"))
+            {
             <th>@Localizer["Student"]</th>
+            }
             <th>@Localizer["Course"]</th>
             <th>@Localizer["LabWork"]</th>
             <th>@Localizer["Value"]</th>
@@ -32,7 +35,10 @@
         @foreach (var item in Model)
         {
             <tr>
+                @if (!User.IsInRole("Student"))
+                 {
                 <td>@(item.Student?.Email ?? "—")</td>
+                 }
                 <td>@(item.Course?.Name ?? "—")</td>
                 <td>@(item.LabWork?.Title ?? "—")</td>
                 <td>@item.Value</td>
@@ -52,7 +58,7 @@
         }
     </tbody>
 </table>
-
+</div>
 <div class="d-flex justify-content-center mt-3">
     @Html.PagedListPager(Model, page => Url.Action("Index", new { page }),
         new PagedListRenderOptions
