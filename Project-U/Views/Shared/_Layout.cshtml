@@ -21,6 +21,11 @@
     <link rel="apple-touch-icon" href="/icons/icon-192.png" />
 </head>
 <body>
+    <script>
+        // Застосовуємо тему одразу щоб уникнути мерехтіння
+        const t = localStorage.getItem('theme');
+        if (t && t !== 'default') document.body.classList.add('theme-' + t);
+    </script>
     <!-- Overlay для мобільних -->
     <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
 
@@ -95,24 +100,6 @@
                 </li>
             </ul>
         }
-
-        <div class="sidebar-section">@Localizer["Language"]</div>
-        <ul class="nav flex-column mb-3">
-            <li class="nav-item">
-                <form asp-controller="SelectLanguage" asp-action="SetLanguage" method="post">
-                    <input type="hidden" name="cultureName" value="uk-UA" />
-                    <input type="hidden" name="returnUrl" value="@Context.Request.Path" />
-                    <button type="submit" class="nav-link btn btn-link text-start w-100">🇺🇦 Українська</button>
-                </form>
-            </li>
-            <li class="nav-item">
-                <form asp-controller="SelectLanguage" asp-action="SetLanguage" method="post">
-                    <input type="hidden" name="cultureName" value="en-US" />
-                    <input type="hidden" name="returnUrl" value="@Context.Request.Path" />
-                    <button type="submit" class="nav-link btn btn-link text-start w-100">🇺🇸 English</button>
-                </form>
-            </li>
-        </ul>
     </div>
 
     <!-- Основний контент -->

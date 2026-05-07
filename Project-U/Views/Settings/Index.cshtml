@@ -94,35 +94,32 @@
 @section Scripts {
     <script>
         // ===== Тема =====
-        function setTheme(theme) {
-            const themes = {
-                dark: { sidebar: '#1a1a2e', accent: '#6c5ce7', bg: '#f8f9fa' },
-                light: { sidebar: '#2d3748', accent: '#4299e1', bg: '#ffffff' },
-                purple: { sidebar: '#2d1b69', accent: '#6c5ce7', bg: '#f8f9fa' },
-                green: { sidebar: '#1a2e1a', accent: '#38a169', bg: '#f8f9fa' },
-                blue: { sidebar: '#1a1f2e', accent: '#3182ce', bg: '#f8f9fa' }
-            };
+                function setTheme(theme) {
+            // Видаляємо всі теми
+            document.body.classList.remove('theme-dark', 'theme-green', 'theme-blue', 'theme-purple');
 
-            const t = themes[theme];
-            if (!t) return;
+            // Додаємо нову
+            if (theme !== 'default') {
+                document.body.classList.add(`theme-${theme}`);
+            }
 
-            document.documentElement.style.setProperty('--sidebar-bg', t.sidebar);
-            document.documentElement.style.setProperty('--accent', t.accent);
-            document.documentElement.style.setProperty('--content-bg', t.bg);
+            // Оновлюємо sidebar accent
+            const accent = {
+                dark: '#6c5ce7',
+                green: '#38a169',
+                blue: '#3182ce',
+                purple: '#6c5ce7',
+                default: '#6c5ce7'
+            }[theme] || '#6c5ce7';
 
-            // Застосовуємо стилі
-            document.getElementById('sidebar').style.background = t.sidebar;
-            document.querySelector('.main-content').style.background = t.bg;
-            document.querySelectorAll('.sidebar .nav-link.active').forEach(el => {
-                el.style.background = t.accent;
-            });
+            document.querySelector('.sidebar').style.background =
+                getComputedStyle(document.documentElement).getPropertyValue('--sidebar-bg');
 
-            localStorage.setItem('theme', JSON.stringify(t));
-            localStorage.setItem('themeName', theme);
+            localStorage.setItem('theme', theme);
         }
 
-        // Завантажуємо збережену тему
-        const savedTheme = localStorage.getItem('themeName');
+        // Завантажуємо тему при старті
+        const savedTheme = localStorage.getItem('theme');
         if (savedTheme) setTheme(savedTheme);
 
         // ===== Browser сповіщення =====

@@ -3,11 +3,48 @@ html, body {
     overflow-x: hidden;
     max-width: 100vw;
 }
+/* ===== CSS ЗМІННІ ДЛЯ ТЕМ ===== */
+:root {
+    --sidebar-bg: #1a1a2e;
+    --accent: #6c5ce7;
+    --content-bg: #f8f9fa;
+    --topbar-bg: #ffffff;
+    --text-color: #333333;
+    --border-color: #dee2e6;
+    --card-bg: #ffffff;
+}
+
+/* Темна тема */
+body.theme-dark {
+    --content-bg: #1a1a2e;
+    --topbar-bg: #16213e;
+    --text-color: #ffffff;
+    --border-color: #2d3561;
+    --card-bg: #16213e;
+}
+
+/* Зелена тема */
+body.theme-green {
+    --sidebar-bg: #1a2e1a;
+    --accent: #38a169;
+    --content-bg: #f0fff4;
+    --topbar-bg: #ffffff;
+    --card-bg: #ffffff;
+}
+
+/* Синя тема */
+body.theme-blue {
+    --sidebar-bg: #1a1f2e;
+    --accent: #3182ce;
+    --content-bg: #ebf8ff;
+    --topbar-bg: #ffffff;
+    --card-bg: #ffffff;
+}
 /* ===== БОКОВИЙ БАР ===== */
 .sidebar {
     width: 250px;
     min-height: 100vh;
-    background: #1a1a2e;
+    background: var(--sidebar-bg);
     color: white;
     position: fixed;
     top: 0;
@@ -50,7 +87,7 @@ html, body {
     }
 
     .sidebar .nav-link.active {
-        background: #6c5ce7;
+        background: var(--accent);
         color: white;
     }
 
@@ -67,7 +104,8 @@ html, body {
     margin-left: 250px;
     min-height: 100vh;
     transition: margin-left 0.3s;
-    background: #f8f9fa;
+    background: var(--content-bg);
+    color: var(--text-color);
 }
 
     .main-content.expanded {
@@ -76,9 +114,9 @@ html, body {
 
 /* ===== ВЕРХНЯ ПАНЕЛЬ ===== */
 .topbar {
-    background: white;
+    background: var(--topbar-bg);
     padding: 10px 20px;
-    border-bottom: 1px solid #dee2e6;
+    border-bottom: 1px solid var(--border-color);
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -97,8 +135,8 @@ html, body {
 
 /* ===== FOOTER ===== */
 .footer {
-    background: white;
-    border-top: 1px solid #dee2e6;
+    background: var(--topbar-bg);
+    border-top: 1px solid var(--border-color);
     padding: 10px 20px;
     text-align: center;
     color: #6c757d;
@@ -163,7 +201,7 @@ html, body {
     position: fixed;
     bottom: 20px;
     right: 20px;
-    background: #6c5ce7;
+    background: var(--accent);
     color: white;
     padding: 15px 20px;
     border-radius: 10px;
