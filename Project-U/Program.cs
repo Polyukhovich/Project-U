@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Project_U.Middlewares;
 using ProjectU.Core.Interfaces;
 using ProjectU.Core.Models;
 using ProjectU.Data;
@@ -71,6 +72,8 @@ if (!app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 app.UseStaticFiles();
+// Rate Limiting
+app.UseRequestLimiter(authLimit: 200, anonLimit: 50, window: TimeSpan.FromMinutes(1));
 // Middleware локалізаці
 app.UseRequestLocalization();
 

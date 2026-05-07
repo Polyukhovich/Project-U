@@ -1,0 +1,87 @@
+﻿<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Забагато запитів - Project U</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <style>
+        body {
+            background: #1a1a2e;
+            color: white;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+        }
+
+        .container {
+            text-align: center;
+            padding: 40px;
+        }
+
+        .icon {
+            font-size: 5rem;
+            margin-bottom: 20px;
+        }
+
+        h1 {
+            font-size: 2rem;
+            margin-bottom: 10px;
+        }
+
+        p {
+            color: rgba(255,255,255,0.7);
+            margin-bottom: 30px;
+        }
+
+        .btn-back {
+            background: #6c5ce7;
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 8px;
+            font-size: 1rem;
+            cursor: pointer;
+            text-decoration: none;
+        }
+
+            .btn-back:hover {
+                background: #5a4bd1;
+                color: white;
+            }
+
+        .countdown {
+            font-size: 1.5rem;
+            color: #6c5ce7;
+            margin: 20px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="icon">⏳</div>
+        <h1>Забагато запитів</h1>
+        <p>Ви надіслали занадто багато запитів за короткий час.<br />Будь ласка, зачекайте і спробуйте знову.</p>
+        <div class="countdown" id="countdown">Спробувати через: <span id="timer">60</span> сек.</div>
+        <a href="/" class="btn-back">🏠 На головну</a>
+    </div>
+
+    <script>
+        let seconds = 60;
+        const timer = document.getElementById('timer');
+        const countdown = document.getElementById('countdown');
+
+        const interval = setInterval(() => {
+            seconds--;
+            timer.textContent = seconds;
+            if (seconds <= 0) {
+                clearInterval(interval);
+                countdown.textContent = '✅ Можете спробувати знову!';
+                window.location.reload();
+            }
+        }, 1000);
+    </script>
+</body>
+</html>
