@@ -5,12 +5,94 @@
     ViewData["Title"] = "Головна";
 }
 
-<div class="text-center">
-    <h1 class="display-4">@Localizer["WelcomeMessage"]</h1>
-    <p>
-        <a asp-controller="SelectLanguage" asp-action="Index"
-               asp-route-returnUrl="@Context.Request.Path">
-            Змінити мову / Change language
+<h2>🏠 Головна</h2>
+
+<!-- Розклад на сьогодні -->
+<div class="card mb-4">
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <strong>📅 Розклад на сьогодні</strong>
+        <span class="text-muted small">@ViewBag.Today</span>
+    </div>
+    <div class="card-body p-0">
+        @if (ViewBag.TodaySchedules != null && ((List<ProjectU.Core.Models.Schedule>)ViewBag.TodaySchedules).Any())
+        {
+            <div class="table-responsive">
+                <table class="table table-hover mb-0">
+                    <thead class="table-dark">
+                        <tr>
+                            <th>Час</th>
+                            <th>Курс</th>
+                            <th>Аудиторія</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var schedule in (List<ProjectU.Core.Models.Schedule>)ViewBag.TodaySchedules)
+                        {
+                            <tr>
+                                <td>
+                                    <strong>@schedule.StartTime.ToString("HH:mm")</strong>
+                                    — @schedule.EndTime.ToString("HH:mm")
+                                </td>
+                                <td>@(schedule.Course?.Name ?? "—")</td>
+                                <td>
+                                    @if (!string.IsNullOrEmpty(schedule.Room))
+                                    {
+                                        @if (schedule.Room.StartsWith("http"))
+                                        {
+                                            <a href="@schedule.Room" target="_blank" class="btn btn-sm btn-outline-info">🔗 Онлайн</a>
+                                        }
+                                        else
+                                        {
+                                            <span>🏫 @schedule.Room</span>
+                                        }
+                                    }
+                                    else
+                                    {
+                                        <span class="text-muted">—</span>
+                                    }
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        }
+        else
+        {
+            <div class="p-4 text-center text-muted">
+                <p>🎉 Сьогодні занять немає!</p>
+                <a asp-controller="Schedules" asp-action="Index" class="btn btn-outline-primary btn-sm">
+                    📅 Переглянути весь розклад
+                </a>
+            </div>
+        }
+    </div>
+</div>
+
+<!-- Швидкі дії -->
+<div class="row">
+    <div class="col-md-4 mb-3">
+        <a asp-controller="Assignments" asp-action="Index" class="text-decoration-none">
+            <div class="card text-center p-3 h-100">
+                <div style="font-size: 2rem;">📋</div>
+                <div class="fw-bold">Завдання</div>
+            </div>
         </a>
-    </p>
+    </div>
+    <div class="col-md-4 mb-3">
+        <a asp-controller="Grades" asp-action="Index" class="text-decoration-none">
+            <div class="card text-center p-3 h-100">
+                <div style="font-size: 2rem;">📊</div>
+                <div class="fw-bold">Оцінки</div>
+            </div>
+        </a>
+    </div>
+    <div class="col-md-4 mb-3">
+        <a asp-controller="LabWorks" asp-action="Index" class="text-decoration-none">
+            <div class="card text-center p-3 h-100">
+                <div style="font-size: 2rem;">🔬</div>
+                <div class="fw-bold">Лабораторні</div>
+            </div>
+        </a>
+    </div>
 </div>
