@@ -7,10 +7,6 @@ namespace ProjectU.Core.Models
     {
         public int Id { get; set; }
 
-        // День тижня (наприклад "Понеділок")
-        [Required(ErrorMessage = "День тижня обов'язковий")]
-        public string DayOfWeek { get; set; } = string.Empty;
-
         // Час початку заняття
         [Required(ErrorMessage = "Час початку обов'язковий")]
         public TimeOnly StartTime { get; set; }
@@ -19,21 +15,20 @@ namespace ProjectU.Core.Models
         [Required(ErrorMessage = "Час завершення обов'язковий")]
         public TimeOnly EndTime { get; set; }
 
-        // Аудиторія
+        // Аудиторія або посилання (необов'язково)
         public string Room { get; set; } = string.Empty;
 
         // Зовнішній ключ до курсу
         [Required(ErrorMessage = "Оберіть курс")]
         public int CourseId { get; set; }
-
-        // Навігаційна властивість до курсу
         public Course? Course { get; set; }
 
         // Зовнішній ключ до групи
         [Required(ErrorMessage = "Оберіть групу")]
         public int GroupId { get; set; }
-
-        // Навігаційна властивість до групи
         public Group? Group { get; set; }
+
+        // Конкретні дати занять
+        public ICollection<ScheduleDate> Dates { get; set; } = new List<ScheduleDate>();
     }
 }

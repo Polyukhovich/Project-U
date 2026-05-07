@@ -18,6 +18,7 @@ namespace ProjectU.Data
         public DbSet<PlagiarismResult> PlagiarismResults { get; set; }
         public DbSet<Notification> Notifications { get; set; }
         public DbSet<Assignment> Assignments { get; set; }
+        public DbSet<ScheduleDate> ScheduleDates { get; set; }
 
         protected override void OnModelCreating(ModelBuilder builder)
         {

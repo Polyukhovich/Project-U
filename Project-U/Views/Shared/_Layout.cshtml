@@ -1,5 +1,8 @@
 ﻿@using Microsoft.AspNetCore.Mvc.Localization
 @inject IViewLocalizer Localizer
+@using Microsoft.AspNetCore.Identity
+@using ProjectU.Core.Models
+@inject UserManager<ApplicationUser> UserManager
 
 <!DOCTYPE html>
 <html lang="uk">
@@ -29,6 +32,23 @@
 
         @if (User.Identity!.IsAuthenticated)
         {
+            <li class="nav-item">
+                @{
+                    var currentUser = await UserManager.GetUserAsync(User);
+                }
+
+                <a class="nav-link" asp-area="Identity" asp-page="/Account/Manage/Index">
+                    👤
+                    <div style="display:inline-block; line-height:1.2;">
+                        <div style="font-size:0.95rem; color:white; font-weight:500;">
+                            @(currentUser?.FirstName ?? "") @(currentUser?.LastName ?? "")
+                        </div>
+                        <div style="font-size:0.75rem; color:rgba(255,255,255,0.5);">
+                            @User.Identity!.Name
+                        </div>
+                    </div>
+                </a>
+            </li>
             <div class="sidebar-section">@Localizer["Navigation"]</div>
             <ul class="nav flex-column">
                 <li class="nav-item">
@@ -52,6 +72,9 @@
                 <li class="nav-item">
                     <a class="nav-link" asp-controller="LabWorks" asp-action="Index">🔬 @Localizer["LabWorks"]</a>
                 </li>
+                <li class="nav-item">
+                    <a class="nav-link" asp-controller="Settings" asp-action="Index">⚙️ Налаштування</a>
+                </li>
             </ul>
 
             @if (User.IsInRole("Admin"))
@@ -63,18 +86,6 @@
                     </li>
                 </ul>
             }
-
-            <div class="sidebar-section">@Localizer["Account"]</div>
-            <ul class="nav flex-column">
-                <li class="nav-item">
-                    <a class="nav-link" asp-area="Identity" asp-page="/Account/Manage/Index">👤 @User.Identity.Name</a>
-                </li>
-                <li class="nav-item">
-                    <form asp-area="Identity" asp-page="/Account/Logout" method="post">
-                        <button type="submit" class="nav-link btn btn-link text-start w-100">🚪 @Localizer["Logout"]</button>
-                    </form>
-                </li>
-            </ul>
         }
         else
         {

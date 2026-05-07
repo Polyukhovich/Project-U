@@ -35,6 +35,7 @@ namespace Controllers
             var schedules = await _context.Schedules
                 .Include(s => s.Course)
                 .Include(s => s.Group)
+                .Include(s => s.Dates)
                 .ToListAsync();
             var pagedSchedules = schedules.ToPagedList(page, pageSize);
             return View(pagedSchedules);
@@ -52,6 +53,7 @@ namespace Controllers
             var schedule = await _context.Schedules
                 .Include(s => s.Course)
                 .Include(s => s.Group)
+                .Include(s => s.Dates)
                 .FirstOrDefaultAsync(m => m.Id == id);
             if (schedule == null)
             {
@@ -63,10 +65,13 @@ namespace Controllers
 
         // GET: Schedules/Create — Admin та Teacher
         [Authorize(Roles = "Admin,Teacher")]
-        public IActionResult Create()
+        public async Task<IActionResult> Create()
         {
-            ViewData["CourseId"] = new SelectList(_context.Courses, "Id", "Description");
-            ViewData["GroupId"] = new SelectList(_context.Groups, "Id", "Name");
+            var courses = await _context.Courses.ToListAsync();
+            var groups = await _context.Groups.ToListAsync();
+
+            ViewData["CourseId"] = new SelectList(courses, "Id", "Name");
+            ViewData["GroupId"] = new SelectList(groups, "Id", "Name");
             return View();
         }
 
@@ -76,16 +81,35 @@ namespace Controllers
         [HttpPost]
         [ValidateAntiForgeryToken]
         [Authorize(Roles = "Admin,Teacher")]
-        public async Task<IActionResult> Create([Bind("Id,DayOfWeek,StartTime,EndTime,Room,CourseId,GroupId")] Schedule schedule)
+        public async Task<IActionResult> Create([Bind("Id,StartTime,EndTime,Room,CourseId,GroupId")] Schedule schedule, string selectedDatesJson)
         {
             if (ModelState.IsValid)
             {
                 _context.Add(schedule);
                 await _context.SaveChangesAsync();
+
+                // Зберігаємо обрані дати
+                if (!string.IsNullOrEmpty(selectedDatesJson))
+                {
+                    var dates = selectedDatesJson.Split(',')
+                        .Where(d => !string.IsNullOrEmpty(d))
+                        .Select(d => new ScheduleDate
+                        {
+                            ScheduleId = schedule.Id,
+                            Date = DateOnly.Parse(d)
+                        });
+
+                    _context.ScheduleDates.AddRange(dates);
+                    await _context.SaveChangesAsync();
+                }
+
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["CourseId"] = new SelectList(_context.Courses, "Id", "Description", schedule.CourseId);
-            ViewData["GroupId"] = new SelectList(_context.Groups, "Id", "Name", schedule.GroupId);
+
+            var courses = await _context.Courses.ToListAsync();
+            var groups = await _context.Groups.ToListAsync();
+            ViewData["CourseId"] = new SelectList(courses, "Id", "Name", schedule.CourseId);
+            ViewData["GroupId"] = new SelectList(groups, "Id", "Name", schedule.GroupId);
             return View(schedule);
         }
 
@@ -93,18 +117,18 @@ namespace Controllers
         [Authorize(Roles = "Admin,Teacher")]
         public async Task<IActionResult> Edit(int? id)
         {
-            if (id == null)
-            {
-                return NotFound();
-            }
+            if (id == null) return NotFound();
 
-            var schedule = await _context.Schedules.FindAsync(id);
-            if (schedule == null)
-            {
-                return NotFound();
-            }
-            ViewData["CourseId"] = new SelectList(_context.Courses, "Id", "Description", schedule.CourseId);
-            ViewData["GroupId"] = new SelectList(_context.Groups, "Id", "Name", schedule.GroupId);
+            var schedule = await _context.Schedules
+                .Include(s => s.Dates)
+                .FirstOrDefaultAsync(s => s.Id == id);
+
+            if (schedule == null) return NotFound();
+
+            var courses = await _context.Courses.ToListAsync();
+            var groups = await _context.Groups.ToListAsync();
+            ViewData["CourseId"] = new SelectList(courses, "Id", "Name", schedule.CourseId);
+            ViewData["GroupId"] = new SelectList(groups, "Id", "Name", schedule.GroupId);
             return View(schedule);
         }
 
@@ -114,20 +138,38 @@ namespace Controllers
         [HttpPost]
         [ValidateAntiForgeryToken]
         [Authorize(Roles = "Admin,Teacher")]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,DayOfWeek,StartTime,EndTime,Room,CourseId,GroupId")] Schedule schedule)
+        public async Task<IActionResult> Edit(int id, [Bind("Id,StartTime,EndTime,Room,CourseId,GroupId")] Schedule schedule, string selectedDatesJson)
         {
-            if (id != schedule.Id)
-            {
-                return NotFound();
-            }
+            if (id != schedule.Id) return NotFound();
 
             if (ModelState.IsValid)
             {
                 try
                 {
                     _context.Update(schedule);
+
+                    // Видаляємо старі дати
+                    var oldDates = await _context.ScheduleDates
+                        .Where(d => d.ScheduleId == id)
+                        .ToListAsync();
+                    _context.ScheduleDates.RemoveRange(oldDates);
+
+                    // Додаємо нові дати
+                    if (!string.IsNullOrEmpty(selectedDatesJson))
+                    {
+                        var dates = selectedDatesJson.Split(',')
+                            .Where(d => !string.IsNullOrEmpty(d))
+                            .Select(d => new ScheduleDate
+                            {
+                                ScheduleId = schedule.Id,
+                                Date = DateOnly.Parse(d)
+                            });
+                        _context.ScheduleDates.AddRange(dates);
+                    }
+
                     await _context.SaveChangesAsync();
-                    // Сповіщення всім студентам групи про зміну розкладу
+
+                    // Сповіщення студентам
                     var updatedSchedule = await _context.Schedules
                         .Include(s => s.Course)
                         .Include(s => s.Group)
@@ -136,7 +178,7 @@ namespace Controllers
 
                     if (updatedSchedule?.Group?.Students != null)
                     {
-                        var message = $"Змінено розклад: {updatedSchedule.Course?.Name} — {updatedSchedule.DayOfWeek} {updatedSchedule.StartTime}";
+                        var message = $"Змінено розклад: {updatedSchedule.Course?.Name} — {updatedSchedule.StartTime}";
 
                         foreach (var student in updatedSchedule.Group.Students)
                         {
@@ -157,20 +199,17 @@ namespace Controllers
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!ScheduleExists(schedule.Id))
-                    {
+                    if (!_context.Schedules.Any(e => e.Id == id))
                         return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
+                    throw;
                 }
-
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["CourseId"] = new SelectList(_context.Courses, "Id", "Description", schedule.CourseId);
-            ViewData["GroupId"] = new SelectList(_context.Groups, "Id", "Name", schedule.GroupId);
+
+            var courses = await _context.Courses.ToListAsync();
+            var groups = await _context.Groups.ToListAsync();
+            ViewData["CourseId"] = new SelectList(courses, "Id", "Name", schedule.CourseId);
+            ViewData["GroupId"] = new SelectList(groups, "Id", "Name", schedule.GroupId);
             return View(schedule);
         }
 
@@ -186,6 +225,7 @@ namespace Controllers
             var schedule = await _context.Schedules
                 .Include(s => s.Course)
                 .Include(s => s.Group)
+                .Include(s => s.Dates)
                 .FirstOrDefaultAsync(m => m.Id == id);
             if (schedule == null)
             {

@@ -17,49 +17,67 @@
     }
 </p>
 
-<table class="table table-striped">
-    <thead>
-        <tr>
-            <th>@Localizer["DayOfWeek"]</th>
-            <th>@Localizer["StartTime"]</th>
-            <th>@Localizer["EndTime"]</th>
-            <th>@Localizer["Room"]</th>
-            <th>@Localizer["Course"]</th>
-            <th>@Localizer["Group"]</th>
-            <th>@Localizer["Actions"]</th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var item in Model)
-        {
+<div class="table-responsive">
+    <table class="table table-striped table-hover">
+        <thead class="table-dark">
             <tr>
-                <td>@item.DayOfWeek</td>
-                <td>@item.StartTime</td>
-                <td>@item.EndTime</td>
-                <td>@item.Room</td>
-                <td>@(item.Course?.Name ?? "—")</td>
-                <td>@(item.Group?.Name ?? "—")</td>
-                <td>
-                    <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-sm btn-info">@Localizer["Details"]</a>
-                    @if (User.IsInRole("Admin") || User.IsInRole("Teacher"))
-                    {
-                        <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-sm btn-warning">@Localizer["Edit"]</a>
-                    }
-                    @if (User.IsInRole("Admin"))
-                    {
-                        <a asp-action="Delete" asp-route-id="@item.Id" class="btn btn-sm btn-danger">@Localizer["Delete"]</a>
-                    }
-                </td>
+                <th>@Localizer["StartTime"]</th>
+                <th>@Localizer["EndTime"]</th>
+                <th>@Localizer["Room"]</th>
+                <th>@Localizer["Course"]</th>
+                <th>@Localizer["Group"]</th>
+                <th>Дат занять</th>
+                <th>@Localizer["Actions"]</th>
             </tr>
-        }
-    </tbody>
-</table>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td>@item.StartTime.ToString("HH:mm")</td>
+                    <td>@item.EndTime.ToString("HH:mm")</td>
+                    <td>
+                        @if (!string.IsNullOrEmpty(item.Room))
+                        {
+                            @if (item.Room.StartsWith("http"))
+                            {
+                                <a href="@item.Room" target="_blank" class="btn btn-sm btn-outline-info">🔗 Онлайн</a>
+                            }
+                            else
+                            {
+                                <span>🏫 @item.Room</span>
+                            }
+                        }
+                        else
+                        {
+                            <span class="text-muted">—</span>
+                        }
+                    </td>
+                    <td>@(item.Course?.Name ?? "—")</td>
+                    <td><span class="badge bg-secondary">@(item.Group?.Name ?? "—")</span></td>
+                    <td><span class="badge bg-primary">@(item.Dates?.Count ?? 0)</span></td>
+                    <td>
+                        <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-sm btn-info">@Localizer["Details"]</a>
+                        @if (User.IsInRole("Admin") || User.IsInRole("Teacher"))
+                        {
+                            <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-sm btn-warning">✏️</a>
+                        }
+                        @if (User.IsInRole("Admin"))
+                        {
+                            <a asp-action="Delete" asp-route-id="@item.Id" class="btn btn-sm btn-danger">🗑️</a>
+                        }
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
 
 <div class="d-flex justify-content-center mt-3">
     @Html.PagedListPager(Model, page => Url.Action("Index", new { page }),
-        new PagedListRenderOptions
-        {
-            LiElementClasses = new[] { "page-item" },
-            PageClasses = new[] { "page-link" }
-        })
-</div
+    new PagedListRenderOptions
+    {
+        LiElementClasses = new[] { "page-item" },
+        PageClasses = new[] { "page-link" }
+    })
+</div>

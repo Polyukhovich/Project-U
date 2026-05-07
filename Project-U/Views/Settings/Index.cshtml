@@ -1,0 +1,150 @@
+﻿@model ProjectU.Core.Models.ApplicationUser
+@{
+    ViewData["Title"] = "Налаштування";
+}
+
+<h2>⚙️ Налаштування</h2>
+
+<div class="row">
+    <!-- Профіль -->
+    <div class="col-md-6 mb-4">
+        <div class="card">
+            <div class="card-header">👤 Профіль</div>
+            <div class="card-body">
+                <dl class="row">
+                    <dt class="col-sm-4">Ім'я</dt>
+                    <dd class="col-sm-8">@Model?.FirstName</dd>
+                    <dt class="col-sm-4">Прізвище</dt>
+                    <dd class="col-sm-8">@Model?.LastName</dd>
+                    <dt class="col-sm-4">Email</dt>
+                    <dd class="col-sm-8">@Model?.Email</dd>
+                </dl>
+                <a asp-area="Identity" asp-page="/Account/Manage/Index" class="btn btn-outline-primary btn-sm">✏️ Редагувати профіль</a>
+                <a asp-area="Identity" asp-page="/Account/Manage/ChangePassword" class="btn btn-outline-warning btn-sm">🔑 Змінити пароль</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Мова -->
+    <div class="col-md-6 mb-4">
+        <div class="card">
+            <div class="card-header">🌐 Мова інтерфейсу</div>
+            <div class="card-body">
+                <form asp-controller="SelectLanguage" asp-action="SetLanguage" method="post">
+                    <input type="hidden" name="returnUrl" value="/Settings" />
+                    <div class="d-grid gap-2">
+                        <button type="submit" name="cultureName" value="uk-UA" class="btn btn-outline-primary">
+                            🇺🇦 Українська
+                        </button>
+                        <button type="submit" name="cultureName" value="en-US" class="btn btn-outline-secondary">
+                            🇺🇸 English
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Тема -->
+    <div class="col-md-6 mb-4">
+        <div class="card">
+            <div class="card-header">🎨 Тема оформлення</div>
+            <div class="card-body">
+                <div class="d-grid gap-2">
+                    <button onclick="setTheme('dark')" class="btn btn-outline-dark">🌙 Темна тема</button>
+                    <button onclick="setTheme('light')" class="btn btn-outline-secondary">☀️ Світла тема</button>
+                    <button onclick="setTheme('purple')" class="btn btn-outline-primary" style="background:#6c5ce7; color:white;">💜 Фіолетова</button>
+                    <button onclick="setTheme('green')" class="btn btn-outline-success">💚 Зелена</button>
+                    <button onclick="setTheme('blue')" class="btn btn-outline-info">💙 Синя</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Сповіщення -->
+    <div class="col-md-6 mb-4">
+        <div class="card">
+            <div class="card-header">🔔 Сповіщення</div>
+            <div class="card-body">
+                <div class="form-check form-switch mb-2">
+                    <input class="form-check-input" type="checkbox" id="browserNotif" onchange="toggleBrowserNotif(this)">
+                    <label class="form-check-label" for="browserNotif">Browser сповіщення</label>
+                </div>
+                <div class="form-check form-switch mb-2">
+                    <input class="form-check-input" type="checkbox" id="soundNotif" onchange="toggleSound(this)" checked>
+                    <label class="form-check-label" for="soundNotif">Звук сповіщень</label>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Акаунт -->
+    <div class="col-md-6 mb-4">
+        <div class="card border-danger">
+            <div class="card-header text-danger">⚠️ Акаунт</div>
+            <div class="card-body">
+                <form asp-area="Identity" asp-page="/Account/Logout" method="post">
+                    <button type="submit" class="btn btn-danger w-100">🚪 Вийти з акаунту</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        // ===== Тема =====
+        function setTheme(theme) {
+            const themes = {
+                dark: { sidebar: '#1a1a2e', accent: '#6c5ce7', bg: '#f8f9fa' },
+                light: { sidebar: '#2d3748', accent: '#4299e1', bg: '#ffffff' },
+                purple: { sidebar: '#2d1b69', accent: '#6c5ce7', bg: '#f8f9fa' },
+                green: { sidebar: '#1a2e1a', accent: '#38a169', bg: '#f8f9fa' },
+                blue: { sidebar: '#1a1f2e', accent: '#3182ce', bg: '#f8f9fa' }
+            };
+
+            const t = themes[theme];
+            if (!t) return;
+
+            document.documentElement.style.setProperty('--sidebar-bg', t.sidebar);
+            document.documentElement.style.setProperty('--accent', t.accent);
+            document.documentElement.style.setProperty('--content-bg', t.bg);
+
+            // Застосовуємо стилі
+            document.getElementById('sidebar').style.background = t.sidebar;
+            document.querySelector('.main-content').style.background = t.bg;
+            document.querySelectorAll('.sidebar .nav-link.active').forEach(el => {
+                el.style.background = t.accent;
+            });
+
+            localStorage.setItem('theme', JSON.stringify(t));
+            localStorage.setItem('themeName', theme);
+        }
+
+        // Завантажуємо збережену тему
+        const savedTheme = localStorage.getItem('themeName');
+        if (savedTheme) setTheme(savedTheme);
+
+        // ===== Browser сповіщення =====
+        const browserNotifCheckbox = document.getElementById('browserNotif');
+        browserNotifCheckbox.checked = Notification.permission === 'granted';
+
+        function toggleBrowserNotif(checkbox) {
+            if (checkbox.checked) {
+                Notification.requestPermission().then(p => {
+                    checkbox.checked = p === 'granted';
+                });
+            }
+        }
+
+        // ===== Звук =====
+        function toggleSound(checkbox) {
+            localStorage.setItem('soundEnabled', checkbox.checked);
+        }
+
+        const soundEnabled = localStorage.getItem('soundEnabled');
+        if (soundEnabled !== null) {
+            document.getElementById('soundNotif').checked = soundEnabled === 'true';
+        }
+    </script>
+}

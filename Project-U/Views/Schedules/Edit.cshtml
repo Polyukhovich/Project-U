@@ -1,56 +1,99 @@
 ﻿@model ProjectU.Core.Models.Schedule
-
 @{
-    ViewData["Title"] = "Edit";
+    ViewData["Title"] = "Редагувати розклад";
 }
 
-<h1>Edit</h1>
+<h2>Редагувати розклад</h2>
 
-<h4>Schedule</h4>
-<hr />
 <div class="row">
-    <div class="col-md-4">
-        <form asp-action="Edit">
+    <div class="col-md-5">
+        <form asp-action="Edit" method="post" id="scheduleForm">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <input type="hidden" asp-for="Id" />
-            <div class="form-group">
-                <label asp-for="DayOfWeek" class="control-label"></label>
-                <input asp-for="DayOfWeek" class="form-control" />
-                <span asp-validation-for="DayOfWeek" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="StartTime" class="control-label"></label>
-                <input asp-for="StartTime" class="form-control" />
+
+            <div class="mb-3">
+                <label asp-for="StartTime" class="form-label">Час початку</label>
+                <input asp-for="StartTime" class="form-control" type="time" />
                 <span asp-validation-for="StartTime" class="text-danger"></span>
             </div>
-            <div class="form-group">
-                <label asp-for="EndTime" class="control-label"></label>
-                <input asp-for="EndTime" class="form-control" />
+
+            <div class="mb-3">
+                <label asp-for="EndTime" class="form-label">Час завершення</label>
+                <input asp-for="EndTime" class="form-control" type="time" />
                 <span asp-validation-for="EndTime" class="text-danger"></span>
             </div>
-            <div class="form-group">
-                <label asp-for="Room" class="control-label"></label>
+
+            <div class="mb-3">
+                <label asp-for="Room" class="form-label">Аудиторія або посилання</label>
                 <input asp-for="Room" class="form-control" />
-                <span asp-validation-for="Room" class="text-danger"></span>
             </div>
-            <div class="form-group">
-                <label asp-for="CourseId" class="control-label"></label>
-                <select asp-for="CourseId" class="form-control" asp-items="ViewBag.CourseId"></select>
+
+            <div class="mb-3">
+                <label asp-for="CourseId" class="form-label">Курс</label>
+                <select asp-for="CourseId" asp-items="@(ViewData["CourseId"] as SelectList)" class="form-select">
+                    <option value="">— Оберіть курс —</option>
+                </select>
                 <span asp-validation-for="CourseId" class="text-danger"></span>
             </div>
-            <div class="form-group">
-                <label asp-for="GroupId" class="control-label"></label>
-                <select asp-for="GroupId" class="form-control" asp-items="ViewBag.GroupId"></select>
+
+            <div class="mb-3">
+                <label asp-for="GroupId" class="form-label">Група</label>
+                <select asp-for="GroupId" asp-items="@(ViewData["GroupId"] as SelectList)" class="form-select">
+                    <option value="">— Оберіть групу —</option>
+                </select>
                 <span asp-validation-for="GroupId" class="text-danger"></span>
             </div>
-            <div class="form-group">
-                <input type="submit" value="Save" class="btn btn-primary" />
+
+            <!-- Вибір дат через календар -->
+            <div class="mb-3">
+                <label class="form-label">📅 Дати занять</label>
+                <div id="calendar" class="border rounded p-2 mb-2"></div>
+                <div id="selectedDates" class="d-flex flex-wrap gap-1 mb-2">
+                    @foreach (var date in Model.Dates.OrderBy(d => d.Date))
+                    {
+                        <span class="badge bg-primary">@date.Date.ToString("dd.MM.yyyy")</span>
+                    }
+                </div>
+                <input type="hidden" name="selectedDatesJson" id="selectedDatesJson"
+                       value="@string.Join(",", Model.Dates.Select(d => d.Date.ToString("yyyy-MM-dd")))" />
+                <small class="text-muted">Клікніть на дати щоб обрати/скасувати</small>
             </div>
+
+            <button type="submit" class="btn btn-warning">💾 Зберегти</button>
+            <a asp-action="Index" class="btn btn-secondary">Назад</a>
         </form>
     </div>
 </div>
 
-<div>
-    <a asp-action="Index">Back to List</a>
-</div>
+@section Scripts {
+    <link href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/uk.js"></script>
 
+    <script>
+        // Завантажуємо існуючі дати
+        const existingDates = "@string.Join(",", Model.Dates.Select(d => d.Date.ToString("yyyy-MM-dd")))".split(',').filter(d => d);
+
+        const fp = flatpickr("#calendar", {
+            inline: true,
+            mode: "multiple",
+            locale: "uk",
+            dateFormat: "Y-m-d",
+            defaultDate: existingDates,
+            onChange: function(dates) {
+                const container = document.getElementById('selectedDates');
+                container.innerHTML = dates.map(d => {
+                    const formatted = d.toLocaleDateString('uk-UA');
+                    return `<span class="badge bg-primary">${formatted}</span>`;
+                }).join('');
+
+                document.getElementById('selectedDatesJson').value =
+                    dates.map(d => d.toISOString().split('T')[0]).join(',');
+            }
+        });
+    </script>
+
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}
