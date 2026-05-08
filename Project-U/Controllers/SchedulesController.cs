@@ -31,14 +31,51 @@ namespace Controllers
         [Authorize(Roles = "Admin,Teacher,Student")]
         public async Task<IActionResult> Index(int page = 1)
         {
-            int pageSize = 10;
-            var schedules = await _context.Schedules
+            var currentUser = await _context.Users
+                .Include(u => u.Group)
+                .FirstOrDefaultAsync(u => u.UserName == User.Identity!.Name);
+
+            var schedulesQuery = _context.Schedules
                 .Include(s => s.Course)
                 .Include(s => s.Group)
                 .Include(s => s.Dates)
-                .ToListAsync();
-            var pagedSchedules = schedules.ToPagedList(page, pageSize);
-            return View(pagedSchedules);
+                .AsQueryable();
+
+            // Студент бачить тільки свою групу
+            if (User.IsInRole("Student") && currentUser?.GroupId != null)
+            {
+                schedulesQuery = schedulesQuery.Where(s => s.GroupId == currentUser.GroupId);
+            }
+
+            var schedules = await schedulesQuery.ToListAsync();
+            var today = DateOnly.FromDateTime(DateTime.Today);
+
+            // Групуємо по днях тижня — показуємо тільки якщо є майбутні дати
+            var days = new (string Name, DayOfWeek Day)[]
+            {
+        ("Понеділок", DayOfWeek.Monday),
+        ("Вівторок", DayOfWeek.Tuesday),
+        ("Середа", DayOfWeek.Wednesday),
+        ("Четвер", DayOfWeek.Thursday),
+        ("П'ятниця", DayOfWeek.Friday),
+        ("Субота", DayOfWeek.Saturday)
+            };
+
+            var grouped = days.Select(d => new
+            {
+                Day = d.Name,
+                DayOfWeek = d.Day,
+                Schedules = schedules
+                    .Where(s => s.Dates.Any(date =>
+                        date.Date.DayOfWeek == d.Day &&
+                        date.Date >= today))
+                    .OrderBy(s => s.StartTime)
+                    .ToList()
+            }).ToList();
+
+            ViewBag.GroupedSchedules = grouped;
+            ViewBag.AllSchedules = schedules;
+            return View();
         }
 
         // GET: Schedules/Details/5
