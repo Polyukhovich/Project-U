@@ -1,69 +1,127 @@
-﻿@model X.PagedList.IPagedList<ProjectU.Core.Models.Grade>
-@using X.PagedList.Mvc.Core
-@using X.PagedList
-@using Microsoft.AspNetCore.Mvc.Localization
+﻿@using Microsoft.AspNetCore.Mvc.Localization
 @inject IViewLocalizer Localizer
 
 @{
     ViewData["Title"] = Localizer["Title"].Value;
+    var grouped = ViewBag.GroupedGrades as IEnumerable<dynamic>;
 }
 
-<h2>@Localizer["Title"]</h2>
-
-<p>
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2>📊 @Localizer["Title"]</h2>
     @if (User.IsInRole("Admin") || User.IsInRole("Teacher"))
     {
         <a asp-action="Create" class="btn btn-primary">➕ @Localizer["AddGrade"]</a>
     }
-</p>
-<div class="table-responsive">
-<table class="table table-striped">
-    <thead>
-        <tr>       
-            @if (!User.IsInRole("Student"))
-            {
-            <th>@Localizer["Student"]</th>
-            }
-            <th>@Localizer["Course"]</th>
-            <th>@Localizer["LabWork"]</th>
-            <th>@Localizer["Value"]</th>
-            <th>@Localizer["Date"]</th>
-            <th>@Localizer["Actions"]</th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var item in Model)
-        {
-            <tr>
-                @if (!User.IsInRole("Student"))
-                 {
-                <td>@(item.Student?.Email ?? "—")</td>
-                 }
-                <td>@(item.Course?.Name ?? "—")</td>
-                <td>@(item.LabWork?.Title ?? "—")</td>
-                <td>@item.Value</td>
-                <td>@item.CreatedAt.ToShortDateString()</td>
-                <td>
-                    <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-sm btn-info">@Localizer["Details"]</a>
-                    @if (User.IsInRole("Admin") || User.IsInRole("Teacher"))
-                    {
-                        <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-sm btn-warning">@Localizer["Edit"]</a>
-                    }
-                    @if (User.IsInRole("Admin"))
-                    {
-                        <a asp-action="Delete" asp-route-id="@item.Id" class="btn btn-sm btn-danger">@Localizer["Delete"]</a>
-                    }
-                </td>
-            </tr>
-        }
-    </tbody>
-</table>
 </div>
-<div class="d-flex justify-content-center mt-3">
-    @Html.PagedListPager(Model, page => Url.Action("Index", new { page }),
-        new PagedListRenderOptions
-        {
-            LiElementClasses = new[] { "page-item" },
-            PageClasses = new[] { "page-link" }
-        })
-</div>
+
+@if (grouped != null && grouped.Any())
+{
+    @foreach (var group in grouped)
+    {
+        var avg = (double)group.Average;
+        var avgColor = avg >= 90 ? "#00b894" : avg >= 75 ? "#0984e3" : avg >= 60 ? "#fdcb6e" : "#d63031";
+
+        <div class="card mb-4">
+            <div class="card-header d-flex justify-content-between align-items-center"
+                 style="border-left: 4px solid @avgColor;">
+                <div>
+                    <strong>📚 @group.CourseName</strong>
+                    <span class="text-muted small ms-2">@((group.Grades as IEnumerable<dynamic>)?.Count() ?? 0) оцінок</span>
+                </div>
+                <div class="d-flex align-items-center gap-2">
+                    <span class="small text-muted">Середній бал:</span>
+                    <span class="badge" style="background: @avgColor; font-size: 1rem;">
+                        @avg.ToString("F1")
+                    </span>
+                </div>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    @foreach (ProjectU.Core.Models.Grade item in group.Grades)
+                    {
+                        var badgeColor = item.Value >= 90 ? "#00b894" : item.Value >= 75 ? "#0984e3" : item.Value >= 60 ? "#fdcb6e" : "#d63031";
+                        var emoji = item.Value >= 90 ? "🏆" : item.Value >= 75 ? "👍" : item.Value >= 60 ? "📝" : "❌";
+
+                        <div class="col-md-6 col-lg-4 mb-3">
+                            <div class="card h-100" style="border-top: 3px solid @badgeColor;">
+                                <div class="card-body p-3">
+                                    <div class="d-flex justify-content-between align-items-start mb-2">
+                                        <div>
+                                            @if (!User.IsInRole("Student"))
+                                            {
+                                                <div class="small fw-bold">👤 @(item.Student?.Email ?? "—")</div>
+                                            }
+                                            <div class="small text-muted">🔬 @(item.LabWork?.Title ?? "—")</div>
+                                            <div class="small text-muted">📅 @item.CreatedAt.ToShortDateString()</div>
+                                        </div>
+                                        <div style="
+                                                        width: 55px;
+                                                        height: 55px;
+                                                        border-radius: 50%;
+                                                        background: @badgeColor;
+                                                        display: flex;
+                                                        align-items: center;
+                                                        justify-content: center;
+                                                        font-size: 1.2rem;
+                                                        font-weight: bold;
+                                                        color: white;
+                                                        flex-shrink: 0;">
+                                            @item.Value
+                                        </div>
+                                    </div>
+
+                                    <div class="progress mb-2" style="height: 5px; border-radius: 3px;">
+                                        <div class="progress-bar" style="width: @item.Value%; background: @badgeColor;"></div>
+                                    </div>
+
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <small>
+                                            @emoji
+                                            @if (item.Value >= 90)
+                                            {
+                                                <text>Відмінно</text>
+                                            }
+                                            else if (item.Value >= 75)
+                                            {
+
+                                                <text>Добре</text>
+                                            }
+                                            else if (item.Value >= 60)
+                                            {
+
+                                                <text>Задовільно</text>
+                                            }
+                                            else
+                                            {
+
+                                                <text>Незадовільно</text>
+                                            }
+                                        </small>
+                                        <div class="d-flex gap-1">
+                                            <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-sm btn-outline-info">👁️</a>
+                                            @if (User.IsInRole("Admin") || User.IsInRole("Teacher"))
+                                            {
+                                                <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-sm btn-outline-warning">✏️</a>
+                                            }
+                                            @if (User.IsInRole("Admin"))
+                                            {
+                                                <a asp-action="Delete" asp-route-id="@item.Id" class="btn btn-sm btn-outline-danger">🗑️</a>
+                                            }
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    }
+}
+else
+{
+    <div class="alert alert-info text-center p-4">
+        <div style="font-size: 3rem;">📭</div>
+        <div>Оцінок ще немає</div>
+    </div>
+}

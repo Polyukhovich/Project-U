@@ -27,18 +27,43 @@ namespace Controllers
         }
 
         // GET: Grades — Student бачить тільки свої, Teacher/Admin бачать всі
-        [Authorize(Roles = "Admin,Teacher,Student")]
-        public async Task<IActionResult> Index(int page = 1)
+       [Authorize(Roles = "Admin,Teacher,Student")]
+public async Task<IActionResult> Index(int page = 1)
+{
+    var currentUser = await _context.Users
+        .FirstOrDefaultAsync(u => u.UserName == User.Identity!.Name);
+
+    var gradesQuery = _context.Grades
+        .Include(g => g.Student)
+        .Include(g => g.Course)
+        .Include(g => g.LabWork)
+        .AsQueryable();
+
+    // Студент бачить тільки свої оцінки
+    if (User.IsInRole("Student"))
+    {
+        gradesQuery = gradesQuery.Where(g => g.StudentId == currentUser!.Id);
+    }
+
+    var grades = await gradesQuery
+        .OrderByDescending(g => g.CreatedAt)
+        .ToListAsync();
+
+    // Групуємо по курсах
+    var grouped = grades
+        .GroupBy(g => g.Course?.Name ?? "—")
+        .Select(g => new
         {
-            int pageSize = 10;
-            var grades = await _context.Grades
-                .Include(g => g.Student)
-                .Include(g => g.Course)
-                .Include(g => g.LabWork)
-                .ToListAsync();
-            var pagedSchedules = grades.ToPagedList(page, pageSize);
-            return View(pagedSchedules);
-        }
+            CourseName = g.Key,
+            Grades = g.ToList(),
+            Average = g.Average(x => x.Value)
+        })
+        .OrderBy(g => g.CourseName)
+        .ToList();
+
+    ViewBag.GroupedGrades = grouped;
+    return View();
+}
 
         // GET: Grades/Create — тільки Teacher та Admin
         [Authorize(Roles = "Admin,Teacher")]
