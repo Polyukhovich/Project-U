@@ -3,15 +3,20 @@ html, body {
     overflow-x: hidden;
     max-width: 100vw;
 }
+
 /* ===== CSS ЗМІННІ ДЛЯ ТЕМ ===== */
 :root {
     --sidebar-bg: #1a1a2e;
     --accent: #6c5ce7;
-    --content-bg: #f8f9fa;
+    --content-bg: #F0F7F4;
     --topbar-bg: #ffffff;
-    --text-color: #333333;
-    --border-color: #dee2e6;
+    --text-color: #2A2B2E;
+    --border-color: #C2D3CD;
     --card-bg: #ffffff;
+    --card-shadow: 0 5px 20px rgba(0,0,0,0.08);
+    --input-bg: #F0F7F4;
+    --table-stripe: rgba(194, 211, 205, 0.2);
+    --table-hover: rgba(194, 211, 205, 0.4);
 }
 
 /* Темна тема */
@@ -21,7 +26,53 @@ body.theme-dark {
     --text-color: #ffffff;
     --border-color: #2d3561;
     --card-bg: #16213e;
+    --card-shadow: 0 5px 20px rgba(0,0,0,0.3);
+    --input-bg: #0f3460;
+    --table-stripe: rgba(255,255,255,0.05);
+    --table-hover: rgba(255,255,255,0.1);
 }
+    body.theme-dark .card {
+        background: #16213e;
+        color: #ffffff;
+    }
+
+        body.theme-dark .card p,
+        body.theme-dark .card span,
+        body.theme-dark .card div,
+        body.theme-dark .card h1,
+        body.theme-dark .card h2,
+        body.theme-dark .card h3,
+        body.theme-dark .card h4,
+        body.theme-dark .card h5,
+        body.theme-dark .card h6,
+        body.theme-dark .card .fw-bold,
+        body.theme-dark .card .text-muted {
+            color: #ffffff !important;
+        }
+    /* Темна тема — таблиці */
+    body.theme-dark .table {
+        background: #16213e;
+        color: #ffffff;
+    }
+
+        body.theme-dark .table td,
+        body.theme-dark .table th {
+            background: #16213e;
+            color: #ffffff !important;
+            border-color: #2d3561;
+        }
+
+    body.theme-dark .table-striped tbody tr:nth-of-type(odd) td {
+        background-color: #0f3460;
+    }
+
+    body.theme-dark .table-hover tbody tr:hover td {
+        background-color: #1a3a6e;
+    }
+
+    body.theme-dark .table-responsive {
+        background: #16213e;
+    }
 
 /* Зелена тема */
 body.theme-green {
@@ -30,7 +81,35 @@ body.theme-green {
     --content-bg: #f0fff4;
     --topbar-bg: #ffffff;
     --card-bg: #ffffff;
+    --border-color: #9ae6b4;
+    --input-bg: #f0fff4;
+    --table-stripe: rgba(154, 230, 180, 0.2);
+    --table-hover: rgba(154, 230, 180, 0.4);
 }
+    /* Зелена тема — таблиці */
+    body.theme-green .table {
+        background: #f0fff4;
+        color: #1a2e1a;
+    }
+
+        body.theme-green .table td,
+        body.theme-green .table th {
+            background: #f0fff4;
+            color: #1a2e1a !important;
+            border-color: #9ae6b4;
+        }
+
+    body.theme-green .table-striped tbody tr:nth-of-type(odd) td {
+        background-color: #c6f6d5;
+    }
+
+    body.theme-green .table-hover tbody tr:hover td {
+        background-color: #9ae6b4;
+    }
+
+    body.theme-green .table-responsive {
+        background: #f0fff4;
+    }
 
 /* Синя тема */
 body.theme-blue {
@@ -39,7 +118,37 @@ body.theme-blue {
     --content-bg: #ebf8ff;
     --topbar-bg: #ffffff;
     --card-bg: #ffffff;
+    --border-color: #90cdf4;
+    --input-bg: #ebf8ff;
+    --table-stripe: rgba(144, 205, 244, 0.2);
+    --table-hover: rgba(144, 205, 244, 0.4);
 }
+    /* Синя тема — таблиці */
+    body.theme-blue .table {
+        background: #ebf8ff;
+        color: #1a1f2e;
+    }
+
+        body.theme-blue .table td,
+        body.theme-blue .table th {
+            background: #ebf8ff;
+            color: #1a1f2e !important;
+            border-color: #90cdf4;
+        }
+
+    body.theme-blue .table-striped tbody tr:nth-of-type(odd) td {
+        background-color: #bee3f8;
+    }
+
+    body.theme-blue .table-hover tbody tr:hover td {
+        background-color: #90cdf4;
+    }
+
+    body.theme-blue .table-responsive {
+        background: #ebf8ff;
+    }
+
+
 /* ===== БОКОВИЙ БАР ===== */
 .sidebar {
     width: 250px;
@@ -84,6 +193,7 @@ body.theme-blue {
     .sidebar .nav-link:hover {
         background: rgba(255,255,255,0.1);
         color: white;
+        transform: translateX(5px);
     }
 
     .sidebar .nav-link.active {
@@ -123,6 +233,7 @@ body.theme-blue {
     position: sticky;
     top: 0;
     z-index: 999;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.05);
 }
 
 .toggle-btn {
@@ -130,7 +241,7 @@ body.theme-blue {
     border: none;
     font-size: 1.5rem;
     cursor: pointer;
-    color: #333;
+    color: var(--text-color);
 }
 
 /* ===== FOOTER ===== */
@@ -159,14 +270,120 @@ body.theme-blue {
         display: block;
     }
 
+/* ===== КАРТКИ ===== */
+.card {
+    background: var(--card-bg);
+    border: none;
+    border-radius: 15px;
+    box-shadow: var(--card-shadow);
+    transition: transform 0.2s ease;
+}
+
+    .card:hover {
+        transform: translateY(-2px);
+    }
+
+.card-header {
+    background: var(--card-bg);
+    color: var(--text-color);
+    border-bottom: 1px solid var(--border-color);
+    border-radius: 15px 15px 0 0 !important;
+    font-weight: 600;
+    color: var(--text-color);
+    padding: 15px 20px;
+}
+
+.card-body {
+    color: var(--text-color);
+}
+
+
+/* ===== ТАБЛИЦІ ===== */
+.table {
+    color: var(--text-color);
+    margin-bottom: 0;
+}
+
+    .table td, .table th {
+        border-color: var(--border-color);
+        color: var(--text-color);
+        vertical-align: middle;
+        padding: 12px 15px;
+    }
+
+.table-responsive {
+    border-radius: 12px;
+    box-shadow: var(--card-shadow);
+    background: var(--card-bg);
+}
+
+.table-striped tbody tr:nth-of-type(odd) {
+    background-color: var(--table-stripe);
+}
+
+.table-hover tbody tr:hover {
+    background-color: var(--table-hover);
+}
+
+.table thead.table-dark {
+    background: var(--accent) !important;
+}
+
+    .table thead.table-dark th {
+        background: var(--accent) !important;
+        color: white !important;
+        border-color: var(--accent) !important;
+    }
+
+/* ===== ФОРМИ ===== */
+.form-control, .form-select {
+    border: 2px solid var(--border-color);
+    border-radius: 12px;
+    background: var(--input-bg);
+    color: var(--text-color);
+    transition: all 0.3s ease;
+    padding: 10px 15px;
+}
+
+    .form-control:focus, .form-select:focus {
+        border-color: var(--accent);
+        box-shadow: 0 0 15px rgba(108,92,231,0.2);
+        background: var(--card-bg);
+        color: var(--text-color);
+    }
+
+/* ===== КНОПКИ ===== */
+.btn {
+    border-radius: 8px;
+    transition: all 0.2s ease;
+}
+
+    .btn:hover {
+        transform: translateY(-2px);
+    }
+
+.btn-primary {
+    background: linear-gradient(135deg, var(--accent), #a29bfe);
+    border: none;
+}
+
+    .btn-primary:hover {
+        box-shadow: 0 5px 15px rgba(108,92,231,0.4);
+    }
+
+/* ===== CONTENT AREA ===== */
+.content-area {
+    padding: 25px;
+}
+
 /* ===== АДАПТИВНІСТЬ ===== */
 @media (max-width: 991.98px) {
     .sidebar {
         width: 0;
         overflow: hidden;
-        z-index: 1050; /* Збільшив z-index, щоб меню було точно поверх усього */
+        z-index: 1050;
         box-shadow: none;
-        transition: width 0.3s ease; /* Додаємо плавність для появи */
+        transition: width 0.3s ease;
     }
 
         .sidebar.mobile-open {
@@ -177,13 +394,8 @@ body.theme-blue {
     .main-content {
         margin-left: 0 !important;
         width: 100%;
-        max-width: 100vw; /* Запобігає розтягуванню екрану */
+        max-width: 100vw;
     }
-}
-
-/* ===== CONTENT AREA ===== */
-.content-area {
-    padding: 20px;
 }
 
 @media (max-width: 575.98px) {
