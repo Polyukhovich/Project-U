@@ -14,7 +14,6 @@
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/css/sidebar.css" asp-append-version="true" />
-    <link rel="stylesheet" href="~/Project_U.styles.css" asp-append-version="true" />
     <!-- PWA -->
     <link rel="manifest" href="/manifest.json" />
     <meta name="theme-color" content="#6c5ce7" />
@@ -28,7 +27,10 @@
     </script>
     <!-- Overlay для мобільних -->
     <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
-
+    <!-- Офлайн банер -->
+    <div id="offlineBanner" style="display:none; position:fixed; top:0; left:0; right:0; background:#d63031; color:white; text-align:center; padding:8px; z-index:99999; font-size:0.9rem;">
+        📡 Ви зараз в режимі офлайн — деякі функції недоступні
+    </div>
     <!-- Боковий бар -->
     <div class="sidebar" id="sidebar">
         <a class="sidebar-brand" asp-controller="Home" asp-action="Index">
@@ -115,18 +117,17 @@
 
                     <!-- Випадаюче вікно сповіщень -->
                     <div id="notificationDropdown" style="
-                    display: none;
-                    position: absolute;
-                    right: 0;
-                    top: 45px;
-                    width: 320px;
-                    background: white;
-                    border-radius: 12px;
-                    box-shadow: 0 8px 25px rgba(0,0,0,0.15);
-                    z-index: 9999;
-                    overflow: hidden;
-                ">
-                        <div style="padding: 12px 15px; border-bottom: 1px solid #eee; display: flex; justify-content: space-between; align-items: center;">
+                        display: none;
+                        position: absolute;
+                        right: 0;
+                        top: 45px;
+                        width: 320px;
+                        border-radius: 12px;
+                        box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+                        z-index: 9999;
+                        overflow: hidden;
+                    " class="notification-dropdown">
+                        <div class="notification-dropdown-header">
                             <strong>🔔 Сповіщення</strong>
                             <span id="markAllBtn" style="display:none">
                                 <button onclick="markAllRead()" class="btn btn-sm btn-outline-success">✅ Прочитано</button>
@@ -152,199 +153,32 @@
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
-    <script>
-        function toggleSidebar() {
-            const sidebar = document.getElementById('sidebar');
-            const mainContent = document.getElementById('mainContent');
-            const overlay = document.getElementById('sidebarOverlay');
-
-            if (window.innerWidth <= 991) {
-                sidebar.classList.toggle('mobile-open');
-                overlay.classList.toggle('active');
-            } else {
-                sidebar.classList.toggle('collapsed');
-                mainContent.classList.toggle('expanded');
-            }
-        }
-
-        // Закриття при кліку поза меню (на мобільних)
-        document.addEventListener('click', function(e) {
-            const sidebar = document.getElementById('sidebar');
-            const toggleBtn = document.querySelector('.toggle-btn');
-            const overlay = document.getElementById('sidebarOverlay');
-
-            if (window.innerWidth <= 991 &&
-                !sidebar.contains(e.target) &&
-                !toggleBtn.contains(e.target)) {
-
-                sidebar.classList.remove('mobile-open');
-                overlay.classList.remove('active'); // Важливо: ховаємо і оверлей теж
-           
-                // Розблоковуємо скрол, якщо клікнули повз меню
-                document.body.classList.remove('no-scroll');
-                }
-        });
-
-        // Підсвічування активного посилання
-        document.querySelectorAll('.sidebar .nav-link').forEach(link => {
-            if (link.href === window.location.href) {
-                link.classList.add('active');
-            }
-        });
-
-        // Обробник зміни розміру вікна (очищений)
-        window.addEventListener('resize', function() {
-            // Просто скидаємо мобільні класи, якщо екран став великим
-            if (window.innerWidth > 991) {
-                document.getElementById('sidebar').classList.remove('mobile-open');
-                document.getElementById('sidebarOverlay').classList.remove('active');
-            // Точно розблоковуємо скрол, якщо перевернули телефон або розтягнули вікно
-        document.body.classList.remove('no-scroll');
-            }
-        });
-    </script>
-    <!-- SignalR клієнт -->
+    <script src="~/js/sidebar.js" asp-append-version="true"></script>
     <script src="~/lib/signalr/dist/browser/signalr.js"></script>
 
     @if (User.Identity!.IsAuthenticated)
     {
+        <script src="~/js/notifications.js" asp-append-version="true"></script>
         <script>
-            // ===== SignalR =====
             const connection = new signalR.HubConnectionBuilder()
                 .withUrl("/hubs/notifications")
                 .withAutomaticReconnect()
                 .build();
 
             connection.on("ReceiveNotification", function (message) {
-                showToast(message);
+                const url = getNotificationUrl(message);
+                showToast(message, url);
                 loadNotifications();
                 sendBrowserNotification(message);
             });
 
             connection.start().catch(err => console.error(err));
-
-            // ===== Toggle dropdown =====
-            function toggleNotifications() {
-                const dropdown = document.getElementById('notificationDropdown');
-                dropdown.style.display = dropdown.style.display === 'none' ? 'block' : 'none';
-                if (dropdown.style.display === 'block') loadNotifications();
-            }
-
-            // Закриваємо при кліку поза вікном
-            document.addEventListener('click', function(e) {
-                const wrapper = document.querySelector('.notification-wrapper');
-                if (wrapper && !wrapper.contains(e.target)) {
-                    document.getElementById('notificationDropdown').style.display = 'none';
-                }
-            });
-           
-                        function getNotificationUrl(message) {
-                if (message.includes('оцінку')) return '/Grades';
-                if (message.includes('здав роботу') || message.includes('роботу')) return '/Assignments';
-                if (message.includes('розклад')) return '/Schedules';
-                if (message.includes('дедлайн') || message.includes('Дедлайн')) return '/Assignments';
-                if (message.includes('схожість') || message.includes('перевірку')) return '/LabWorks';
-                return '/';
-            }
-            // ===== Генерація HTML сповіщення =====
-            function buildNotificationHtml(n) {
-                var bg = n.isRead ? 'white' : '#f0eeff';
-                var badge = n.isRead ? '' : '<span style="float:right; background:#6c5ce7; color:white; border-radius:10px; padding:1px 8px; font-size:0.7rem;">Нове</span>';
-                var url = getNotificationUrl(n.message);
-                return '<div style="padding:12px 15px; border-bottom:1px solid #f0f0f0; background:' + bg + '; cursor:pointer;" onclick="readAndGo(' + n.id + ', \'' + url + '\')">'
-                    + '<div style="font-size:0.85rem; color:#333;">' + n.message + '</div>'
-                    + '<div style="font-size:0.75rem; color:#999; margin-top:3px;">🕐 ' + n.createdAt + '</div>'
-                    + badge
-                    + '</div>';
-            }
-            
-            // ===== Завантаження сповіщень =====
-            function loadNotifications() {
-                fetch('/Notifications/GetNotifications')
-                    .then(r => r.json())
-                    .then(data => {
-                        const list = document.getElementById('notificationList');
-                        const badge = document.getElementById('unreadBadge');
-                        const markAllBtn = document.getElementById('markAllBtn');
-
-                        // Спочатку фільтруємо
-                        const unread = data.filter(n => !n.isRead);
-
-                        badge.style.display = unread.length > 0 ? 'inline' : 'none';
-                        badge.textContent = unread.length;
-
-                        // Потім показуємо/ховаємо кнопку
-                        if (markAllBtn) {
-                            markAllBtn.style.display = unread.length > 0 ? 'inline' : 'none';
-                        }
-
-                        if (unread.length === 0) {
-                            list.innerHTML = '<p class="text-center text-muted p-3">Немає нових сповіщень</p>';
-                            return;
-                        }
-
-                        list.innerHTML = unread.map(n => buildNotificationHtml(n)).join('');
-                    });
-            }
-
-            // ===== Прочитано =====
-            function markAllRead() {
-                const token = document.querySelector('input[name="__RequestVerificationToken"]')?.value;
-                fetch('/Notifications/MarkAllRead', {
-                    method: 'POST',
-                    headers: { 'RequestVerificationToken': token || '' }
-                }).then(() => {
-                    loadNotifications();
-                    document.getElementById('notificationDropdown').style.display = 'none';
-                });
-            }
-            // Позначити як прочитане і перейти
-            function readAndGo(id, url) {
-                const token = document.querySelector('input[name="__RequestVerificationToken"]')?.value;
-                fetch(`/Notifications/MarkRead/${id}`, {
-                    method: 'POST',
-                    headers: { 'RequestVerificationToken': token || '' }
-                }).then(() => {
-                    loadNotifications();
-                    window.location = url;
-                });
-            }
-            // ===== Toast =====
-            function showToast(message) {
-                const toast = document.createElement('div');
-                toast.className = 'toast-notification';
-                toast.innerHTML = `🔔 ${message}`;
-                document.body.appendChild(toast);
-                setTimeout(() => toast.classList.add('show'), 100);
-                setTimeout(() => {
-                    toast.classList.remove('show');
-                    setTimeout(() => toast.remove(), 300);
-                }, 4000);
-            }
-
-            // ===== Browser Notifications =====
-            function sendBrowserNotification(message) {
-                if ('Notification' in window && Notification.permission === 'granted') {
-                    new Notification('Project U 🎓', {
-                        body: message,
-                        icon: '/favicon.ico'
-                    });
-                }
-            }
-
-            // Запит дозволу
-            if ('Notification' in window && Notification.permission === 'default') {
-                Notification.requestPermission();
-            }
-
-            // Завантажуємо при старті
-            loadNotifications();
-            setInterval(loadNotifications, 30000);
         </script>
     }
+
     @await RenderSectionAsync("Scripts", required: false)
+
     <script>
-        // Реєстрація Service Worker
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', function() {
                 navigator.serviceWorker.register('/sw.js')

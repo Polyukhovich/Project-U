@@ -1,17 +1,12 @@
-const CACHE_NAME = 'projectu-v1';
+const CACHE_NAME = 'projectu-v3';
 
-// Файли які кешуємо для offline
 const STATIC_ASSETS = [
     '/',
-    '/css/site.css',
-    '/css/sidebar.css',
-    '/lib/bootstrap/dist/css/bootstrap.min.css',
-    '/lib/jquery/dist/jquery.min.js',
-    '/lib/bootstrap/dist/js/bootstrap.bundle.min.js',
-    '/offline.html'
+    '/offline.html',
+    '/icons/icon-192.png',
+    '/icons/icon-512.png'
 ];
 
-// Встановлення Service Worker
 self.addEventListener('install', event => {
     event.waitUntil(
         caches.open(CACHE_NAME)
@@ -20,7 +15,6 @@ self.addEventListener('install', event => {
     );
 });
 
-// Активація — видаляємо старий кеш
 self.addEventListener('activate', event => {
     event.waitUntil(
         caches.keys().then(keys =>
@@ -32,47 +26,47 @@ self.addEventListener('activate', event => {
     );
 });
 
-// Обробка запитів
 self.addEventListener('fetch', event => {
     const url = new URL(event.request.url);
 
+    if (event.request.method !== 'GET') return;
+    if (url.pathname.startsWith('/hubs/')) return;
+    if (url.pathname.startsWith('/Notifications/')) return;
+    if (url.pathname === '/ping.txt') return;
+
     // Cache-First для статичних файлів
-    if (event.request.method === 'GET' && (
+    if (
         url.pathname.startsWith('/css/') ||
         url.pathname.startsWith('/js/') ||
         url.pathname.startsWith('/lib/') ||
         url.pathname.startsWith('/icons/')
-    )) {
+    ) {
         event.respondWith(
-            caches.match(event.request)
-                .then(cached => cached || fetch(event.request))
-        );
-        return;
-    }
-
-    // Network-First для розкладу та оцінок
-    if (event.request.method === 'GET' && (
-        url.pathname.startsWith('/Schedules') ||
-        url.pathname.startsWith('/Grades')
-    )) {
-        event.respondWith(
-            fetch(event.request)
-                .then(response => {
+            caches.match(event.request).then(cached => {
+                if (cached) return cached;
+                return fetch(event.request).then(response => {
                     const clone = response.clone();
-                    caches.open(CACHE_NAME)
-                        .then(cache => cache.put(event.request, clone));
+                    caches.open(CACHE_NAME).then(cache => cache.put(event.request, clone));
                     return response;
-                })
-                .catch(() => caches.match(event.request)
-                    .then(cached => cached || caches.match('/offline.html'))
-                )
+                });
+            })
         );
         return;
     }
 
-    // Для решти — Network з fallback
+    // Network-First для динамічних сторінок
     event.respondWith(
         fetch(event.request)
-            .catch(() => caches.match('/offline.html'))
+            .then(response => {
+                if (response.ok) {
+                    const clone = response.clone();
+                    caches.open(CACHE_NAME).then(cache => cache.put(event.request, clone));
+                }
+                return response;
+            })
+            .catch(() =>
+                caches.match(event.request)
+                    .then(cached => cached || caches.match('/offline.html'))
+            )
     );
 });

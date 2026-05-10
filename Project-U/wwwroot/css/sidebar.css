@@ -181,7 +181,21 @@ body.theme-blue {
     cursor: pointer;
     color: var(--text-color);
 }
+/* ===== DROPDOWN СПОВІЩЕНЬ ===== */
+.notification-dropdown {
+    background: var(--card-bg);
+    border: 1px solid var(--border-color);
+}
 
+.notification-dropdown-header {
+    padding: 12px 15px;
+    border-bottom: 1px solid var(--border-color);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    color: var(--text-color);
+    background: var(--card-bg);
+}
 /* ===== FOOTER ===== */
 .footer {
     background: var(--topbar-bg);
@@ -347,7 +361,7 @@ body.theme-blue {
 /* ===== TOAST ===== */
 .toast-notification {
     position: fixed;
-    bottom: 20px;
+    top: 70px;
     right: 20px;
     background: var(--accent);
     color: white;
@@ -356,7 +370,7 @@ body.theme-blue {
     box-shadow: 0 4px 15px rgba(0,0,0,0.2);
     z-index: 9999;
     opacity: 0;
-    transform: translateY(20px);
+    transform: translateY(-20px);
     transition: all 0.3s ease;
     max-width: 300px;
 }

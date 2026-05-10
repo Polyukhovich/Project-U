@@ -4,101 +4,131 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Project U — Офлайн</title>
+    <link rel="stylesheet" href="/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="/css/sidebar.css" />
     <style>
         body {
-            font-family: 'Times New Roman', sans-serif;
-            background: #1a1a2e;
+            background: var(--content-bg);
+        }
+
+        .offline-badge {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background: #d63031;
             color: white;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            margin: 0;
-        }
-
-        .container {
             text-align: center;
-            padding: 40px;
+            padding: 8px;
+            z-index: 99999;
+            font-size: 0.9rem;
         }
 
-        .icon {
-            font-size: 5rem;
-            margin-bottom: 20px;
+        .nav-sidebar {
+            position: fixed;
+            left: 0;
+            top: 40px;
+            width: 250px;
+            height: 100vh;
+            background: #1a1a2e;
+            padding: 20px 10px;
+            overflow-y: auto;
         }
 
-        h1 {
-            font-size: 2rem;
+            .nav-sidebar a {
+                display: block;
+                color: rgba(255,255,255,0.8);
+                padding: 10px 15px;
+                border-radius: 8px;
+                text-decoration: none;
+                margin-bottom: 4px;
+                transition: all 0.2s;
+            }
+
+                .nav-sidebar a:hover {
+                    background: rgba(255,255,255,0.1);
+                    color: white;
+                }
+
+        .nav-brand {
+            color: white;
+            font-size: 1.3rem;
+            font-weight: bold;
+            padding: 10px 15px 20px;
+            display: block;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
             margin-bottom: 10px;
         }
 
-        p {
-            color: rgba(255,255,255,0.7);
-            margin-bottom: 30px;
+        .main {
+            margin-left: 250px;
+            padding: 60px 30px 30px;
         }
 
-        .btn {
-            background: #6c5ce7;
-            color: white;
-            border: none;
-            padding: 12px 30px;
-            border-radius: 8px;
-            font-size: 1rem;
-            cursor: pointer;
-            text-decoration: none;
+        @media (max-width: 991px) {
+            .nav-sidebar {
+                display: none;
+            }
+
+            .main {
+                margin-left: 0;
+            }
         }
-
-            .btn:hover {
-                background: #5a4bd1;
-            }
-
-        .available {
-            margin-top: 30px;
-            padding: 20px;
-            background: rgba(255,255,255,0.05);
-            border-radius: 10px;
-        }
-
-            .available h3 {
-                margin-bottom: 10px;
-            }
-
-            .available a {
-                display: inline-block;
-                margin: 5px;
-                padding: 8px 15px;
-                background: rgba(108,92,231,0.3);
-                border-radius: 6px;
-                color: white;
-                text-decoration: none;
-            }
     </style>
 </head>
 <body>
-    <div class="container">
-        <div class="icon">📡</div>
-        <h1>Немає підключення до інтернету</h1>
-        <p>Перевірте підключення та спробуйте знову</p>
-        <a href="/" class="btn" onclick="checkConnection(event)">🔄 Спробувати знову</a>
+    <script>
+        const t = localStorage.getItem('theme');
+        if (t && t !== 'default') document.body.classList.add('theme-' + t);
+    </script>
 
-        <div class="available">
-            <h3>📋 Доступно офлайн:</h3>
-            <a href="/Schedules">📅 Розклад</a>
-            <a href="/Grades">📊 Оцінки</a>
+    <!-- Офлайн банер -->
+    <div class="offline-badge">
+        📡 Ви зараз в режимі офлайн
+    </div>
+
+    <!-- Бокова панель -->
+    <div class="nav-sidebar">
+        <span class="nav-brand">🎓 Project U</span>
+        <a href="/">🏠 Головна</a>
+        <a href="/Groups">👥 Групи</a>
+        <a href="/Courses">📚 Курси</a>
+        <a href="/Schedules">📅 Розклад</a>
+        <a href="/Grades">📊 Оцінки</a>
+        <a href="/Assignments">📋 Завдання</a>
+        <a href="/Settings">⚙️ Налаштування</a>
+    </div>
+
+    <!-- Основний контент -->
+    <div class="main">
+        <div class="card text-center p-5" style="max-width: 500px; margin: 0 auto;">
+            <div style="font-size: 4rem;">📡</div>
+            <h2 class="mt-3">Немає підключення</h2>
+            <p class="text-muted">
+                Ця сторінка недоступна офлайн. Але ви можете переглянути сторінки які ви вже відвідували.
+            </p>
+
+            <div class="d-flex flex-wrap gap-2 justify-content-center mb-4">
+                <a href="/Schedules" class="btn btn-outline-primary">📅 Розклад</a>
+                <a href="/Grades" class="btn btn-outline-success">📊 Оцінки</a>
+                <a href="/Assignments" class="btn btn-outline-warning">📋 Завдання</a>
+            </div>
+
+            <button onclick="tryReconnect()" class="btn btn-primary w-100">🔄 Спробувати знову</button>
         </div>
     </div>
+
     <script>
-        function checkConnection(e) {
-            e.preventDefault();
+        function tryReconnect() {
             if (navigator.onLine) {
                 window.location.href = '/';
             } else {
-                const btn = document.querySelector('.btn');
+                const btn = document.querySelector('.btn-primary');
                 btn.textContent = '❌ Немає з\'єднання';
                 setTimeout(() => btn.textContent = '🔄 Спробувати знову', 2000);
             }
         }
 
-        // Автоматично перенаправляємо коли з'явиться інтернет
         window.addEventListener('online', function () {
             window.location.href = '/';
         });

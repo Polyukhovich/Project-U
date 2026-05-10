@@ -264,7 +264,7 @@ namespace Controllers
                         await _context.SaveChangesAsync();
                     }
                 }
-                return RedirectToAction(nameof(Index));
+                return RedirectToAction("Index", "Assignments");
             }
 
             ViewData["StudentId"] = new SelectList(_context.Users, "Id", "Email", labWork.StudentId);
@@ -379,7 +379,7 @@ namespace Controllers
             _context.LabWorks.Remove(labWork);
             await _context.SaveChangesAsync();
 
-            return RedirectToAction(nameof(Index));
+            return RedirectToAction("Index", "Assignments");
         }
 
         private bool LabWorkExists(int id)
