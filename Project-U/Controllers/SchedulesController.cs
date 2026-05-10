@@ -77,29 +77,6 @@ namespace Controllers
             ViewBag.AllSchedules = schedules;
             return View();
         }
-
-        // GET: Schedules/Details/5
-        [Authorize(Roles = "Admin,Teacher,Student")]
-        public async Task<IActionResult> Details(int? id)
-        {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            var schedule = await _context.Schedules
-                .Include(s => s.Course)
-                .Include(s => s.Group)
-                .Include(s => s.Dates)
-                .FirstOrDefaultAsync(m => m.Id == id);
-            if (schedule == null)
-            {
-                return NotFound();
-            }
-
-            return View(schedule);
-        }
-
         // GET: Schedules/Create — Admin та Teacher
         [Authorize(Roles = "Admin,Teacher")]
         public async Task<IActionResult> Create()
@@ -249,6 +226,93 @@ namespace Controllers
             ViewData["GroupId"] = new SelectList(groups, "Id", "Name", schedule.GroupId);
             return View(schedule);
         }
+        // GET: Schedules/All — загальний розклад для всіх
+        [Authorize(Roles = "Admin,Teacher,Student")]
+        public async Task<IActionResult> All()
+        {
+            var schedules = await _context.Schedules
+                .Include(s => s.Course)
+                .Include(s => s.Group)
+                .Include(s => s.Dates)
+                .ToListAsync();
+
+            var today = DateOnly.FromDateTime(DateTime.Today);
+
+            var days = new (string Name, DayOfWeek Day)[]
+            {
+        ("Понеділок", DayOfWeek.Monday),
+        ("Вівторок", DayOfWeek.Tuesday),
+        ("Середа", DayOfWeek.Wednesday),
+        ("Четвер", DayOfWeek.Thursday),
+        ("П'ятниця", DayOfWeek.Friday),
+        ("Субота", DayOfWeek.Saturday)
+            };
+
+            var grouped = days.Select(d => new
+            {
+                Day = d.Name,
+                DayOfWeek = d.Day,
+                Schedules = schedules
+                    .Where(s => s.Dates.Any(date =>
+                        date.Date.DayOfWeek == d.Day &&
+                        date.Date >= today))
+                    .OrderBy(s => s.StartTime)
+                    .ToList()
+            }).ToList();
+
+            ViewBag.GroupedSchedules = grouped;
+            return View("Index");
+        }
+
+        [Authorize(Roles = "Admin,Teacher,Student")]
+        public async Task<IActionResult> ByDay(string day)
+        {
+            var currentUser = await _context.Users
+                .Include(u => u.Group)
+                .FirstOrDefaultAsync(u => u.UserName == User.Identity!.Name);
+
+            var today = DateOnly.FromDateTime(DateTime.Today);
+
+            var dayOfWeekMap = new Dictionary<string, DayOfWeek>
+    {
+        { "Понеділок", DayOfWeek.Monday },
+        { "Вівторок", DayOfWeek.Tuesday },
+        { "Середа", DayOfWeek.Wednesday },
+        { "Четвер", DayOfWeek.Thursday },
+        { "П'ятниця", DayOfWeek.Friday },
+        { "Субота", DayOfWeek.Saturday }
+    };
+
+            if (!dayOfWeekMap.TryGetValue(day, out var dayOfWeek))
+                return NotFound();
+
+            // Завантажуємо всі розклади з датами
+            var allSchedules = await _context.Schedules
+                .Include(s => s.Course)
+                .Include(s => s.Group)
+                .Include(s => s.Dates)
+                .ToListAsync();
+
+            // Фільтруємо в пам'яті
+            var schedules = allSchedules
+                .Where(s => s.Dates.Any(d =>
+                    d.Date.DayOfWeek == dayOfWeek &&
+                    d.Date >= today))
+                .ToList();
+
+            // Фільтрація по ролі
+            if (User.IsInRole("Student") && currentUser?.GroupId != null)
+                schedules = schedules.Where(s => s.GroupId == currentUser.GroupId).ToList();
+
+            if (User.IsInRole("Teacher"))
+                schedules = schedules.Where(s => s.Course.TeacherId == currentUser!.Id).ToList();
+
+            schedules = schedules.OrderBy(s => s.StartTime).ToList();
+
+            ViewBag.Day = day;
+            ViewBag.Schedules = schedules;
+            return View();
+        }
 
         // GET: Schedules/Delete/5 — тільки Admin
         [Authorize(Roles = "Admin")]
@@ -275,16 +339,21 @@ namespace Controllers
         // POST: Schedules/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
-        [Authorize(Roles = "Admin")]
+        [Authorize(Roles = "Admin,Teacher")]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var schedule = await _context.Schedules.FindAsync(id);
+            var schedule = await _context.Schedules
+                .Include(s => s.Dates)
+                .FirstOrDefaultAsync(s => s.Id == id);
+
             if (schedule != null)
             {
+                // Спочатку видаляємо дати
+                _context.ScheduleDates.RemoveRange(schedule.Dates);
                 _context.Schedules.Remove(schedule);
+                await _context.SaveChangesAsync();
             }
 
-            await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
 

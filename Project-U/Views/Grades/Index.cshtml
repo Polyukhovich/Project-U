@@ -41,76 +41,92 @@
                     {
                         var badgeColor = item.Value >= 90 ? "#00b894" : item.Value >= 75 ? "#0984e3" : item.Value >= 60 ? "#fdcb6e" : "#d63031";
                         var emoji = item.Value >= 90 ? "🏆" : item.Value >= 75 ? "👍" : item.Value >= 60 ? "📝" : "❌";
+                        var isAdminOrTeacher = User.IsInRole("Admin") || User.IsInRole("Teacher");
 
                         <div class="col-md-6 col-lg-4 mb-3">
-                            <div class="card h-100" style="border-top: 3px solid @badgeColor;">
-                                <div class="card-body p-3">
-                                    <div class="d-flex justify-content-between align-items-start mb-2">
-                                        <div>
-                                            @if (!User.IsInRole("Student"))
-                                            {
-                                                <div class="small fw-bold">👤 @(item.Student?.Email ?? "—")</div>
-                                            }
+                            @if (isAdminOrTeacher)
+                            {
+                                <a asp-action="Details" asp-route-id="@item.Id" class="text-decoration-none d-block">
+                                    <div class="card h-100" style="border-top: 3px solid @badgeColor; cursor: pointer; transition: transform 0.2s ease, box-shadow 0.2s ease;"
+                                         onmouseover="this.style.transform='translateY(-5px)'; this.style.boxShadow='0 10px 25px rgba(0,0,0,0.15)'"
+                                         onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow=''">
+                                        <div class="card-body p-3">
+                                            <div class="small fw-bold">👤 @(item.Student != null ? $"{item.Student.FirstName} {item.Student.LastName}" : "—")</div>
                                             <div class="small text-muted">🔬 @(item.LabWork?.Title ?? "—")</div>
                                             <div class="small text-muted">📅 @item.CreatedAt.ToShortDateString()</div>
-                                        </div>
-                                        <div style="
-                                                        width: 55px;
-                                                        height: 55px;
-                                                        border-radius: 50%;
-                                                        background: @badgeColor;
-                                                        display: flex;
-                                                        align-items: center;
-                                                        justify-content: center;
-                                                        font-size: 1.2rem;
-                                                        font-weight: bold;
-                                                        color: white;
-                                                        flex-shrink: 0;">
-                                            @item.Value
+                                            <div class="d-flex justify-content-between align-items-center mt-2">
+                                                <small>
+                                                    @emoji
+                                                    @if (item.Value >= 90)
+                                                    {
+                                                        <text>Відмінно</text>
+                                                    }
+                                                    else if (item.Value >= 75)
+                                                    {
+
+                                                        <text>Добре</text>
+                                                    }
+                                                    else if (item.Value >= 60)
+                                                    {
+
+                                                        <text>Задовільно</text>
+                                                    }
+                                                    else
+                                                    {
+
+                                                        <text>Незадовільно</text>
+                                                    }
+                                                </small>
+                                                <div style="width:50px;height:50px;border-radius:50%;background:@badgeColor;display:flex;align-items:center;justify-content:center;font-size:1.1rem;font-weight:bold;color:white;">
+                                                    @item.Value
+                                                </div>
+                                            </div>
+                                            <div class="progress mt-2" style="height:5px;border-radius:3px;">
+                                                <div class="progress-bar" style="width:@item.Value%;background:@badgeColor;"></div>
+                                            </div>
                                         </div>
                                     </div>
+                                </a>
+                            }
+                            else
+                            {
+                                <div class="card h-100" style="border-top: 3px solid @badgeColor;">
+                                    <div class="card-body p-3">
+                                        <div class="small text-muted">🔬 @(item.LabWork?.Title ?? "—")</div>
+                                        <div class="small text-muted">📅 @item.CreatedAt.ToShortDateString()</div>
+                                        <div class="d-flex justify-content-between align-items-center mt-2">
+                                            <small>
+                                                @emoji
+                                                @if (item.Value >= 90)
+                                                {
+                                                    <text>Відмінно</text>
+                                                }
+                                                else if (item.Value >= 75)
+                                                {
 
-                                    <div class="progress mb-2" style="height: 5px; border-radius: 3px;">
-                                        <div class="progress-bar" style="width: @item.Value%; background: @badgeColor;"></div>
-                                    </div>
+                                                    <text>Добре</text>
+                                                }
+                                                else if (item.Value >= 60)
+                                                {
 
-                                    <div class="d-flex justify-content-between align-items-center">
-                                        <small>
-                                            @emoji
-                                            @if (item.Value >= 90)
-                                            {
-                                                <text>Відмінно</text>
-                                            }
-                                            else if (item.Value >= 75)
-                                            {
+                                                    <text>Задовільно</text>
+                                                }
+                                                else
+                                                {
 
-                                                <text>Добре</text>
-                                            }
-                                            else if (item.Value >= 60)
-                                            {
-
-                                                <text>Задовільно</text>
-                                            }
-                                            else
-                                            {
-
-                                                <text>Незадовільно</text>
-                                            }
-                                        </small>
-                                        <div class="d-flex gap-1">
-                                            <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-sm btn-outline-info">👁️</a>
-                                            @if (User.IsInRole("Admin") || User.IsInRole("Teacher"))
-                                            {
-                                                <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-sm btn-outline-warning">✏️</a>
-                                            }
-                                            @if (User.IsInRole("Admin"))
-                                            {
-                                                <a asp-action="Delete" asp-route-id="@item.Id" class="btn btn-sm btn-outline-danger">🗑️</a>
-                                            }
+                                                    <text>Незадовільно</text>
+                                                }
+                                            </small>
+                                            <div style="width:50px;height:50px;border-radius:50%;background:@badgeColor;display:flex;align-items:center;justify-content:center;font-size:1.1rem;font-weight:bold;color:white;">
+                                                @item.Value
+                                            </div>
+                                        </div>
+                                        <div class="progress mt-2" style="height:5px;border-radius:3px;">
+                                            <div class="progress-bar" style="width:@item.Value%;background:@badgeColor;"></div>
                                         </div>
                                     </div>
                                 </div>
-                            </div>
+                            }
                         </div>
                     }
                 </div>

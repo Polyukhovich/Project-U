@@ -1,0 +1,51 @@
+﻿@{
+    ViewData["Title"] = "Помилка";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    var code = ViewBag.Code ?? 404;
+}
+
+<div class="text-center p-5">
+    <div style="font-size: 5rem;">
+        @if (code == 404)
+        {
+            <text>🔍</text>
+        }
+        else if (code == 403)
+        {
+
+            <text>🚫</text>
+        }
+        else
+        {
+
+            <text>⚠️</text>
+        }
+    </div>
+    <h1 style="font-size: 4rem; color: var(--accent);">@code</h1>
+    <h3 class="mb-3">
+        @if (code == 404)
+        {
+            <text>Сторінку не знайдено</text>
+        }
+        else if (code == 403)
+        {
+
+            <text>Доступ заборонено</text>
+        }
+        else
+        {
+
+            <text>Щось пішло не так</text>
+        }
+    </h3>
+    <p class="text-muted mb-4">
+        @if (code == 404)
+        {
+            <text>Можливо сторінку було видалено або посилання застаріло</text>
+        }
+    </p>
+    <div class="d-flex justify-content-center gap-3">
+        <a asp-controller="Home" asp-action="Index" class="btn btn-primary">🏠 На головну</a>
+        <button onclick="history.back()" class="btn btn-outline-secondary">← Назад</button>
+    </div>
+</div>

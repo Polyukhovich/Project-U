@@ -1,80 +1,136 @@
 ﻿@model ProjectU.Core.Models.LabWork
-@using Microsoft.AspNetCore.Mvc.Localization
-@inject IViewLocalizer Localizer
-
 @{
     ViewData["Title"] = "Деталі роботи";
 }
 
-<h2>@Model.Title</h2>
-
-<div class="card mb-3">
-    <div class="card-body">
-        <dl class="row">
-            <dt class="col-sm-3">Студент</dt>
-            <dd class="col-sm-9">@(Model.Student?.Email ?? "—")</dd>
-
-            <dt class="col-sm-3">Курс</dt>
-            <dd class="col-sm-9">@(Model.Course?.Name ?? "—")</dd>
-
-            <dt class="col-sm-3">Дата завантаження</dt>
-            <dd class="col-sm-9">@Model.UploadedAt.ToShortDateString()</dd>
-
-            <dt class="col-sm-3">Текст роботи</dt>
-            <dd class="col-sm-9">@Model.Content</dd>
-        </dl>
-    </div>
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2>🔬 @Model.Title</h2>
+    <a asp-action="Index" class="btn btn-outline-secondary">← Назад</a>
 </div>
 
-<!-- Результати перевірки антиплагіату -->
-@if (Model.PlagiarismResults != null && Model.PlagiarismResults.Any())
-{
-    <h4>🔍 Результати перевірки антиплагіату</h4>
-    <table class="table table-bordered">
-        <thead>
-            <tr>
-                <th>Порівняно з роботою</th>
-                <th>Відсоток схожості</th>
-                <th>Дата перевірки</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var result in Model.PlagiarismResults)
-            {
-                <tr class="@(result.SimilarityPercent > 50 ? "table-danger" : result.SimilarityPercent > 20 ? "table-warning" : "table-success")">
-                    <td>@(result.ComparedWith?.Title ?? "—")</td>
-                    <td>
-                        <strong>@result.SimilarityPercent.ToString("F1")%</strong>
-                        @if (result.SimilarityPercent > 50)
+<div class="row">
+    <!-- Інформація про роботу -->
+    <div class="col-md-4 mb-4">
+        <div class="card" style="border-top: 4px solid @(Model.IsGraded ? "#00b894" : "#fdcb6e");">
+            <div class="card-header"><strong>📋 Інформація</strong></div>
+            <div class="card-body">
+                <dl class="row mb-0">
+                    <dt class="col-sm-5">Студент</dt>
+                    <dd class="col-sm-7">
+                        @(Model.Student != null
+                                                ? $"{Model.Student.FirstName} {Model.Student.LastName}"
+                                                : "—")
+                    </dd>
+
+                    <dt class="col-sm-5">Курс</dt>
+                    <dd class="col-sm-7">@(Model.Course?.Name ?? "—")</dd>
+
+                    <dt class="col-sm-5">Завдання</dt>
+                    <dd class="col-sm-7">@(Model.Assignment?.Title ?? "—")</dd>
+
+                    <dt class="col-sm-5">Файл</dt>
+                    <dd class="col-sm-7">
+                        @if (!string.IsNullOrEmpty(Model.FileName))
                         {
-                            <span class="badge bg-danger">Високий плагіат</span>
-                        }
-                        else if (result.SimilarityPercent > 20)
-                        {
-                            <span class="badge bg-warning">Середній</span>
+                            <span>📄 @Model.FileName</span>
                         }
                         else
                         {
-                            <span class="badge bg-success">Низький</span>
+                            <span class="text-muted">—</span>
                         }
-                    </td>
-                    <td>@result.CheckedAt.ToShortDateString()</td>
-                </tr>
-            }
-        </tbody>
-    </table>
-}
-else
-{
-    <div class="alert alert-info">
-        🔍 Результати перевірки антиплагіату відсутні
-    </div>
-}
+                    </dd>
 
-<div class="mt-3">
-    @if (User.IsInRole("Admin") || User.IsInRole("Student"))
-    {
-        <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-warning">Редагувати</a>
-    }
-    <a asp-action="Index" class="btn btn-secondary">Назад</a>
+                    <dt class="col-sm-5">Дата здачі</dt>
+                    <dd class="col-sm-7">@Model.UploadedAt.ToString("dd.MM.yyyy HH:mm")</dd>
+
+                    <dt class="col-sm-5">Статус</dt>
+                    <dd class="col-sm-7">
+                        @if (Model.IsGraded)
+                        {
+                            <span class="badge bg-success">✅ Оцінено</span>
+                        }
+                        else
+                        {
+                            <span class="badge bg-warning">⏳ Очікує оцінки</span>
+                        }
+                    </dd>
+                </dl>
+            </div>
+            @if (User.IsInRole("Admin") || User.IsInRole("Student"))
+            {
+                <div class="card-footer d-flex gap-2">
+                    @if (!Model.IsGraded)
+                    {
+                        <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-warning btn-sm flex-fill">✏️ Редагувати</a>
+                    }
+                    @if (User.IsInRole("Admin"))
+                    {
+                        <a asp-action="Delete" asp-route-id="@Model.Id" class="btn btn-danger btn-sm">🗑️</a>
+                    }
+                </div>
+            }
+        </div>
+    </div>
+
+    <!-- Результати антиплагіату -->
+    <div class="col-md-8 mb-4">
+        <div class="card">
+            <div class="card-header"><strong>🔍 Результати антиплагіату</strong></div>
+            <div class="card-body p-0">
+                @if (Model.PlagiarismResults != null && Model.PlagiarismResults.Any())
+                {
+                    <div class="table-responsive">
+                        <table class="table table-hover mb-0">
+                            <thead>
+                                <tr>
+                                    <th>Порівняно з роботою</th>
+                                    <th>Схожість</th>
+                                    <th>Дата перевірки</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var result in Model.PlagiarismResults)
+                                {
+                                    var plagColor = result.SimilarityPercent > 50 ? "#d63031" : result.SimilarityPercent > 20 ? "#fdcb6e" : "#00b894";
+                                    <tr>
+                                        <td>@(result.ComparedWith?.Title ?? "—")</td>
+                                        <td>
+                                            <div class="d-flex align-items-center gap-2">
+                                                <div class="progress flex-fill" style="height: 8px;">
+                                                    <div class="progress-bar" style="width: @result.SimilarityPercent%; background: @plagColor;"></div>
+                                                </div>
+                                                <span class="badge" style="background: @plagColor;">
+                                                    @result.SimilarityPercent.ToString("F1")%
+                                                </span>
+                                            </div>
+                                            @if (result.SimilarityPercent > 50)
+                                            {
+                                                <small class="text-danger">Високий плагіат</small>
+                                            }
+                                            else if (result.SimilarityPercent > 20)
+                                            {
+                                                <small class="text-warning">Середній</small>
+                                            }
+                                            else
+                                            {
+                                                <small class="text-success">Низький</small>
+                                            }
+                                        </td>
+                                        <td>@result.CheckedAt.ToShortDateString()</td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                }
+                else
+                {
+                    <div class="p-4 text-center text-muted">
+                        <div style="font-size: 2rem;">🔍</div>
+                        <div>Результати перевірки відсутні</div>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
 </div>

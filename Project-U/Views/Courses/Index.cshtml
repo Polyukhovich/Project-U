@@ -1,59 +1,85 @@
-﻿@model X.PagedList.IPagedList<ProjectU.Core.Models.Course>
-@using X.PagedList.Mvc.Core
-@using X.PagedList
-@using Microsoft.AspNetCore.Mvc.Localization
+﻿@using Microsoft.AspNetCore.Mvc.Localization
 @inject IViewLocalizer Localizer
 
 @{
     ViewData["Title"] = Localizer["Title"].Value;
+    var grouped = ViewBag.GroupedCourses as IEnumerable<dynamic>;
 }
 
-<h2>@Localizer["Title"]</h2>
-
-<p>
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2>📚 @Localizer["Title"]</h2>
     @if (User.IsInRole("Admin") || User.IsInRole("Teacher"))
     {
         <a asp-action="Create" class="btn btn-primary">➕ @Localizer["AddCourse"]</a>
     }
-</p>
-<div class="table-responsive">
-<table class="table table-striped">
-    <thead>
-        <tr>
-            <th>@Localizer["CourseName"]</th>
-            <th>@Localizer["Teacher"]</th>
-            <th>@Localizer["Group"]</th>
-            <th>@Localizer["Actions"]</th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var item in Model)
-        {
-            <tr>
-                <td>@item.Name</td>
-                <td>@(item.Teacher?.Email ?? "—")</td>
-                <td>@(item.Group?.Name ?? "—")</td>
-                <td>
-                    <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-sm btn-info">@Localizer["Details"]</a>
-                    @if (User.IsInRole("Admin") || User.IsInRole("Teacher"))
-                    {
-                        <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-sm btn-warning">@Localizer["Edit"]</a>
-                    }
-                    @if (User.IsInRole("Admin"))
-                    {
-                        <a asp-action="Delete" asp-route-id="@item.Id" class="btn btn-sm btn-danger">@Localizer["Delete"]</a>
-                    }
-                </td>
-            </tr>
-        }
-    </tbody>
-</table>
 </div>
-<div class="d-flex justify-content-center mt-3">
-    @Html.PagedListPager(Model, page => Url.Action("Index", new { page }),
-        new PagedListRenderOptions
-        {
-            LiElementClasses = new[] { "page-item" },
-            PageClasses = new[] { "page-link" }
-        })
-</div>
+
+@if (grouped != null && grouped.Any())
+{
+    @foreach (var group in grouped)
+    {
+        <div class="card mb-4">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <strong>👥 @group.GroupName</strong>
+                <span class="badge bg-secondary">
+                    @((group.Courses as IEnumerable<dynamic>)?.Count() ?? 0) курсів
+                </span>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    @foreach (ProjectU.Core.Models.Course item in group.Courses)
+                    {
+                        <div class="col-md-6 col-lg-4 mb-3">
+                            <a asp-action="Details" asp-route-id="@item.Id" class="text-decoration-none d-block">
+                                <div class="card h-100" style="border-top: 3px solid var(--accent); cursor: pointer; transition: transform 0.2s ease, box-shadow 0.2s ease;"
+                                     onmouseover="this.style.transform='translateY(-5px)'; this.style.boxShadow='0 10px 25px rgba(0,0,0,0.15)'"
+                                     onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow=''">
+                                    <div class="card-body p-3">
+                                        <div class="mb-2">
+                                            <h6 class="mb-0">📚 @item.Name</h6>
+                                        </div>
+                                        <div class="small mb-1">
+                                            👨‍🏫 @(item.Teacher != null
+                                                                            ? $"{item.Teacher.FirstName} {item.Teacher.LastName}"
+                                                                            : "—")
+                            </div>
+                            @if (item.CourseTeachers != null && item.CourseTeachers.Any())
+                                        {
+                                            @foreach (var ct in item.CourseTeachers)
+                                            {
+                                                <div class="small mb-1">
+                                                    👨‍🏫 @(ct.Teacher != null
+                                                                                    ? $"{ct.Teacher.FirstName} {ct.Teacher.LastName}"
+                                                                                    : "—")
+                                <span class="badge bg-secondary" style="font-size:0.6rem;">асистент</span>
+                            </div>
+                                                        }
+                                        }
+                        </div>
+                    </div>
+                </a>
+
+                @if (User.IsInRole("Admin") || User.IsInRole("Teacher"))
+                            {
+                                <div class="d-flex gap-1 mt-1">
+                                    <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-sm btn-outline-warning flex-fill">✏️</a>
+                                    @if (User.IsInRole("Admin"))
+                                    {
+                                        <a asp-action="Delete" asp-route-id="@item.Id" class="btn btn-sm btn-outline-danger flex-fill">🗑️</a>
+                                    }
+                                </div>
+                            }
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    }
+}
+else
+{
+    <div class="alert alert-info text-center p-4">
+        <div style="font-size: 3rem;">📭</div>
+        <div>Курсів ще немає</div>
+    </div>
+}

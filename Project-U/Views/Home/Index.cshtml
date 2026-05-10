@@ -5,94 +5,61 @@
     ViewData["Title"] = "Головна";
 }
 
-<h2>🏠 Головна</h2>
+<!-- Привітання -->
+<div class="card mb-4" style="border-top: 4px solid var(--accent);">
+    <div class="card-body p-4">
+        <h3 class="mb-1">👋 Ласкаво просимо до Project U!</h3>
+        <p class="text-muted mb-0">📅 @ViewBag.Today</p>
+    </div>
+</div>
 
 <!-- Розклад на сьогодні -->
-<div class="card mb-4">
+<div class="card">
     <div class="card-header d-flex justify-content-between align-items-center">
         <strong>📅 Розклад на сьогодні</strong>
-        <span class="text-muted small">@ViewBag.Today</span>
+        <a asp-controller="Schedules" asp-action="Index" class="btn btn-sm btn-outline-primary">
+            Весь розклад →
+        </a>
     </div>
     <div class="card-body p-0">
         @if (ViewBag.TodaySchedules != null && ((List<ProjectU.Core.Models.Schedule>)ViewBag.TodaySchedules).Any())
         {
-            <div class="table-responsive">
-                <table class="table table-hover mb-0">
-                    <thead class="table-dark">
-                        <tr>
-                            <th>Час</th>
-                            <th>Курс</th>
-                            <th>Аудиторія</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach (var schedule in (List<ProjectU.Core.Models.Schedule>)ViewBag.TodaySchedules)
-                        {
-                            <tr>
-                                <td>
-                                    <strong>@schedule.StartTime.ToString("HH:mm")</strong>
-                                    — @schedule.EndTime.ToString("HH:mm")
-                                </td>
-                                <td>@(schedule.Course?.Name ?? "—")</td>
-                                <td>
-                                    @if (!string.IsNullOrEmpty(schedule.Room))
-                                    {
+            <div class="row p-3 g-3">
+                @foreach (var schedule in (List<ProjectU.Core.Models.Schedule>)ViewBag.TodaySchedules)
+                {
+                    <div class="col-md-6">
+                        <div class="card h-100" style="border-left: 4px solid var(--accent);">
+                            <div class="card-body p-3">
+                                <div class="fw-bold">@(schedule.Course?.Name ?? "—")</div>
+                                <div class="small text-muted mt-1">
+                                    ⏰ @schedule.StartTime.ToString("HH:mm") — @schedule.EndTime.ToString("HH:mm")
+                                </div>
+                                @if (!string.IsNullOrEmpty(schedule.Room))
+                                {
+                                    <div class="mt-2">
                                         @if (schedule.Room.StartsWith("http"))
                                         {
-                                            <a href="@schedule.Room" target="_blank" class="btn btn-sm btn-outline-info">🔗 Онлайн</a>
+                                            <a href="@schedule.Room" target="_blank" class="btn btn-sm btn-outline-info w-100">🔗 Приєднатись онлайн</a>
                                         }
                                         else
                                         {
-                                            <span>🏫 @schedule.Room</span>
+                                            <span class="small">🏫 @schedule.Room</span>
                                         }
-                                    }
-                                    else
-                                    {
-                                        <span class="text-muted">—</span>
-                                    }
-                                </td>
-                            </tr>
-                        }
-                    </tbody>
-                </table>
+                                    </div>
+                                }
+                            </div>
+                        </div>
+                    </div>
+                }
             </div>
         }
         else
         {
-            <div class="p-4 text-center text-muted">
-                <p>🎉 Сьогодні занять немає!</p>
-                <a asp-controller="Schedules" asp-action="Index" class="btn btn-outline-primary btn-sm">
-                    📅 Переглянути весь розклад
-                </a>
+            <div class="p-5 text-center">
+                <div style="font-size: 4rem;">🎉</div>
+                <h5 class="mt-2">Сьогодні занять немає!</h5>
+                <p class="text-muted">Можна відпочити 😊</p>
             </div>
         }
-    </div>
-</div>
-
-<!-- Швидкі дії -->
-<div class="row">
-    <div class="col-md-4 mb-3">
-        <a asp-controller="Assignments" asp-action="Index" class="text-decoration-none">
-            <div class="card text-center p-3 h-100">
-                <div style="font-size: 2rem;">📋</div>
-                <div class="fw-bold">Завдання</div>
-            </div>
-        </a>
-    </div>
-    <div class="col-md-4 mb-3">
-        <a asp-controller="Grades" asp-action="Index" class="text-decoration-none">
-            <div class="card text-center p-3 h-100">
-                <div style="font-size: 2rem;">📊</div>
-                <div class="fw-bold">Оцінки</div>
-            </div>
-        </a>
-    </div>
-    <div class="col-md-4 mb-3">
-        <a asp-controller="LabWorks" asp-action="Index" class="text-decoration-none">
-            <div class="card text-center p-3 h-100">
-                <div style="font-size: 2rem;">🔬</div>
-                <div class="fw-bold">Лабораторні</div>
-            </div>
-        </a>
     </div>
 </div>

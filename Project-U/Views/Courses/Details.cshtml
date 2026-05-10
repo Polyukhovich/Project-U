@@ -1,36 +1,117 @@
 ﻿@model ProjectU.Core.Models.Course
-
 @{
-    ViewData["Title"] = "Details";
+    ViewData["Title"] = "Деталі курсу";
 }
 
-<h1>Details</h1>
-
-<div>
-    <h4>Course</h4>
-    <hr />
-    <dl class="row">
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Name)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Name)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Teacher)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Teacher.Id)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Group)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Group.Name)
-        </dd>
-    </dl>
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2>📚 @Model.Name</h2>
+    <a asp-action="Index" class="btn btn-outline-secondary">← Назад</a>
 </div>
-<div>
-    <a asp-action="Edit" asp-route-id="@Model?.Id">Edit</a> |
-    <a asp-action="Index">Back to List</a>
+
+<div class="row">
+    <!-- Інформація про курс -->
+    <div class="col-md-4 mb-4">
+        <div class="card" style="border-top: 4px solid var(--accent);">
+            <div class="card-header"><strong>📋 Інформація</strong></div>
+            <div class="card-body">
+                <dl class="row mb-0">
+                    <dt class="col-sm-5">Назва</dt>
+                    <dd class="col-sm-7">@Model.Name</dd>
+
+                    <dt class="col-sm-5">Група</dt>
+                    <dd class="col-sm-7">
+                        <span class="badge bg-secondary">@(Model.Group?.Name ?? "—")</span>
+                    </dd>
+                </dl>
+
+                <!-- Головний викладач -->
+                <hr />
+                <div class="fw-bold mb-2">👨‍🏫 Викладачі:</div>
+                <div class="d-flex align-items-center gap-2 mb-2">
+                    <span class="badge bg-primary">Головний</span>
+                    <span>@(Model.Teacher != null ? $"{Model.Teacher.FirstName} {Model.Teacher.LastName}" : "—")</span>
+                </div>
+
+                <!-- Додаткові викладачі -->
+                @if (Model.CourseTeachers != null && Model.CourseTeachers.Any())
+                {
+                    @foreach (var ct in Model.CourseTeachers)
+                    {
+                        <div class="d-flex align-items-center gap-2 mb-2">
+                            <span class="badge bg-secondary">Асистент</span>
+                            <span>@(ct.Teacher != null ? $"{ct.Teacher.FirstName} {ct.Teacher.LastName}" : "—")</span>
+                        </div>
+                    }
+                }
+            </div>
+            @if (User.IsInRole("Admin") || User.IsInRole("Teacher"))
+            {
+                <div class="card-footer d-flex gap-2">
+                    <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-warning btn-sm flex-fill">✏️ Редагувати</a>
+                    @if (User.IsInRole("Admin"))
+                    {
+                        <a asp-action="Delete" asp-route-id="@Model.Id" class="btn btn-danger btn-sm">🗑️</a>
+                    }
+                </div>
+            }
+        </div>
+    </div>
+
+    <!-- Роботи студентів -->
+    <div class="col-md-8 mb-4">
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <strong>🔬 Здані роботи</strong>
+                <span class="badge bg-secondary">@(Model.LabWorks?.Count ?? 0)</span>
+            </div>
+            <div class="card-body p-0">
+                @if (Model.LabWorks != null && Model.LabWorks.Any())
+                {
+                    <div class="table-responsive">
+                        <table class="table table-hover mb-0">
+                            <thead>
+                                <tr>
+                                    <th>Назва</th>
+                                    <th>Студент</th>
+                                    <th>Дата</th>
+                                    <th>Статус</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var work in Model.LabWorks)
+                                {
+                                    <tr>
+                                        <td>@work.Title</td>
+                                        <td>
+                                            @(work.Student != null
+                                            ? $"{work.Student.FirstName} {work.Student.LastName}"
+                                            : "—")
+                                </td>
+                                <td>@work.UploadedAt.ToShortDateString()</td>
+                                <td>
+                                    @if (work.IsGraded)
+                                            {
+                                                <span class="badge bg-success">✅ Оцінено</span>
+                                            }
+                                            else
+                                            {
+                                                <span class="badge bg-warning">⏳ Очікує</span>
+                                            }
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                }
+                else
+                {
+                    <div class="p-4 text-center text-muted">
+                        <div style="font-size: 2rem;">📭</div>
+                        <div>Робіт ще немає</div>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
 </div>

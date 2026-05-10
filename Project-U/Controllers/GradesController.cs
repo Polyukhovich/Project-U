@@ -69,20 +69,15 @@ public async Task<IActionResult> Index(int page = 1)
         [Authorize(Roles = "Admin,Teacher")]
         public async Task<IActionResult> Details(int? id)
         {
-            if (id == null)
-            {
-                return NotFound();
-            }
+            if (id == null) return NotFound();
 
             var grade = await _context.Grades
+                .Include(g => g.Student)
                 .Include(g => g.Course)
                 .Include(g => g.LabWork)
-                .Include(g => g.Student)
                 .FirstOrDefaultAsync(m => m.Id == id);
-            if (grade == null)
-            {
-                return NotFound();
-            }
+
+            if (grade == null) return NotFound();
 
             return View(grade);
         }
@@ -141,19 +136,16 @@ public async Task<IActionResult> Index(int page = 1)
         [Authorize(Roles = "Admin,Teacher")]
         public async Task<IActionResult> Edit(int? id)
         {
-            if (id == null)
-            {
-                return NotFound();
-            }
+            if (id == null) return NotFound();
 
-            var grade = await _context.Grades.FindAsync(id);
-            if (grade == null)
-            {
-                return NotFound();
-            }
-            ViewData["CourseId"] = new SelectList(_context.Courses, "Id", "Description", grade.CourseId);
-            ViewData["LabWorkId"] = new SelectList(_context.LabWorks, "Id", "Content", grade.LabWorkId);
-            ViewData["StudentId"] = new SelectList(_context.Users, "Id", "Id", grade.StudentId);
+            var grade = await _context.Grades
+                .Include(g => g.Student)
+                .Include(g => g.Course)
+                .Include(g => g.LabWork)
+                .FirstOrDefaultAsync(g => g.Id == id);
+
+            if (grade == null) return NotFound();
+
             return View(grade);
         }
 
@@ -196,24 +188,19 @@ public async Task<IActionResult> Index(int page = 1)
             return View(grade);
         }
 
-        // GET: Grades/Delete/5 — тільки Admin
-        [Authorize(Roles = "Admin")]
+        // GET: Grades/Delete/5 — тільки Admin та Teacher
+        [Authorize(Roles = "Admin,Teacher")]
         public async Task<IActionResult> Delete(int? id)
         {
-            if (id == null)
-            {
-                return NotFound();
-            }
+            if (id == null) return NotFound();
 
             var grade = await _context.Grades
+                .Include(g => g.Student)
                 .Include(g => g.Course)
                 .Include(g => g.LabWork)
-                .Include(g => g.Student)
                 .FirstOrDefaultAsync(m => m.Id == id);
-            if (grade == null)
-            {
-                return NotFound();
-            }
+
+            if (grade == null) return NotFound();
 
             return View(grade);
         }
@@ -221,16 +208,26 @@ public async Task<IActionResult> Index(int page = 1)
         // POST: Grades/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
-        [Authorize(Roles = "Admin")]
+        [Authorize(Roles = "Admin,Teacher")]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
             var grade = await _context.Grades.FindAsync(id);
             if (grade != null)
             {
-                _context.Grades.Remove(grade);
-            }
+                // Якщо є LabWork — змінюємо статус на неоцінений
+                if (grade.LabWorkId != null)
+                {
+                    var labWork = await _context.LabWorks.FindAsync(grade.LabWorkId);
+                    if (labWork != null)
+                    {
+                        labWork.IsGraded = false;
+                        _context.Update(labWork);
+                    }
+                }
 
-            await _context.SaveChangesAsync();
+                _context.Grades.Remove(grade);
+                await _context.SaveChangesAsync();
+            }
             return RedirectToAction(nameof(Index));
         }
 

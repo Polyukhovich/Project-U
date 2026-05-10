@@ -8,10 +8,13 @@
 
 <div class="d-flex justify-content-between align-items-center mb-4">
     <h2>📅 Розклад</h2>
-    @if (User.IsInRole("Admin") || User.IsInRole("Teacher"))
-    {
-        <a asp-action="Create" class="btn btn-primary">➕ Додати заняття</a>
-    }
+    <div class="d-flex gap-2">
+        <a asp-action="All" class="btn btn-outline-secondary">🌍 Загальний розклад</a>
+        @if (User.IsInRole("Admin") || User.IsInRole("Teacher"))
+        {
+            <a asp-action="Create" class="btn btn-primary">➕ Додати заняття</a>
+        }
+    </div>
 </div>
 
 @if (grouped != null)
@@ -54,7 +57,9 @@
                                         break;
                                 }
                             </span>
-                            <strong>@group.Day</strong>
+                            <a asp-action="ByDay" asp-route-day="@group.Day" class="text-decoration-none">
+                                <strong>@group.Day</strong>
+                            </a>
                         </div>
                         @if (hasSchedules)
                         {

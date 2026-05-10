@@ -33,22 +33,19 @@ namespace Controllers
         }
 
         // GET: Groups/Details/5
-        [Authorize(Roles = "Admin,Teacher,Student")]
         public async Task<IActionResult> Details(int? id)
         {
-            if (id == null)
-            {
-                return NotFound();
-            }
+            if (id == null) return NotFound();
 
-            var @group = await _context.Groups
+            var group = await _context.Groups
+                .Include(g => g.Students)
+                .Include(g => g.Courses)
+                    .ThenInclude(c => c.Teacher)
                 .FirstOrDefaultAsync(m => m.Id == id);
-            if (@group == null)
-            {
-                return NotFound();
-            }
 
-            return View(@group);
+            if (group == null) return NotFound();
+
+            return View(group);
         }
 
         // GET: Groups/Create — тільки Admin

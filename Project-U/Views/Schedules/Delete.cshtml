@@ -3,35 +3,68 @@
     ViewData["Title"] = "Видалити розклад";
 }
 
-<h2>Видалити розклад</h2>
-
-<div class="alert alert-warning">
-    ⚠️ Ви впевнені що хочете видалити цей розклад?
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2>🗑️ Видалити розклад</h2>
+    <a asp-action="Index" class="btn btn-outline-secondary">← Назад</a>
 </div>
 
-<div class="card mb-4">
-    <div class="card-body">
-        <dl class="row">
-            <dt class="col-sm-3">Курс</dt>
-            <dd class="col-sm-9">@(Model?.Course?.Name ?? "—")</dd>
+<div class="row">
+    <div class="col-md-5">
+        <div class="card" style="border-top: 4px solid #d63031;">
+            <div class="card-body">
+                <div class="alert alert-warning mb-3">
+                    ⚠️ Ви впевнені що хочете видалити цей розклад? Всі дати занять також будуть видалені!
+                </div>
 
-            <dt class="col-sm-3">Група</dt>
-            <dd class="col-sm-9">@(Model?.Group?.Name ?? "—")</dd>
+                <dl class="row mb-3">
+                    <dt class="col-sm-5">Курс</dt>
+                    <dd class="col-sm-7">
+                        <span class="badge bg-secondary">@(Model?.Course?.Name ?? "—")</span>
+                    </dd>
 
-            <dt class="col-sm-3">Час</dt>
-            <dd class="col-sm-9">@Model?.StartTime.ToString("HH:mm") — @Model?.EndTime.ToString("HH:mm")</dd>
+                    <dt class="col-sm-5">Група</dt>
+                    <dd class="col-sm-7">
+                        <span class="badge bg-secondary">@(Model?.Group?.Name ?? "—")</span>
+                    </dd>
 
-            <dt class="col-sm-3">Аудиторія</dt>
-            <dd class="col-sm-9">@(string.IsNullOrEmpty(Model?.Room) ? "—" : Model.Room)</dd>
+                    <dt class="col-sm-5">Час</dt>
+                    <dd class="col-sm-7">
+                        ⏰ @Model?.StartTime.ToString("HH:mm") — @Model?.EndTime.ToString("HH:mm")
+                    </dd>
 
-            <dt class="col-sm-3">Кількість занять</dt>
-            <dd class="col-sm-9">@(Model?.Dates?.Count ?? 0)</dd>
-        </dl>
+                    <dt class="col-sm-5">Аудиторія</dt>
+                    <dd class="col-sm-7">
+                        @if (!string.IsNullOrEmpty(Model?.Room))
+                        {
+                            @if (Model.Room.StartsWith("http"))
+                            {
+                                <a href="@Model.Room" target="_blank" class="btn btn-sm btn-outline-info">🔗 Онлайн</a>
+                            }
+                            else
+                            {
+                                <span>🏫 @Model.Room</span>
+                            }
+                        }
+                        else
+                        {
+                            <span class="text-muted">—</span>
+                        }
+                    </dd>
+
+                    <dt class="col-sm-5">Кількість дат</dt>
+                    <dd class="col-sm-7">
+                        <span class="badge bg-primary">@(Model?.Dates?.Count ?? 0)</span>
+                    </dd>
+                </dl>
+
+                <form asp-action="Delete" method="post">
+                    <input type="hidden" asp-for="Id" />
+                    <div class="d-flex gap-2">
+                        <button type="submit" class="btn btn-danger flex-fill">🗑️ Видалити</button>
+                        <a asp-action="Index" class="btn btn-outline-secondary flex-fill">Скасувати</a>
+                    </div>
+                </form>
+            </div>
+        </div>
     </div>
 </div>
-
-<form asp-action="Delete" method="post">
-    <input type="hidden" asp-for="Id" />
-    <button type="submit" class="btn btn-danger">🗑️ Видалити</button>
-    <a asp-action="Index" class="btn btn-secondary">Скасувати</a>
-</form>

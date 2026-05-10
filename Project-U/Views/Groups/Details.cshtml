@@ -1,24 +1,126 @@
 ﻿@model ProjectU.Core.Models.Group
-
 @{
-    ViewData["Title"] = "Details";
+    ViewData["Title"] = "Деталі групи";
 }
 
-<h1>Details</h1>
-
-<div>
-    <h4>Group</h4>
-    <hr />
-    <dl class="row">
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Name)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Name)
-        </dd>
-    </dl>
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2>👥 @Model.Name</h2>
+    <a asp-action="Index" class="btn btn-outline-secondary">← Назад</a>
 </div>
-<div>
-    <a asp-action="Edit" asp-route-id="@Model?.Id">Edit</a> |
-    <a asp-action="Index">Back to List</a>
+
+<div class="row">
+    <!-- Інформація про групу -->
+    <div class="col-md-4 mb-4">
+        <div class="card" style="border-top: 4px solid var(--accent);">
+            <div class="card-header"><strong>📋 Інформація</strong></div>
+            <div class="card-body">
+                <dl class="row mb-0">
+                    <dt class="col-sm-5">Назва</dt>
+                    <dd class="col-sm-7">@Model.Name</dd>
+                    <dt class="col-sm-5">Студентів</dt>
+                    <dd class="col-sm-7">
+                        <span class="badge bg-primary">@(Model.Students?.Count ?? 0)</span>
+                    </dd>
+                    <dt class="col-sm-5">Курсів</dt>
+                    <dd class="col-sm-7">
+                        <span class="badge bg-secondary">@(Model.Courses?.Count ?? 0)</span>
+                    </dd>
+                </dl>
+            </div>
+            @if (User.IsInRole("Admin"))
+            {
+                <div class="card-footer d-flex gap-2">
+                    <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-warning btn-sm flex-fill">✏️ Редагувати</a>
+                    <a asp-action="Delete" asp-route-id="@Model.Id" class="btn btn-danger btn-sm flex-fill">🗑️ Видалити</a>
+                </div>
+            }
+        </div>
+    </div>
+
+    <!-- Студенти групи -->
+    <div class="col-md-8 mb-4">
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <strong>👨‍🎓 Студенти</strong>
+                <span class="badge bg-primary">@(Model.Students?.Count ?? 0)</span>
+            </div>
+            <div class="card-body p-0">
+                @if (Model.Students != null && Model.Students.Any())
+                {
+                    <div class="table-responsive">
+                        <table class="table table-hover mb-0">
+                            <thead>
+                                <tr>
+                                    <th>Ім'я</th>
+                                    <th>Email</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var student in Model.Students)
+                                {
+                                    <tr>
+                                        <td>@student.FirstName @student.LastName</td>
+                                        <td>@student.Email</td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                }
+                else
+                {
+                    <div class="p-4 text-center text-muted">
+                        <div style="font-size: 2rem;">📭</div>
+                        <div>Студентів ще немає</div>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+
+    <!-- Курси групи -->
+    <div class="col-12 mb-4">
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <strong>📚 Курси</strong>
+                <span class="badge bg-secondary">@(Model.Courses?.Count ?? 0)</span>
+            </div>
+            <div class="card-body p-0">
+                @if (Model.Courses != null && Model.Courses.Any())
+                {
+                    <div class="table-responsive">
+                        <table class="table table-hover mb-0">
+                            <thead>
+                                <tr>
+                                    <th>Назва курсу</th>
+                                    <th>Викладач</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var course in Model.Courses)
+                                {
+                                    <tr>
+                                        <td>@course.Name</td>
+                                        <td>
+                                            @(course.Teacher != null
+                                                ? $"{course.Teacher.FirstName} {course.Teacher.LastName}"
+                                                : "—")
+                                </td>
+                            </tr>
+                                                        }
+                            </tbody>
+                        </table>
+                    </div>
+                }
+                else
+                {
+                    <div class="p-4 text-center text-muted">
+                        <div style="font-size: 2rem;">📭</div>
+                        <div>Курсів ще немає</div>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>
 </div>

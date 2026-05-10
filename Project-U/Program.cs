@@ -71,9 +71,12 @@ if (!app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+
+app.UseStatusCodePagesWithReExecute("/Home/Error/{0}");
+
 app.UseStaticFiles();
 // Rate Limiting
-app.UseRequestLimiter(authLimit: 200, anonLimit: 50, window: TimeSpan.FromMinutes(1));
+app.UseRequestLimiter(authLimit: 250, anonLimit: 150, window: TimeSpan.FromMinutes(1));
 // Middleware локалізаці
 app.UseRequestLocalization();
 

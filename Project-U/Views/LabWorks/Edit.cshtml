@@ -1,51 +1,81 @@
 ﻿@model ProjectU.Core.Models.LabWork
-
 @{
-    ViewData["Title"] = "Edit";
+    ViewData["Title"] = "Редагувати роботу";
 }
 
-<h1>Edit</h1>
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2>✏️ Редагувати роботу</h2>
+    <a asp-action="Index" class="btn btn-outline-secondary">← Назад</a>
+</div>
 
-<h4>LabWork</h4>
-<hr />
 <div class="row">
-    <div class="col-md-4">
-        <form asp-action="Edit">
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <input type="hidden" asp-for="Id" />
-            <div class="form-group">
-                <label asp-for="Title" class="control-label"></label>
-                <input asp-for="Title" class="form-control" />
-                <span asp-validation-for="Title" class="text-danger"></span>
+    <div class="col-md-5">
+        <div class="card" style="border-top: 4px solid var(--accent);">
+            <div class="card-body">
+                <form asp-action="Edit" method="post" enctype="multipart/form-data">
+                    <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+                    <input type="hidden" asp-for="Id" />
+                    <input type="hidden" asp-for="StudentId" />
+                    <input type="hidden" asp-for="CourseId" />
+                    <input type="hidden" asp-for="AssignmentId" />
+                    <input type="hidden" asp-for="FilePath" />
+                    <input type="hidden" asp-for="UploadedAt" />
+                    <input type="hidden" asp-for="IsGraded" />
+
+                    <div class="mb-3">
+                        <label class="form-label">👤 Студент</label>
+                        <input type="text" class="form-control"
+                               value="@(Model.Student != null ? $"{Model.Student.FirstName} {Model.Student.LastName}" : "—")"
+                               disabled />
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">📚 Курс</label>
+                        <input type="text" class="form-control"
+                               value="@(Model.Course?.Name ?? "—")"
+                               disabled />
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">📋 Завдання</label>
+                        <input type="text" class="form-control"
+                               value="@(Model.Assignment?.Title ?? "—")"
+                               disabled />
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="Title" class="form-label">Назва роботи</label>
+                        <input asp-for="Title" class="form-control" />
+                        <span asp-validation-for="Title" class="text-danger"></span>
+                    </div>
+
+                    @if (!string.IsNullOrEmpty(Model.FileName))
+                    {
+                        <div class="mb-3">
+                            <label class="form-label">Поточний файл</label>
+                            <div class="alert alert-info py-2">
+                                📄 @Model.FileName
+                            </div>
+                        </div>
+                    }
+
+                    <div class="mb-3">
+                        <label class="form-label">Новий файл (залиш порожнім щоб не змінювати)</label>
+                        <input type="file" name="uploadedFile" class="form-control" accept=".pdf,.docx" />
+                    </div>
+
+                    <div class="d-flex gap-2">
+                        <button type="submit" class="btn btn-warning flex-fill">💾 Зберегти</button>
+                        <a asp-action="Index" class="btn btn-outline-secondary">Скасувати</a>
+                    </div>
+                </form>
             </div>
-            <div class="form-group">
-                <label asp-for="Content" class="control-label"></label>
-                <input asp-for="Content" class="form-control" />
-                <span asp-validation-for="Content" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="UploadedAt" class="control-label"></label>
-                <input asp-for="UploadedAt" class="form-control" />
-                <span asp-validation-for="UploadedAt" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="StudentId" class="control-label"></label>
-                <select asp-for="StudentId" class="form-control" asp-items="ViewBag.StudentId"></select>
-                <span asp-validation-for="StudentId" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="CourseId" class="control-label"></label>
-                <select asp-for="CourseId" class="form-control" asp-items="ViewBag.CourseId"></select>
-                <span asp-validation-for="CourseId" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <input type="submit" value="Save" class="btn btn-primary" />
-            </div>
-        </form>
+        </div>
     </div>
 </div>
 
-<div>
-    <a asp-action="Index">Back to List</a>
-</div>
-
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

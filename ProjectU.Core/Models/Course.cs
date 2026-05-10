@@ -34,5 +34,8 @@ namespace ProjectU.Core.Models
 
         // Список лабораторних робіт по курсу
         public ICollection<LabWork> LabWorks { get; set; } = new List<LabWork>();
+        // Всі викладачі курсу
+        public ICollection<CourseTeacher> CourseTeachers { get; set; } = new List<CourseTeacher>();
+
     }
 }

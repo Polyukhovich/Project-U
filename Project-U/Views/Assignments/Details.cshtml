@@ -1,148 +1,245 @@
 ﻿@model ProjectU.Core.Models.Assignment
 @{
     ViewData["Title"] = "Деталі завдання";
+    var isExpired = Model.Deadline < DateTime.Now;
+    var hoursLeft = (Model.Deadline - DateTime.Now).TotalHours;
+    var borderColor = isExpired ? "#d63031" : hoursLeft < 24 ? "#fdcb6e" : "#00b894";
+    var currentUserId = ViewBag.CurrentUserId as string;
+    var mySubmission = Model.Submissions?.FirstOrDefault(s => s.StudentId == currentUserId);
+    var groupStudents = Model.Course?.Group?.Students?.ToList();
 }
 
-<h2>@Model.Title</h2>
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2>📋 @Model.Title</h2>
+    <a asp-action="Index" class="btn btn-outline-secondary">← Назад</a>
+</div>
 
-<div class="card mb-4">
-    <div class="card-body">
-        <dl class="row">
-            <dt class="col-sm-3">Курс</dt>
-            <dd class="col-sm-9">@(Model.Course?.Name ?? "—")</dd>
+<div class="row">
+    <!-- Інформація про завдання -->
+    <div class="col-md-4 mb-4">
+        <div class="card" style="border-top: 4px solid @borderColor;">
+            <div class="card-header"><strong>📋 Інформація</strong></div>
+            <div class="card-body">
+                <dl class="row mb-0">
+                    <dt class="col-sm-5">Курс</dt>
+                    <dd class="col-sm-7"><span class="badge bg-secondary">@(Model.Course?.Name ?? "—")</span></dd>
 
-            <dt class="col-sm-3">Опис</dt>
-            <dd class="col-sm-9">@Model.Description</dd>
-            <tr>
-                <th>📎 Матеріал</th>
-                <td>
-                    @if (Model.MaterialType == "Link" && !string.IsNullOrEmpty(Model.MaterialUrl))
+                    <dt class="col-sm-5">Дедлайн</dt>
+                    <dd class="col-sm-7">
+                        <span class="badge" style="background: @borderColor;">
+                            @Model.Deadline.ToString("dd.MM.yyyy HH:mm")
+                            @if (isExpired)
+                            {
+                                <text>(прострочено)</text>
+                            }
+                            else if (hoursLeft < 24)
+                            {
+
+                                <text>(залишилось @((int)hoursLeft) год)</text>
+                            }
+                        </span>
+                    </dd>
+
+                    <dt class="col-sm-5">Створено</dt>
+                    <dd class="col-sm-7">@Model.CreatedAt.ToShortDateString()</dd>
+
+                    @if (!string.IsNullOrEmpty(Model.Description))
                     {
-                        <a href="@Model.MaterialUrl" target="_blank" class="btn btn-sm btn-outline-info">🔗 Відкрити посилання</a>
+                        <dt class="col-sm-5">Опис</dt>
+                        <dd class="col-sm-7">@Model.Description</dd>
                     }
-                    else if (Model.MaterialType == "File" && !string.IsNullOrEmpty(Model.MaterialFilePath))
-                    {
-                        @if (Model.MaterialFileName!.EndsWith(".pdf"))
-                        {
-                            <a asp-controller="Assignments" asp-action="ViewMaterial" asp-route-id="@Model.Id"
-                               target="_blank" class="btn btn-sm btn-outline-primary">👁️ Переглянути PDF</a>
-                        }
-                        else
-                        {
-                            <a asp-controller="Assignments" asp-action="ViewMaterial" asp-route-id="@Model.Id"
-                               class="btn btn-sm btn-outline-primary">👁️ Переглянути файл</a>
-                        }
 
-                        @if (Model.AllowDownload)
-                        {
-                            <a asp-controller="Assignments" asp-action="DownloadMaterial" asp-route-id="@Model.Id"
-                               class="btn btn-sm btn-outline-secondary ms-1">📥 Завантажити</a>
-                        }
+                    @if (Model.MaterialType != "None")
+                    {
+                        <dt class="col-sm-5">📎 Матеріал</dt>
+                        <dd class="col-sm-7">
+                            @if (Model.MaterialType == "Link" && !string.IsNullOrEmpty(Model.MaterialUrl))
+                            {
+                                <a href="@Model.MaterialUrl" target="_blank" class="btn btn-sm btn-outline-info w-100">🔗 Відкрити</a>
+                            }
+                            else if (Model.MaterialType == "File" && !string.IsNullOrEmpty(Model.MaterialFilePath))
+                            {
+                                @if (Model.MaterialFileName!.EndsWith(".pdf"))
+                                {
+                                    <a asp-controller="Assignments" asp-action="ViewMaterial" asp-route-id="@Model.Id"
+                                       target="_blank" class="btn btn-sm btn-outline-primary w-100 mb-1">👁️ Переглянути PDF</a>
+                                }
+                                @if (Model.AllowDownload)
+                                {
+                                    <a asp-controller="Assignments" asp-action="DownloadMaterial" asp-route-id="@Model.Id"
+                                       class="btn btn-sm btn-outline-secondary w-100">📥 Завантажити</a>
+                                }
+                            }
+                        </dd>
+                    }
+                </dl>
+            </div>
+
+            @if (User.IsInRole("Admin") || User.IsInRole("Teacher"))
+            {
+                <div class="card-footer d-flex gap-2">
+                    <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-warning btn-sm flex-fill">✏️ Редагувати</a>
+                    <a asp-action="Delete" asp-route-id="@Model.Id" class="btn btn-danger btn-sm">🗑️</a>
+                </div>
+            }
+
+            @if (User.IsInRole("Student") && !isExpired)
+            {
+                <div class="card-footer">
+                    @if (mySubmission == null)
+                    {
+                        <a asp-controller="LabWorks" asp-action="Create" asp-route-assignmentId="@Model.Id"
+                           class="btn btn-primary w-100">📤 Здати роботу</a>
                     }
                     else
                     {
-                        <span class="text-muted">—</span>
+                        <div class="text-center">
+                            <span class="badge bg-success mb-2">✅ Ви вже здали роботу</span>
+                            <a asp-controller="LabWorks" asp-action="Details" asp-route-id="@mySubmission.Id"
+                               class="btn btn-outline-info w-100 btn-sm">👁️ Переглянути свою роботу</a>
+                        </div>
                     }
-                </td>
-            </tr>
-            <dt class="col-sm-3">Дедлайн</dt>
-            <dd class="col-sm-9">
-                @if (Model.Deadline < DateTime.Now)
-                {
-                    <span class="badge bg-danger">@Model.Deadline.ToString("dd.MM.yyyy HH:mm") (прострочено)</span>
-                }
-                else
-                {
-                    <span class="badge bg-success">@Model.Deadline.ToString("dd.MM.yyyy HH:mm")</span>
-                }
-            </dd>
-
-            <dt class="col-sm-3">Дата створення</dt>
-            <dd class="col-sm-9">@Model.CreatedAt.ToShortDateString()</dd>
-        </dl>
-    </div>
-</div>
-
-<!-- Здачі студентів -->
-<h4>📋 Здачі студентів (@(Model.Submissions?.Count ?? 0))</h4>
-
-@if (Model.Submissions != null && Model.Submissions.Any())
-{<div class="table-responsive">
-    <table class="table table-striped">
-        <thead>
-            <tr>
-            @if (!User.IsInRole("Student"))
-            {
-             <th>Студент</th>
+                </div>
             }
-            <th>Файл</th>
-            <th>Дата здачі</th>
-            <th>Плагіат</th>
-            <th>Оцінено</th>
-            <th>Дії</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var submission in Model.Submissions)
-            {
-                <tr>
-                    @if (!User.IsInRole("Student"))
-                    {
-                    <td>@(submission.Student?.Email ?? "—")</td>
-                    }
-                    <td>@submission.FileName</td>
-                    <td>@submission.UploadedAt.ToShortDateString()</td>
-                    <td>
-                        @if (submission.PlagiarismResults.Any())
-                        {
-                            var maxSimilarity = submission.PlagiarismResults.Max(p => p.SimilarityPercent);
-                            <span class="badge @(maxSimilarity > 50 ? "bg-danger" : maxSimilarity > 20 ? "bg-warning" : "bg-success")">
-                                @maxSimilarity.ToString("F1")%
-                            </span>
-                        }
-                        else
-                        {
-                            <span class="badge bg-secondary">—</span>
-                        }
-                    </td>
-                    <td>
-                        @if (submission.IsGraded)
-                        {
-                            <span class="badge bg-success">✅ Так</span>
-                        }
-                        else
-                        {
-                            <span class="badge bg-warning">⏳ Ні</span>
-                        }
-                    </td>
-                    <td>
-                        @if (!submission.IsGraded && (User.IsInRole("Admin") || User.IsInRole("Teacher")))
-                        {
-                            <a asp-action="Grade" asp-route-id="@submission.Id" class="btn btn-sm btn-success">✅ Оцінити</a>
-                        }
-                    </td>
-                </tr>
-            }
-        </tbody>
-        </table>
+        </div>
     </div>
-}
-else
-{
-    <div class="alert alert-info">📭 Жодної здачі ще немає</div>
-}
 
-@if (User.IsInRole("Student"))
-{
-    <a asp-controller="LabWorks" asp-action="Create" asp-route-assignmentId="@Model.Id" class="btn btn-primary mt-3">
-        📤 Здати роботу
-    </a>
-}
+    <div class="col-md-8">
+        <!-- Статус здачі по групі -->
+        @if (groupStudents != null && groupStudents.Any())
+        {
+            var submittedIds = Model.Submissions?.Select(s => s.StudentId).ToHashSet() ?? new HashSet<string>();
+            var submittedCount = groupStudents.Count(s => submittedIds.Contains(s.Id));
 
-<div class="mt-3">
-    @if (User.IsInRole("Admin") || User.IsInRole("Teacher"))
-    {
-        <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-warning">Редагувати</a>
-    }
-    <a asp-action="Index" class="btn btn-secondary">Назад</a>
+            <div class="card mb-4">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <strong>👥 Статус здачі групи</strong>
+                    <span class="badge bg-primary">@submittedCount / @groupStudents.Count здали</span>
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover mb-0">
+                            <thead>
+                                <tr>
+                                    <th>Студент</th>
+                                    <th>Статус</th>
+                                    @if (User.IsInRole("Admin") || User.IsInRole("Teacher"))
+                                    {
+                                        <th>Оцінка</th>
+                                        <th>Дії</th>
+                                    }
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var student in groupStudents.OrderBy(s => s.LastName))
+                                {
+                                    var submission = Model.Submissions?.FirstOrDefault(s => s.StudentId == student.Id);
+                                    var isMe = student.Id == currentUserId;
+
+                                    <tr class="@(isMe ? "table-active" : "")">
+                                        <td>
+                                            @student.FirstName @student.LastName
+                                            @if (isMe)
+                                            {
+                                                <span class="badge bg-primary ms-1">Ви</span>
+                                            }
+                                        </td>
+                                        <td>
+                                            @if (submission != null)
+                                            {
+                                                <span class="badge bg-success">✅ Здав</span>
+                                            }
+                                            else
+                                            {
+                                                <span class="badge bg-danger">❌ Не здав</span>
+                                            }
+                                        </td>
+                                        @if (User.IsInRole("Admin") || User.IsInRole("Teacher"))
+                                        {
+                                            <td>
+                                                @if (submission != null && submission.IsGraded)
+                                                {
+                                                    <span class="badge bg-success">✅ Оцінено</span>
+                                                }
+                                                else if (submission != null)
+                                                {
+                                                    <span class="badge bg-warning">⏳ Не оцінено</span>
+                                                }
+                                                else
+                                                {
+                                                    <span class="text-muted">—</span>
+                                                }
+                                            </td>
+                                            <td>
+                                                @if (submission != null)
+                                                {
+                                                    @if (!submission.IsGraded)
+                                                    {
+                                                        <a asp-action="Grade" asp-route-id="@submission.Id"
+                                                           class="btn btn-sm btn-success">✅ Оцінити</a>
+                                                    }
+                                                    else
+                                                    {
+                                                        <a asp-controller="LabWorks" asp-action="Details" asp-route-id="@submission.Id"
+                                                           class="btn btn-sm btn-outline-info">👁️ Переглянути</a>
+                                                    }
+                                                }
+                                            </td>
+                                        }
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        }
+
+        <!-- Деталі здачі для викладача -->
+        @if ((User.IsInRole("Admin") || User.IsInRole("Teacher")) && Model.Submissions != null && Model.Submissions.Any())
+        {
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <strong>📤 Деталі здач</strong>
+                    <span class="badge bg-secondary">@Model.Submissions.Count</span>
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover mb-0">
+                            <thead>
+                                <tr>
+                                    <th>Студент</th>
+                                    <th>Файл</th>
+                                    <th>Дата</th>
+                                    <th>Плагіат</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var submission in Model.Submissions)
+                                {
+                                    <tr onclick="window.location='/Assignments/Grade/@submission.Id'" style="cursor:pointer;">
+                                        <td>@(submission.Student != null ? $"{submission.Student.FirstName} {submission.Student.LastName}" : "—")</td>
+                                        <td><small>📄 @(submission.FileName ?? "—")</small></td>
+                                        <td><small>@submission.UploadedAt.ToString("dd.MM.yyyy")</small></td>
+                                        <td>
+                                            @if (submission.PlagiarismResults.Any())
+                                            {
+                                                var maxSimilarity = submission.PlagiarismResults.Max(p => p.SimilarityPercent);
+                                                var plagColor = maxSimilarity > 50 ? "#d63031" : maxSimilarity > 20 ? "#fdcb6e" : "#00b894";
+                                                <span class="badge" style="background: @plagColor;">@maxSimilarity.ToString("F1")%</span>
+                                            }
+                                            else
+                                            {
+                                                <span class="badge bg-secondary">—</span>
+                                            }
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
 </div>

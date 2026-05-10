@@ -3,38 +3,71 @@
     ViewData["Title"] = "Створити курс";
 }
 
-<h2>Створити курс</h2>
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2>➕ Створити курс</h2>
+    <a asp-action="Index" class="btn btn-outline-secondary">← Назад</a>
+</div>
 
 <div class="row">
     <div class="col-md-5">
-        <form asp-action="Create" method="post">
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+        <div class="card" style="border-top: 4px solid var(--accent);">
+            <div class="card-body">
+                <form asp-action="Create" method="post">
+                    <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
 
-            <!-- Прихований TeacherId — поточний викладач -->
-            <input type="hidden" name="TeacherId" value="@ViewData["CurrentUserId"]" />
+                    <input type="hidden" name="TeacherId" value="@ViewBag.CurrentUserId" />
 
-            <div class="mb-3">
-                <label class="form-label">Викладач</label>
-                <input type="text" class="form-control" value="@ViewData["CurrentUserName"]" disabled />
+                    <div class="mb-3">
+                        <label asp-for="Name" class="form-label">Назва курсу</label>
+                        <input asp-for="Name" class="form-control" placeholder="Наприклад: Системне програмування" />
+                        <span asp-validation-for="Name" class="text-danger"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">👨‍🏫 Головний викладач</label>
+                        <input type="text" class="form-control" value="@ViewBag.CurrentUserName" disabled />
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="GroupId" class="form-label">Група</label>
+                        <select asp-for="GroupId" asp-items="@(ViewData["GroupId"] as SelectList)" class="form-select">
+                            <option value="">— Оберіть групу —</option>
+                        </select>
+                        <span asp-validation-for="GroupId" class="text-danger"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">👨‍🏫 Додаткові викладачі (необов'язково)</label>
+                        @if (ViewBag.AllTeachers != null)
+                        {
+                            @foreach (var teacher in (IList<ProjectU.Core.Models.ApplicationUser>)ViewBag.AllTeachers)
+                            {
+                                @if (teacher.Id != (string)ViewBag.CurrentUserId)
+                                {
+                                    <div class="form-check">
+                                        <input type="checkbox" name="additionalTeacherIds"
+                                               value="@teacher.Id"
+                                               class="form-check-input" />
+                                        <label class="form-check-label">
+                                            @teacher.FirstName @teacher.LastName
+                                        </label>
+                                    </div>
+                                }
+                            }
+                        }
+                        else
+                        {
+                            <p class="text-muted small">Інших викладачів немає</p>
+                        }
+                    </div>
+
+                    <div class="d-flex gap-2">
+                        <button type="submit" class="btn btn-primary flex-fill">➕ Створити</button>
+                        <a asp-action="Index" class="btn btn-outline-secondary">Скасувати</a>
+                    </div>
+                </form>
             </div>
-
-            <div class="mb-3">
-                <label asp-for="Name" class="form-label">Назва курсу</label>
-                <input asp-for="Name" class="form-control" placeholder="Наприклад: Сучасні Інтернет Технології" />
-                <span asp-validation-for="Name" class="text-danger"></span>
-            </div>
-
-            <div class="mb-3">
-                <label asp-for="GroupId" class="form-label">Група</label>
-                <select asp-for="GroupId" asp-items="ViewBag.GroupId" class="form-select">
-                    <option value="">— Оберіть групу —</option>
-                </select>
-                <span asp-validation-for="GroupId" class="text-danger"></span>
-            </div>
-
-            <button type="submit" class="btn btn-primary">Створити</button>
-            <a asp-action="Index" class="btn btn-secondary">Назад</a>
-        </form>
+        </div>
     </div>
 </div>
 

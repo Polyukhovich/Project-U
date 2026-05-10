@@ -42,7 +42,9 @@ namespace Controllers
         [Authorize(Roles = "Admin,Teacher,Student")]
         public async Task<IActionResult> Index(int page = 1)
         {
-            int pageSize = 10;
+            var currentUser = await _context.Users
+                .FirstOrDefaultAsync(u => u.UserName == User.Identity!.Name);
+
             IQueryable<LabWork> query = _context.LabWorks
                 .Include(l => l.Student)
                 .Include(l => l.Course)
@@ -51,14 +53,28 @@ namespace Controllers
             // Студент бачить тільки свої роботи
             if (User.IsInRole("Student"))
             {
-                var currentUser = await _context.Users
-                    .FirstOrDefaultAsync(u => u.UserName == User.Identity!.Name);
                 query = query.Where(l => l.StudentId == currentUser!.Id);
             }
 
-            var labWorks = await query.ToListAsync();
-            var paged = labWorks.ToPagedList(page, pageSize);
-            return View(paged);
+            var labWorks = await query
+                .OrderByDescending(l => l.UploadedAt)
+                .ToListAsync();
+
+            // Групуємо по курсах
+            var grouped = labWorks
+                .GroupBy(l => l.Course?.Name ?? "—")
+                .Select(g => new
+                {
+                    CourseName = g.Key,
+                    LabWorks = g.ToList(),
+                    GradedCount = g.Count(l => l.IsGraded),
+                    TotalCount = g.Count()
+                })
+                .OrderBy(g => g.CourseName)
+                .ToList();
+
+            ViewBag.GroupedLabWorks = grouped;
+            return View();
         }
 
         // GET: LabWorks/Details/5
@@ -242,18 +258,16 @@ namespace Controllers
         [Authorize(Roles = "Admin,Student")]
         public async Task<IActionResult> Edit(int? id)
         {
-            if (id == null)
-            {
-                return NotFound();
-            }
+            if (id == null) return NotFound();
 
-            var labWork = await _context.LabWorks.FindAsync(id);
-            if (labWork == null)
-            {
-                return NotFound();
-            }
-            ViewData["CourseId"] = new SelectList(_context.Courses, "Id", "Description", labWork.CourseId);
-            ViewData["StudentId"] = new SelectList(_context.Users, "Id", "Id", labWork.StudentId);
+            var labWork = await _context.LabWorks
+                .Include(l => l.Student)
+                .Include(l => l.Course)
+                .Include(l => l.Assignment)
+                .FirstOrDefaultAsync(l => l.Id == id);
+
+            if (labWork == null) return NotFound();
+
             return View(labWork);
         }
 

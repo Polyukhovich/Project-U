@@ -3,29 +3,42 @@
     ViewData["Title"] = "Видалити групу";
 }
 
-<h2>Видалити групу</h2>
-
-<div class="alert alert-warning">
-    ⚠️ Ви впевнені що хочете видалити цю групу?
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2>🗑️ Видалити групу</h2>
+    <a asp-action="Index" class="btn btn-outline-secondary">← Назад</a>
 </div>
 
-@if (ViewBag.HasStudents == true)
-{
-    <div class="alert alert-danger">
-        ❌ Неможливо видалити групу <strong>@Model.Name</strong> — в ній є студенти!
-        Спочатку перемістіть або видаліть студентів групи.
-    </div>
-    <a asp-action="Index" class="btn btn-secondary">Назад</a>
-}
-else
-{
-    <dl class="row">
-        <dt class="col-sm-3">Назва групи</dt>
-        <dd class="col-sm-9">@Model.Name</dd>
-    </dl>
+<div class="row">
+    <div class="col-md-5">
+        <div class="card" style="border-top: 4px solid #d63031;">
+            <div class="card-body">
+                @if (ViewBag.HasStudents == true)
+                {
+                    <div class="alert alert-danger mb-3">
+                        ❌ Неможливо видалити групу <strong>@Model.Name</strong> — в ній є студенти!
+                        Спочатку перемістіть або видаліть студентів групи.
+                    </div>
+                    <a asp-action="Index" class="btn btn-secondary w-100">← Назад</a>
+                }
+                else
+                {
+                    <div class="alert alert-warning mb-3">
+                        ⚠️ Ви впевнені що хочете видалити цю групу?
+                    </div>
 
-    <form asp-action="Delete" method="post">
-        <button type="submit" class="btn btn-danger">🗑️ Видалити</button>
-        <a asp-action="Index" class="btn btn-secondary">Скасувати</a>
-    </form>
-}
+                    <dl class="row mb-3">
+                        <dt class="col-sm-4">Назва групи</dt>
+                        <dd class="col-sm-8"><strong>@Model.Name</strong></dd>
+                    </dl>
+
+                    <form asp-action="Delete" method="post">
+                        <div class="d-flex gap-2">
+                            <button type="submit" class="btn btn-danger flex-fill">🗑️ Видалити</button>
+                            <a asp-action="Index" class="btn btn-outline-secondary flex-fill">Скасувати</a>
+                        </div>
+                    </form>
+                }
+            </div>
+        </div>
+    </div>
+</div>

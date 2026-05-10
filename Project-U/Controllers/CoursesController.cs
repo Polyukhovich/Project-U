@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
@@ -16,42 +17,74 @@ namespace Controllers
     public class CoursesController : Controller
     {
         private readonly ApplicationDbContext _context;
+        private readonly UserManager<ApplicationUser> _userManager;
 
-        public CoursesController(ApplicationDbContext context)
+        public CoursesController(ApplicationDbContext context, UserManager<ApplicationUser> userManager )
         {
             _context = context;
+            _userManager = userManager;
         }
 
         // GET: Courses — всі ролі можуть переглядати
         [Authorize(Roles = "Admin,Teacher,Student")]
         public async Task<IActionResult> Index(int page = 1)
         {
-            int pageSize = 10;
-            var courses = await _context.Courses
+            var currentUser = await _context.Users
+                .Include(u => u.Group)
+                .FirstOrDefaultAsync(u => u.UserName == User.Identity!.Name);
+
+            var coursesQuery = _context.Courses
                 .Include(c => c.Teacher)
                 .Include(c => c.Group)
-                .ToListAsync();
-            var pagedCourses = courses.ToPagedList(page, pageSize);
-            return View(pagedCourses);
+                .Include(c => c.CourseTeachers)
+                .ThenInclude(ct => ct.Teacher)
+                .AsQueryable();
+
+            // Студент бачить тільки курси своєї групи
+            if (User.IsInRole("Student") && currentUser?.GroupId != null)
+            {
+                coursesQuery = coursesQuery.Where(c => c.GroupId == currentUser.GroupId);
+            }
+
+            // Викладач бачить тільки свої курси
+            if (User.IsInRole("Teacher"))
+            {
+                coursesQuery = coursesQuery.Where(c => c.TeacherId == currentUser!.Id);
+            }
+
+            var courses = await coursesQuery.ToListAsync();
+
+            // Групуємо по групах
+            var grouped = courses
+                .GroupBy(c => c.Group?.Name ?? "—")
+                .Select(g => new
+                {
+                    GroupName = g.Key,
+                    Courses = g.ToList()
+                })
+                .OrderBy(g => g.GroupName)
+                .ToList();
+
+            ViewBag.GroupedCourses = grouped;
+            return View();
         }
 
         // GET: Courses/Details/5
         [Authorize(Roles = "Admin,Teacher,Student")]
         public async Task<IActionResult> Details(int? id)
         {
-            if (id == null)
-            {
-                return NotFound();
-            }
+            if (id == null) return NotFound();
 
             var course = await _context.Courses
-                .Include(c => c.Group)
                 .Include(c => c.Teacher)
+                .Include(c => c.Group)
+                .Include(c => c.CourseTeachers)
+                    .ThenInclude(ct => ct.Teacher)
+                .Include(c => c.LabWorks)
+                    .ThenInclude(l => l.Student)
                 .FirstOrDefaultAsync(m => m.Id == id);
-            if (course == null)
-            {
-                return NotFound();
-            }
+
+            if (course == null) return NotFound();
 
             return View(course);
         }
@@ -60,14 +93,13 @@ namespace Controllers
         [Authorize(Roles = "Admin,Teacher")]
         public async Task<IActionResult> Create()
         {
-            // Отримуємо поточного викладача
             var currentUser = await _context.Users
                 .FirstOrDefaultAsync(u => u.UserName == User.Identity!.Name);
 
-            if (currentUser == null) return NotFound();
-
-            ViewData["CurrentUserId"] = currentUser.Id;
-            ViewData["CurrentUserName"] = $"{currentUser.FirstName} {currentUser.LastName}";
+            var teachers = await _userManager.GetUsersInRoleAsync("Teacher");
+            ViewBag.AllTeachers = teachers;
+            ViewBag.CurrentUserId = currentUser?.Id;
+            ViewBag.CurrentUserName = $"{currentUser?.FirstName} {currentUser?.LastName}";
             ViewData["GroupId"] = new SelectList(_context.Groups, "Id", "Name");
             return View();
         }
@@ -78,16 +110,34 @@ namespace Controllers
         [HttpPost]
         [ValidateAntiForgeryToken]
         [Authorize(Roles = "Admin,Teacher")]
-        public async Task<IActionResult> Create([Bind("Id,Name,Description,TeacherId,GroupId")] Course course)
+        public async Task<IActionResult> Create([Bind("Id,Name,TeacherId,GroupId")] Course course, List<string>? additionalTeacherIds)
         {
             if (ModelState.IsValid)
             {
                 _context.Add(course);
                 await _context.SaveChangesAsync();
+
+                // Додаємо додаткових викладачів
+                if (additionalTeacherIds != null)
+                {
+                    foreach (var teacherId in additionalTeacherIds)
+                    {
+                        _context.CourseTeachers.Add(new CourseTeacher
+                        {
+                            CourseId = course.Id,
+                            TeacherId = teacherId,
+                            Role = "Assistant"
+                        });
+                    }
+                    await _context.SaveChangesAsync();
+                }
+
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["GroupId"] = new SelectList(_context.Groups, "Id", "Name", course.GroupId);
-            ViewData["TeacherId"] = new SelectList(_context.Users, "Id", "Id", course.TeacherId);
+
+            var teachers = await _userManager.GetUsersInRoleAsync("Teacher");
+            ViewBag.AllTeachers = teachers;
+            ViewData["GroupId"] = new SelectList(_context.Groups, "Id", "Name");
             return View(course);
         }
 
@@ -95,18 +145,23 @@ namespace Controllers
         [Authorize(Roles = "Admin,Teacher")]
         public async Task<IActionResult> Edit(int? id)
         {
-            if (id == null)
-            {
-                return NotFound();
-            }
+            if (id == null) return NotFound();
 
-            var course = await _context.Courses.FindAsync(id);
-            if (course == null)
-            {
-                return NotFound();
-            }
+            var course = await _context.Courses
+                .Include(c => c.CourseTeachers)
+                    .ThenInclude(ct => ct.Teacher)
+                .FirstOrDefaultAsync(c => c.Id == id);
+
+            if (course == null) return NotFound();
+
+            var currentUser = await _context.Users
+                .FirstOrDefaultAsync(u => u.UserName == User.Identity!.Name);
+
+            // Список всіх викладачів
+            var teachers = await _userManager.GetUsersInRoleAsync("Teacher");
+            ViewBag.AllTeachers = teachers;
+            ViewBag.CurrentUserName = $"{currentUser?.FirstName} {currentUser?.LastName}";
             ViewData["GroupId"] = new SelectList(_context.Groups, "Id", "Name", course.GroupId);
-            ViewData["TeacherId"] = new SelectList(_context.Users, "Id", "Id", course.TeacherId);
             return View(course);
         }
 
@@ -116,35 +171,50 @@ namespace Controllers
         [HttpPost]
         [ValidateAntiForgeryToken]
         [Authorize(Roles = "Admin,Teacher")]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,Name,Description,TeacherId,GroupId")] Course course)
+        public async Task<IActionResult> Edit(int id, [Bind("Id,Name,TeacherId,GroupId")] Course course, List<string>? additionalTeacherIds)
         {
-            if (id != course.Id)
-            {
-                return NotFound();
-            }
+            if (id != course.Id) return NotFound();
 
             if (ModelState.IsValid)
             {
                 try
                 {
                     _context.Update(course);
+
+                    // Видаляємо старих додаткових викладачів
+                    var oldTeachers = await _context.CourseTeachers
+                        .Where(ct => ct.CourseId == id)
+                        .ToListAsync();
+                    _context.CourseTeachers.RemoveRange(oldTeachers);
+
+                    // Додаємо нових
+                    if (additionalTeacherIds != null)
+                    {
+                        foreach (var teacherId in additionalTeacherIds)
+                        {
+                            _context.CourseTeachers.Add(new CourseTeacher
+                            {
+                                CourseId = id,
+                                TeacherId = teacherId,
+                                Role = "Assistant"
+                            });
+                        }
+                    }
+
                     await _context.SaveChangesAsync();
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!CourseExists(course.Id))
-                    {
+                    if (!_context.Courses.Any(e => e.Id == id))
                         return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
+                    throw;
                 }
                 return RedirectToAction(nameof(Index));
             }
+
+            var teachers = await _userManager.GetUsersInRoleAsync("Teacher");
+            ViewBag.AllTeachers = teachers;
             ViewData["GroupId"] = new SelectList(_context.Groups, "Id", "Name", course.GroupId);
-            ViewData["TeacherId"] = new SelectList(_context.Users, "Id", "Id", course.TeacherId);
             return View(course);
         }
 
@@ -175,13 +245,26 @@ namespace Controllers
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var course = await _context.Courses.FindAsync(id);
-            if (course != null)
+            var hasLabWorks = await _context.LabWorks.AnyAsync(l => l.CourseId == id);
+            var hasGrades = await _context.Grades.AnyAsync(g => g.CourseId == id);
+
+            if (hasLabWorks || hasGrades)
             {
-                _context.Courses.Remove(course);
+                var course = await _context.Courses
+                    .Include(c => c.Teacher)
+                    .Include(c => c.Group)
+                    .FirstOrDefaultAsync(c => c.Id == id);
+
+                ViewBag.CanDelete = false;
+                return View(course);
             }
 
-            await _context.SaveChangesAsync();
+            var courseToDelete = await _context.Courses.FindAsync(id);
+            if (courseToDelete != null)
+            {
+                _context.Courses.Remove(courseToDelete);
+                await _context.SaveChangesAsync();
+            }
             return RedirectToAction(nameof(Index));
         }
 

@@ -3,64 +3,75 @@
     ViewData["Title"] = "Створити завдання";
 }
 
-<h2>Створити завдання</h2>
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2>➕ Створити завдання</h2>
+    <a asp-action="Index" class="btn btn-outline-secondary">← Назад</a>
+</div>
 
 <div class="row">
-    <div class="col-md-5">
-        <form asp-action="Create" method="post" enctype="multipart/form-data">
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+    <div class="col-md-6">
+        <div class="card" style="border-top: 4px solid var(--accent);">
+            <div class="card-body">
+                <form asp-action="Create" method="post" enctype="multipart/form-data">
+                    <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
 
-            <div class="mb-3">
-                <label asp-for="Title" class="form-label">Назва завдання</label>
-                <input asp-for="Title" class="form-control" placeholder="Наприклад: Лабораторна робота №1" />
-                <span asp-validation-for="Title" class="text-danger"></span>
-            </div>
+                    <div class="mb-3">
+                        <label asp-for="Title" class="form-label">Назва завдання</label>
+                        <input asp-for="Title" class="form-control" placeholder="Наприклад: Лабораторна робота №1" />
+                        <span asp-validation-for="Title" class="text-danger"></span>
+                    </div>
 
-            <div class="mb-3">
-                <label asp-for="Description" class="form-label">Опис завдання</label>
-                <textarea asp-for="Description" class="form-control" rows="4" placeholder="Опишіть завдання для студентів"></textarea>
-                <span asp-validation-for="Description" class="text-danger"></span>
-            </div>
-            <!-- Матеріали до завдання -->
-            <div class="mb-3">
-                <label class="form-label">📎 Матеріал до завдання</label>
-                <select id="materialType" name="MaterialType" class="form-select" onchange="toggleMaterial(this.value)">
-                    <option value="None">— Без матеріалу —</option>
-                    <option value="Link">🔗 Посилання</option>
-                    <option value="File">📄 Файл (.pdf або .docx)</option>
-                </select>
-            </div>
+                    <div class="mb-3">
+                        <label asp-for="Description" class="form-label">Опис завдання</label>
+                        <textarea asp-for="Description" class="form-control" rows="3" placeholder="Опишіть завдання для студентів"></textarea>
+                        <span asp-validation-for="Description" class="text-danger"></span>
+                    </div>
 
-            <div id="materialLink" class="mb-3" style="display:none">
-                <label class="form-label">Посилання</label>
-                <input type="url" name="MaterialUrl" class="form-control" placeholder="https://..." />
-            </div>
+                    <div class="mb-3">
+                        <label asp-for="Deadline" class="form-label">Дедлайн</label>
+                        <input asp-for="Deadline" class="form-control" type="datetime-local" />
+                        <span asp-validation-for="Deadline" class="text-danger"></span>
+                    </div>
 
-            <div id="materialFile" class="mb-3" style="display:none">
-                <label class="form-label">Файл</label>
-                <input type="file" name="materialFile" class="form-control" accept=".pdf,.docx" />
-                <div class="form-check mt-2">
-                    <input type="checkbox" name="AllowDownload" value="true" class="form-check-input" id="allowDownload" checked />
-                    <label class="form-check-label" for="allowDownload">Дозволити завантаження</label>
-                </div>
-            </div>
-            <div class="mb-3">
-                <label asp-for="Deadline" class="form-label">Дедлайн</label>
-                <input asp-for="Deadline" class="form-control" type="datetime-local" />
-                <span asp-validation-for="Deadline" class="text-danger"></span>
-            </div>
+                    <div class="mb-3">
+                        <label asp-for="CourseId" class="form-label">Курс</label>
+                        <select asp-for="CourseId" asp-items="ViewBag.CourseId" class="form-select">
+                            <option value="">— Оберіть курс —</option>
+                        </select>
+                        <span asp-validation-for="CourseId" class="text-danger"></span>
+                    </div>
 
-            <div class="mb-3">
-                <label asp-for="CourseId" class="form-label">Курс</label>
-                <select asp-for="CourseId" asp-items="ViewBag.CourseId" class="form-select">
-                    <option value="">— Оберіть курс —</option>
-                </select>
-                <span asp-validation-for="CourseId" class="text-danger"></span>
-            </div>
+                    <!-- Матеріал -->
+                    <div class="mb-3">
+                        <label class="form-label">📎 Матеріал до завдання</label>
+                        <select id="materialType" name="MaterialType" class="form-select" onchange="toggleMaterial(this.value)">
+                            <option value="None">— Без матеріалу —</option>
+                            <option value="Link">🔗 Посилання</option>
+                            <option value="File">📄 Файл (.pdf або .docx)</option>
+                        </select>
+                    </div>
 
-            <button type="submit" class="btn btn-primary">Створити</button>
-            <a asp-action="Index" class="btn btn-secondary">Назад</a>
-        </form>
+                    <div id="materialLink" class="mb-3" style="display:none">
+                        <label class="form-label">Посилання</label>
+                        <input type="url" name="MaterialUrl" class="form-control" placeholder="https://..." />
+                    </div>
+
+                    <div id="materialFile" class="mb-3" style="display:none">
+                        <label class="form-label">Файл</label>
+                        <input type="file" name="materialFile" class="form-control" accept=".pdf,.docx" />
+                        <div class="form-check mt-2">
+                            <input type="checkbox" name="AllowDownload" value="true" class="form-check-input" id="allowDownload" checked />
+                            <label class="form-check-label" for="allowDownload">Дозволити завантаження</label>
+                        </div>
+                    </div>
+
+                    <div class="d-flex gap-2">
+                        <button type="submit" class="btn btn-primary flex-fill">➕ Створити</button>
+                        <a asp-action="Index" class="btn btn-outline-secondary">Скасувати</a>
+                    </div>
+                </form>
+            </div>
+        </div>
     </div>
 </div>
 
@@ -70,6 +81,9 @@
             document.getElementById('materialLink').style.display = value === 'Link' ? 'block' : 'none';
             document.getElementById('materialFile').style.display = value === 'File' ? 'block' : 'none';
         }
+
+        // Блокуємо кнопку якщо діапазон не обраний
+        document.querySelector('button[onclick="addDateRange()"]')?.setAttribute('disabled', true);
     </script>
     @{
         await Html.RenderPartialAsync("_ValidationScriptsPartial");

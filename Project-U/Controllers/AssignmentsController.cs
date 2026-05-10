@@ -31,12 +31,48 @@ namespace Controllers
         [Authorize(Roles = "Admin,Teacher,Student")]
         public async Task<IActionResult> Index(int page = 1)
         {
-            int pageSize = 10;
-            var assignments = await _context.Assignments
+            var currentUser = await _context.Users
+                .Include(u => u.Group)
+                .FirstOrDefaultAsync(u => u.UserName == User.Identity!.Name);
+
+            var assignmentsQuery = _context.Assignments
                 .Include(a => a.Course)
+                .AsQueryable();
+
+            // Студент бачить тільки завдання своєї групи
+            if (User.IsInRole("Student") && currentUser?.GroupId != null)
+            {
+                assignmentsQuery = assignmentsQuery
+                    .Where(a => a.Course.GroupId == currentUser.GroupId);
+            }
+
+            // Викладач бачить тільки свої курси
+            if (User.IsInRole("Teacher"))
+            {
+                assignmentsQuery = assignmentsQuery
+                    .Where(a => a.Course.TeacherId == currentUser!.Id);
+            }
+
+            var assignments = await assignmentsQuery
+                .OrderByDescending(a => a.Deadline)
                 .ToListAsync();
-            var paged = assignments.ToPagedList(page, pageSize);
-            return View(paged);
+
+            // Групуємо по курсах
+            var grouped = assignments
+                .GroupBy(a => a.Course?.Name ?? "—")
+                .Select(g => new
+                {
+                    CourseName = g.Key,
+                    Assignments = g.ToList(),
+                    HasExpired = g.Any(a => a.Deadline < DateTime.Now),
+                    HasUrgent = g.Any(a => a.Deadline > DateTime.Now &&
+                                           (a.Deadline - DateTime.Now).TotalHours < 24)
+                })
+                .OrderBy(g => g.CourseName)
+                .ToList();
+
+            ViewBag.GroupedAssignments = grouped;
+            return View();
         }
 
         // GET: Assignments/Details/5
@@ -48,6 +84,8 @@ namespace Controllers
 
             var assignment = await _context.Assignments
                 .Include(a => a.Course)
+                    .ThenInclude(c => c.Group)
+                        .ThenInclude(g => g.Students)
                 .Include(a => a.Submissions)
                     .ThenInclude(s => s.Student)
                 .Include(a => a.Submissions)
@@ -56,6 +94,12 @@ namespace Controllers
                 .FirstOrDefaultAsync(m => m.Id == id);
 
             if (assignment == null) return NotFound();
+
+            // Поточний користувач
+            var currentUser = await _context.Users
+                .FirstOrDefaultAsync(u => u.UserName == User.Identity!.Name);
+
+            ViewBag.CurrentUserId = currentUser?.Id;
 
             return View(assignment);
         }
@@ -333,7 +377,8 @@ namespace Controllers
                 : "application/vnd.openxmlformats-officedocument.wordprocessingml.document";
 
             // Для перегляду без завантаження
-            Response.Headers.Add("Content-Disposition", "inline; filename=" + assignment.MaterialFileName);
+            var encodedFileName = Uri.EscapeDataString(assignment.MaterialFileName!);
+            Response.Headers.Add("Content-Disposition", $"inline; filename*=UTF-8''{encodedFileName}");
             return File(fileBytes, contentType);
         }
 
@@ -379,41 +424,60 @@ namespace Controllers
         [Authorize(Roles = "Admin,Teacher")]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            // Сповіщення студентам про видалення завдання
-            var deletedAssignment = await _context.Assignments
-                .Include(a => a.Course)
-                    .ThenInclude(c => c.Group)
-                        .ThenInclude(g => g.Students)
+            var assignment = await _context.Assignments
+                .Include(a => a.Submissions)
+                    .ThenInclude(s => s.PlagiarismResults)
                 .FirstOrDefaultAsync(a => a.Id == id);
 
-            if (deletedAssignment?.Course?.Group?.Students != null)
-            {
-                var message = $"❌ Завдання '{deletedAssignment.Title}' з курсу '{deletedAssignment.Course.Name}' було видалено";
-
-                foreach (var student in deletedAssignment.Course.Group.Students)
-                {
-                    await _hubContext.Clients
-                        .Group($"user_{student.Id}")
-                        .SendAsync("ReceiveNotification", message);
-
-                    _context.Notifications.Add(new Notification
-                    {
-                        UserId = student.Id,
-                        Message = message,
-                        IsRead = false,
-                        CreatedAt = DateTime.UtcNow
-                    });
-                }
-                await _context.SaveChangesAsync();
-            }
-
-            // Тепер видаляємо
-            var assignment = await _context.Assignments.FindAsync(id);
             if (assignment != null)
             {
+                // Спочатку видаляємо результати антиплагіату
+                foreach (var submission in assignment.Submissions)
+                {
+                    _context.PlagiarismResults.RemoveRange(submission.PlagiarismResults);
+                }
+
+                // Потім видаляємо оцінки пов'язані з роботами
+                var labWorkIds = assignment.Submissions.Select(s => s.Id).ToList();
+                var grades = await _context.Grades
+                    .Where(g => g.LabWorkId != null && labWorkIds.Contains(g.LabWorkId.Value))
+                    .ToListAsync();
+                _context.Grades.RemoveRange(grades);
+
+                // Видаляємо здачі
+                _context.LabWorks.RemoveRange(assignment.Submissions);
+
+                // Видаляємо завдання
                 _context.Assignments.Remove(assignment);
+
+                // Сповіщення студентам
+                var deletedCourse = await _context.Courses
+                    .Include(c => c.Group)
+                        .ThenInclude(g => g.Students)
+                    .FirstOrDefaultAsync(c => c.Id == assignment.CourseId);
+
+                if (deletedCourse?.Group?.Students != null)
+                {
+                    var message = $"❌ Завдання '{assignment.Title}' з курсу '{deletedCourse.Name}' було видалено";
+                    foreach (var student in deletedCourse.Group.Students)
+                    {
+                        await _hubContext.Clients
+                            .Group($"user_{student.Id}")
+                            .SendAsync("ReceiveNotification", message);
+
+                        _context.Notifications.Add(new Notification
+                        {
+                            UserId = student.Id,
+                            Message = message,
+                            IsRead = false,
+                            CreatedAt = DateTime.UtcNow
+                        });
+                    }
+                }
+
                 await _context.SaveChangesAsync();
             }
+
             return RedirectToAction(nameof(Index));
         }
     }

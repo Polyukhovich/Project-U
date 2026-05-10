@@ -3,105 +3,116 @@
     ViewData["Title"] = "Створити розклад";
 }
 
-<h2>Створити розклад</h2>
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2>➕ Створити розклад</h2>
+    <a asp-action="Index" class="btn btn-outline-secondary">← Назад</a>
+</div>
 
 <div class="row">
-    <div class="col-md-5">
-        <form asp-action="Create" method="post" id="scheduleForm">
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+    <div class="col-md-6">
+        <div class="card" style="border-top: 4px solid var(--accent);">
+            <div class="card-body">
+                <form asp-action="Create" method="post" id="scheduleForm">
+                    <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
 
-            <div class="mb-3">
-                <label class="form-label">⏰ Пара</label>
-                <select id="pairTemplate" class="form-select" onchange="setPairTime(this.value)">
-                    <option value="">— Оберіть пару —</option>
-                    <option value="09:00,10:20">1 пара (09:00 — 10:20)</option>
-                    <option value="10:30,11:50">2 пара (10:30 — 11:50)</option>
-                    <option value="12:10,13:30">3 пара (12:10 — 13:30)</option>
-                    <option value="13:40,15:00">4 пара (13:40 — 15:00)</option>
-                    <option value="15:10,16:30">5 пара (15:10 — 16:30)</option>
-                    <option value="16:40,18:00">6 пара (16:40 — 18:00)</option>
-                    <option value="18:10,19:30">7 пара (18:10 — 19:30)</option>
-                </select>
-            </div>
-
-            <div class="row">
-                <div class="col-md-6 mb-3">
-                    <label asp-for="StartTime" class="form-label">Час початку</label>
-                    <input asp-for="StartTime" class="form-control" type="time" id="startTime" />
-                    <span asp-validation-for="StartTime" class="text-danger"></span>
-                </div>
-                <div class="col-md-6 mb-3">
-                    <label asp-for="EndTime" class="form-label">Час завершення</label>
-                    <input asp-for="EndTime" class="form-control" type="time" id="endTime" />
-                    <span asp-validation-for="EndTime" class="text-danger"></span>
-                </div>
-            </div>
-
-            <div class="mb-3">
-                <label asp-for="Room" class="form-label">Аудиторія або посилання (необов'язково)</label>
-                <input asp-for="Room" class="form-control" placeholder="Наприклад: 301 або https://meet.google.com/..." />
-            </div>
-
-            <div class="mb-3">
-                <label asp-for="CourseId" class="form-label">Курс</label>
-                <select asp-for="CourseId" asp-items="@(ViewData["CourseId"] as SelectList)" class="form-select">
-                    <option value="">— Оберіть курс —</option>
-                </select>
-                <span asp-validation-for="CourseId" class="text-danger"></span>
-            </div>
-
-            <div class="mb-3">
-                <label asp-for="GroupId" class="form-label">Група</label>
-                <select asp-for="GroupId" asp-items="@(ViewData["GroupId"] as SelectList)" class="form-select">
-                    <option value="">— Оберіть групу —</option>
-                </select>
-                <span asp-validation-for="GroupId" class="text-danger"></span>
-            </div>
-            <!-- Швидкий вибір діапазону -->
-            <div class="card mb-3 p-3 bg-light">
-                <div class="fw-bold mb-2">⚡ Швидкий вибір</div>
-                <div class="row g-2">
-                    <div class="col-md-4">
-                        <label class="form-label small">Від</label>
-                        <input type="date" id="rangeStart" class="form-control form-control-sm" />
-                    </div>
-                    <div class="col-md-4">
-                        <label class="form-label small">До</label>
-                        <input type="date" id="rangeEnd" class="form-control form-control-sm" />
-                    </div>
-                    <div class="col-md-4">
-                        <label class="form-label small">День тижня</label>
-                        <select id="rangeDayOfWeek" class="form-select form-select-sm">
-                            <option value="1">Понеділок</option>
-                            <option value="2">Вівторок</option>
-                            <option value="3">Середа</option>
-                            <option value="4">Четвер</option>
-                            <option value="5">П'ятниця</option>
-                            <option value="6">Субота</option>
+                    <div class="mb-3">
+                        <label class="form-label">⏰ Пара</label>
+                        <select id="pairTemplate" class="form-select" onchange="setPairTime(this.value)">
+                            <option value="">— Оберіть пару —</option>
+                            <option value="09:00,10:20">1 пара (09:00 — 10:20)</option>
+                            <option value="10:30,11:50">2 пара (10:30 — 11:50)</option>
+                            <option value="12:10,13:30">3 пара (12:10 — 13:30)</option>
+                            <option value="13:40,15:00">4 пара (13:40 — 15:00)</option>
+                            <option value="15:10,16:30">5 пара (15:10 — 16:30)</option>
+                            <option value="16:40,18:00">6 пара (16:40 — 18:00)</option>
+                            <option value="18:10,19:30">7 пара (18:10 — 19:30)</option>
                         </select>
                     </div>
-                </div>
-                <div class="mt-2 d-flex gap-2">
-                    <button type="button" onclick="addDateRange()" class="btn btn-sm btn-outline-primary">
-                        ➕ Додати діапазон
-                    </button>
-                    <button type="button" onclick="clearDates()" class="btn btn-sm btn-outline-danger">
-                        🗑️ Очистити всі
-                    </button>
-                </div>
-            </div>
-            <!-- Вибір дат через календар -->
-            <div class="mb-3">
-                <label class="form-label">📅 Дати занять</label>
-                <div id="calendar" class="border rounded p-2 mb-2"></div>
-                <div id="selectedDates" class="d-flex flex-wrap gap-1 mb-2"></div>
-                <input type="hidden" name="selectedDatesJson" id="selectedDatesJson" />
-                <small class="text-muted">Клікніть на дати щоб обрати/скасувати</small>
-            </div>
 
-            <button type="submit" class="btn btn-primary">Створити</button>
-            <a asp-action="Index" class="btn btn-secondary">Назад</a>
-        </form>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label asp-for="StartTime" class="form-label">Час початку</label>
+                            <input asp-for="StartTime" class="form-control" type="time" id="startTime" />
+                            <span asp-validation-for="StartTime" class="text-danger"></span>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label asp-for="EndTime" class="form-label">Час завершення</label>
+                            <input asp-for="EndTime" class="form-control" type="time" id="endTime" />
+                            <span asp-validation-for="EndTime" class="text-danger"></span>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="Room" class="form-label">Аудиторія або посилання (необов'язково)</label>
+                        <input asp-for="Room" class="form-control" placeholder="Наприклад: 301 або https://meet.google.com/..." />
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="CourseId" class="form-label">Курс</label>
+                        <select asp-for="CourseId" asp-items="@(ViewData["CourseId"] as SelectList)" class="form-select">
+                            <option value="">— Оберіть курс —</option>
+                        </select>
+                        <span asp-validation-for="CourseId" class="text-danger"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="GroupId" class="form-label">Група</label>
+                        <select asp-for="GroupId" asp-items="@(ViewData["GroupId"] as SelectList)" class="form-select">
+                            <option value="">— Оберіть групу —</option>
+                        </select>
+                        <span asp-validation-for="GroupId" class="text-danger"></span>
+                    </div>
+
+                    <!-- Швидкий вибір діапазону -->
+                    <div class="card mb-3 p-3" style="background: var(--input-bg);">
+                        <div class="fw-bold mb-2">⚡ Швидкий вибір</div>
+                        <div class="row g-2">
+                            <div class="col-md-4">
+                                <label class="form-label small">Від</label>
+                                <input type="date" id="rangeStart" class="form-control form-control-sm" />
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label small">До</label>
+                                <input type="date" id="rangeEnd" class="form-control form-control-sm" />
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label small">День тижня</label>
+                                <select id="rangeDayOfWeek" class="form-select form-select-sm">
+                                    <option value="1">Понеділок</option>
+                                    <option value="2">Вівторок</option>
+                                    <option value="3">Середа</option>
+                                    <option value="4">Четвер</option>
+                                    <option value="5">П'ятниця</option>
+                                    <option value="6">Субота</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="mt-2 d-flex gap-2">
+                            <button type="button" onclick="addDateRange()" id="addRangeBtn" class="btn btn-sm btn-outline-primary" disabled>
+                                ➕ Додати діапазон
+                            </button>
+                            <button type="button" onclick="clearDates()" class="btn btn-sm btn-outline-danger">
+                                🗑️ Очистити всі
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Вибір дат через календар -->
+                    <div class="mb-3">
+                        <label class="form-label">📅 Дати занять</label>
+                        <div id="calendar" class="border rounded p-2 mb-2"></div>
+                        <div id="selectedDates" class="d-flex flex-wrap gap-1 mb-2"></div>
+                        <input type="hidden" name="selectedDatesJson" id="selectedDatesJson" />
+                        <small class="text-muted">Клікніть на дати щоб обрати/скасувати</small>
+                    </div>
+
+                    <div class="d-flex gap-2">
+                        <button type="submit" class="btn btn-primary flex-fill">➕ Створити</button>
+                        <a asp-action="Index" class="btn btn-outline-secondary">Скасувати</a>
+                    </div>
+                </form>
+            </div>
+        </div>
     </div>
 </div>
 
@@ -111,68 +122,65 @@
     <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/uk.js"></script>
 
     <script>
-        const selectedDates = [];
-                function setPairTime(value) {
+        function setPairTime(value) {
             if (!value) return;
             const [start, end] = value.split(',');
             document.getElementById('startTime').value = start;
             document.getElementById('endTime').value = end;
         }
+
         const fp = flatpickr("#calendar", {
             inline: true,
             mode: "multiple",
             locale: "uk",
             dateFormat: "Y-m-d",
-            onChange: function(dates, dateStr) {
-                // Оновлюємо відображення обраних дат
+            onChange: function(dates) {
                 const container = document.getElementById('selectedDates');
                 container.innerHTML = dates.map(d => {
                     const formatted = d.toLocaleDateString('uk-UA');
-                    return `<span class="badge bg-primary">${formatted}</span>`;
+                    return '<span class="badge bg-primary">' + formatted + '</span>';
                 }).join('');
-
-                // Зберігаємо в hidden field
                 document.getElementById('selectedDatesJson').value =
                     dates.map(d => d.toISOString().split('T')[0]).join(',');
             }
         });
-                function addDateRange() {
-            const start = new Date(document.getElementById('rangeStart').value);
-            const end = new Date(document.getElementById('rangeEnd').value);
+
+        document.getElementById('rangeStart').addEventListener('change', checkRangeFields);
+        document.getElementById('rangeEnd').addEventListener('change', checkRangeFields);
+
+        function checkRangeFields() {
+            const start = document.getElementById('rangeStart').value;
+            const end = document.getElementById('rangeEnd').value;
+            document.getElementById('addRangeBtn').disabled = !start || !end;
+        }
+
+        function addDateRange() {
+            const startVal = document.getElementById('rangeStart').value;
+            const endVal = document.getElementById('rangeEnd').value;
+            if (!startVal || !endVal) return;
+
+            const start = new Date(startVal);
+            const end = new Date(endVal);
             const dayOfWeek = parseInt(document.getElementById('rangeDayOfWeek').value);
 
-            if (!start || !end || start > end) {
-                alert('Оберіть правильний діапазон дат!');
-                return;
-            }
+            if (start > end) { alert('Дата початку має бути раніше дати завершення!'); return; }
 
-            // Знаходимо всі дати потрібного дня тижня в діапазоні
             const datesToAdd = [];
             const current = new Date(start);
+            while (current.getDay() !== dayOfWeek % 7) { current.setDate(current.getDate() + 1); }
+            while (current <= end) { datesToAdd.push(new Date(current)); current.setDate(current.getDate() + 7); }
 
-            // Знаходимо перший потрібний день
-            while (current.getDay() !== dayOfWeek % 7) {
-                current.setDate(current.getDate() + 1);
-            }
-
-            // Додаємо всі такі дні до кінця діапазону
-            while (current <= end) {
-                datesToAdd.push(new Date(current));
-                current.setDate(current.getDate() + 7);
-            }
-
-            // Додаємо до flatpickr
-            const currentDates = fp.selectedDates;
-            fp.setDate([...currentDates, ...datesToAdd], true);
+            fp.setDate([...fp.selectedDates, ...datesToAdd], true);
         }
 
         function clearDates() {
-            fp.clear();
-            document.getElementById('selectedDatesJson').value = '';
-            document.getElementById('selectedDates').innerHTML = '';
+            if (confirm('Очистити всі обрані дати?')) {
+                fp.clear();
+                document.getElementById('selectedDatesJson').value = '';
+                document.getElementById('selectedDates').innerHTML = '';
+            }
         }
 
-        // Перевіряємо перед відправкою
         document.getElementById('scheduleForm').addEventListener('submit', function(e) {
             const dates = document.getElementById('selectedDatesJson').value;
             if (!dates) {
@@ -180,19 +188,6 @@
                 alert('Оберіть хоча б одну дату заняття!');
             }
         });
-                // Слідкуємо за полями діапазону
-        document.getElementById('rangeStart').addEventListener('change', checkRangeFields);
-        document.getElementById('rangeEnd').addEventListener('change', checkRangeFields);
-
-        function checkRangeFields() {
-            const start = document.getElementById('rangeStart').value;
-            const end = document.getElementById('rangeEnd').value;
-            const addBtn = document.querySelector('button[onclick="addDateRange()"]');
-            addBtn.disabled = !start || !end;
-        }
-
-        // При завантаженні — кнопка неактивна
-        document.querySelector('button[onclick="addDateRange()"]').disabled = true;
     </script>
 
     @{

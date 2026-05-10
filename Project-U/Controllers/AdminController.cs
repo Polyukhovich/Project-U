@@ -83,26 +83,39 @@ namespace Project_U.Controllers
             return View(model);
         }
 
-        // GET: Admin/EditRole/userId
-        public async Task<IActionResult> EditRole(string id)
+        // GET: Admin/EditUser/userId
+        public async Task<IActionResult> EditUser(string id)
         {
-            var user = await _userManager.FindByIdAsync(id);
+            var user = await _userManager.Users
+                .Include(u => u.Group)
+                .FirstOrDefaultAsync(u => u.Id == id);
             if (user == null) return NotFound();
 
             var currentRoles = await _userManager.GetRolesAsync(user);
             ViewBag.CurrentRole = currentRoles.FirstOrDefault();
-            ViewData["Roles"] = new SelectList(new[] { "Student", "Teacher", "Admin" });
+            ViewData["Roles"] = new SelectList(new[] { "Student", "Teacher", "Admin" }, currentRoles.FirstOrDefault());
+            ViewData["GroupId"] = new SelectList(_context.Groups, "Id", "Name", user.GroupId);
             return View(user);
         }
 
-        // POST: Admin/EditRole
+        // POST: Admin/EditUser
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> EditRole(string id, string role)
+        public async Task<IActionResult> EditUser(string id, string firstName, string lastName, string email, string role, int? groupId)
         {
             var user = await _userManager.FindByIdAsync(id);
             if (user == null) return NotFound();
 
+            // Оновлюємо дані
+            user.FirstName = firstName;
+            user.LastName = lastName;
+            user.Email = email;
+            user.UserName = email;
+            user.GroupId = groupId;
+
+            await _userManager.UpdateAsync(user);
+
+            // Оновлюємо роль
             var currentRoles = await _userManager.GetRolesAsync(user);
             await _userManager.RemoveFromRolesAsync(user, currentRoles);
             await _userManager.AddToRoleAsync(user, role);

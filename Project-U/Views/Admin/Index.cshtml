@@ -1,43 +1,110 @@
 ﻿@model IEnumerable<ProjectU.Core.Models.ApplicationUser>
 @{
     ViewData["Title"] = "Управління користувачами";
+    var userRoles = ViewBag.UserRoles as Dictionary<string, IList<string>>;
 }
 
-<h2>Управління користувачами</h2>
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2>⚙️ Управління користувачами</h2>
+    <a asp-action="CreateUser" class="btn btn-primary">➕ Додати користувача</a>
+</div>
 
-<a asp-action="CreateUser" class="btn btn-primary mb-3">➕ Додати користувача</a>
+<!-- Статистика -->
+<div class="row mb-4">
+    <div class="col-md-4 mb-3">
+        <div class="card text-center p-3" style="border-top: 3px solid #6c5ce7;">
+            <div style="font-size: 2rem;">👥</div>
+            <div class="fw-bold fs-4">@Model.Count()</div>
+            <div class="text-muted small">Всього користувачів</div>
+        </div>
+    </div>
+    <div class="col-md-4 mb-3">
+        <div class="card text-center p-3" style="border-top: 3px solid #00b894;">
+            <div style="font-size: 2rem;">👨‍🎓</div>
+            <div class="fw-bold fs-4">
+                @Model.Count(u => userRoles != null && userRoles.ContainsKey(u.Id) && userRoles[u.Id].Contains("Student"))
+            </div>
+            <div class="text-muted small">Студентів</div>
+        </div>
+    </div>
+    <div class="col-md-4 mb-3">
+        <div class="card text-center p-3" style="border-top: 3px solid #0984e3;">
+            <div style="font-size: 2rem;">👨‍🏫</div>
+            <div class="fw-bold fs-4">
+                @Model.Count(u => userRoles != null && userRoles.ContainsKey(u.Id) && userRoles[u.Id].Contains("Teacher"))
+            </div>
+            <div class="text-muted small">Викладачів</div>
+        </div>
+    </div>
+</div>
 
-<table class="table table-striped">
-    <thead>
-        <tr>
-            <th>Ім'я</th>
-            <th>Прізвище</th>
-            <th>Email</th>
-            <th>Роль</th>
-            <th>Група</th>
-            <th>Дії</th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var user in Model)
-        {
-            <tr>
-                <td>@user.FirstName</td>
-                <td>@user.LastName</td>
-                <td>@user.Email</td>
-                <td>@(((Dictionary<string, IList<string>>)ViewBag.UserRoles)[user.Id].FirstOrDefault() ?? "—")</td>
-                <td>@(user.Group?.Name ?? "—")</td>
-                <td>
-                    <a asp-action="EditRole" asp-route-id="@user.Id" class="btn btn-sm btn-warning">Роль</a>
-                    <form asp-action="DeleteUser" method="post" style="display:inline">
-                        <input type="hidden" name="id" value="@user.Id" />
-                        <button type="submit" class="btn btn-sm btn-danger"
-                                onclick="return confirm('Видалити користувача?')">
-                            Видалити
-                        </button>
-                    </form>
-                </td>
-            </tr>
-        }
-    </tbody>
-</table>
+<!-- Таблиця користувачів -->
+<div class="card">
+    <div class="card-header"><strong>👥 Список користувачів</strong></div>
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-hover mb-0">
+                <thead>
+                    <tr>
+                        <th>Користувач</th>
+                        <th>Email</th>
+                        <th>Роль</th>
+                        <th>Група</th>
+                        <th>Дії</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var user in Model)
+                    {
+                        var role = userRoles != null && userRoles.ContainsKey(user.Id)
+                        ? userRoles[user.Id].FirstOrDefault() ?? "—"
+                        : "—";
+
+                        var roleBadge = role == "Admin" ? "bg-danger" :
+                        role == "Teacher" ? "bg-success" :
+                        role == "Student" ? "bg-primary" : "bg-secondary";
+
+                        var roleEmoji = role == "Admin" ? "⚙️" :
+                        role == "Teacher" ? "👨‍🏫" :
+                        role == "Student" ? "👨‍🎓" : "👤";
+
+                        <tr>
+                            <td>
+                                <div class="fw-bold">@user.FirstName @user.LastName</div>
+                            </td>
+                            <td>
+                                <small>@user.Email</small>
+                            </td>
+                            <td>
+                                <span class="badge @roleBadge">@roleEmoji @role</span>
+                            </td>
+                            <td>
+                                @if (!string.IsNullOrEmpty(user.Group?.Name))
+                                {
+                                    <span class="badge bg-secondary">@user.Group.Name</span>
+                                }
+                                else
+                                {
+                                    <span class="text-muted">—</span>
+                                }
+                            </td>
+                            <td>
+                                <div class="d-flex gap-1">
+                                    <a asp-action="EditUser" asp-route-id="@user.Id"
+                                       class="btn btn-sm btn-outline-warning">✏️ Роль</a>
+                                    <form asp-action="DeleteUser" method="post" style="display:inline">
+                                        <input type="hidden" name="id" value="@user.Id" />
+                                        <button type="submit" class="btn btn-sm btn-outline-danger"
+                                                onclick="return confirm('Видалити користувача @user.FirstName @user.LastName?')">
+                                            🗑️
+                                        </button>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

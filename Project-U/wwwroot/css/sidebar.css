@@ -31,48 +31,6 @@ body.theme-dark {
     --table-stripe: rgba(255,255,255,0.05);
     --table-hover: rgba(255,255,255,0.1);
 }
-    body.theme-dark .card {
-        background: #16213e;
-        color: #ffffff;
-    }
-
-        body.theme-dark .card p,
-        body.theme-dark .card span,
-        body.theme-dark .card div,
-        body.theme-dark .card h1,
-        body.theme-dark .card h2,
-        body.theme-dark .card h3,
-        body.theme-dark .card h4,
-        body.theme-dark .card h5,
-        body.theme-dark .card h6,
-        body.theme-dark .card .fw-bold,
-        body.theme-dark .card .text-muted {
-            color: #ffffff !important;
-        }
-    /* Темна тема — таблиці */
-    body.theme-dark .table {
-        background: #16213e;
-        color: #ffffff;
-    }
-
-        body.theme-dark .table td,
-        body.theme-dark .table th {
-            background: #16213e;
-            color: #ffffff !important;
-            border-color: #2d3561;
-        }
-
-    body.theme-dark .table-striped tbody tr:nth-of-type(odd) td {
-        background-color: #0f3460;
-    }
-
-    body.theme-dark .table-hover tbody tr:hover td {
-        background-color: #1a3a6e;
-    }
-
-    body.theme-dark .table-responsive {
-        background: #16213e;
-    }
 
 /* Зелена тема */
 body.theme-green {
@@ -86,30 +44,6 @@ body.theme-green {
     --table-stripe: rgba(154, 230, 180, 0.2);
     --table-hover: rgba(154, 230, 180, 0.4);
 }
-    /* Зелена тема — таблиці */
-    body.theme-green .table {
-        background: #f0fff4;
-        color: #1a2e1a;
-    }
-
-        body.theme-green .table td,
-        body.theme-green .table th {
-            background: #f0fff4;
-            color: #1a2e1a !important;
-            border-color: #9ae6b4;
-        }
-
-    body.theme-green .table-striped tbody tr:nth-of-type(odd) td {
-        background-color: #c6f6d5;
-    }
-
-    body.theme-green .table-hover tbody tr:hover td {
-        background-color: #9ae6b4;
-    }
-
-    body.theme-green .table-responsive {
-        background: #f0fff4;
-    }
 
 /* Синя тема */
 body.theme-blue {
@@ -123,31 +57,6 @@ body.theme-blue {
     --table-stripe: rgba(144, 205, 244, 0.2);
     --table-hover: rgba(144, 205, 244, 0.4);
 }
-    /* Синя тема — таблиці */
-    body.theme-blue .table {
-        background: #ebf8ff;
-        color: #1a1f2e;
-    }
-
-        body.theme-blue .table td,
-        body.theme-blue .table th {
-            background: #ebf8ff;
-            color: #1a1f2e !important;
-            border-color: #90cdf4;
-        }
-
-    body.theme-blue .table-striped tbody tr:nth-of-type(odd) td {
-        background-color: #bee3f8;
-    }
-
-    body.theme-blue .table-hover tbody tr:hover td {
-        background-color: #90cdf4;
-    }
-
-    body.theme-blue .table-responsive {
-        background: #ebf8ff;
-    }
-
 
 /* ===== БОКОВИЙ БАР ===== */
 .sidebar {
@@ -285,7 +194,6 @@ body.theme-blue {
 
 .card-header {
     background: var(--card-bg);
-    color: var(--text-color);
     border-bottom: 1px solid var(--border-color);
     border-radius: 15px 15px 0 0 !important;
     font-weight: 600;
@@ -296,7 +204,6 @@ body.theme-blue {
 .card-body {
     color: var(--text-color);
 }
-
 
 /* ===== ТАБЛИЦІ ===== */
 .table {
@@ -432,4 +339,280 @@ body.theme-blue {
 
 * {
     box-sizing: border-box;
+}
+
+/* ===== ТЕМНА ТЕМА — специфічні стилі ===== */
+body.theme-dark .card {
+    background: #16213e;
+    color: #ffffff;
+}
+
+    body.theme-dark .card p,
+    body.theme-dark .card span,
+    body.theme-dark .card div,
+    body.theme-dark .card h1,
+    body.theme-dark .card h2,
+    body.theme-dark .card h3,
+    body.theme-dark .card h4,
+    body.theme-dark .card h5,
+    body.theme-dark .card h6,
+    body.theme-dark .card .fw-bold,
+    body.theme-dark .card .text-muted {
+        color: #ffffff !important;
+    }
+
+body.theme-dark .table {
+    background: #16213e;
+    color: #ffffff;
+}
+
+    body.theme-dark .table td,
+    body.theme-dark .table th {
+        background: #16213e;
+        color: #ffffff !important;
+        border-color: #2d3561;
+    }
+
+body.theme-dark .table-striped tbody tr:nth-of-type(odd) td {
+    background-color: #0f3460;
+}
+
+body.theme-dark .table-hover tbody tr:hover td {
+    background-color: #1a3a6e;
+}
+
+body.theme-dark .table-responsive {
+    background: #16213e;
+}
+
+body.theme-dark .alert-warning {
+    background: #3d3000;
+    border-color: #fdcb6e;
+    color: #fdcb6e;
+}
+
+body.theme-dark .alert-danger {
+    background: #3d0000;
+    border-color: #d63031;
+    color: #ff7675;
+}
+
+body.theme-dark .alert-info {
+    background: #002d3d;
+    border-color: #0984e3;
+    color: #74b9ff;
+}
+
+body.theme-dark .alert-success {
+    background: #003d1a;
+    border-color: #00b894;
+    color: #55efc4;
+}
+
+body.theme-dark .form-control:disabled,
+body.theme-dark .form-control[readonly] {
+    background: #0f3460;
+    color: #ffffff;
+    border-color: #2d3561;
+}
+
+body.theme-dark .form-control::placeholder,
+body.theme-dark .form-select::placeholder {
+    color: rgba(255,255,255,0.4);
+}
+
+body.theme-dark textarea.form-control {
+    background: #0f3460;
+    color: #ffffff;
+}
+
+/* ===== FLATPICKR — всі теми ===== */
+.flatpickr-calendar {
+    background: var(--card-bg);
+    border-color: var(--border-color);
+}
+
+.flatpickr-months .flatpickr-month {
+    color: var(--text-color);
+    background: var(--card-bg);
+}
+
+.flatpickr-months .flatpickr-prev-month svg,
+.flatpickr-months .flatpickr-next-month svg {
+    fill: var(--text-color);
+}
+
+.flatpickr-current-month input.cur-year {
+    color: var(--text-color) !important;
+}
+
+.flatpickr-current-month .flatpickr-monthDropdown-months {
+    color: var(--text-color);
+    background: var(--card-bg);
+}
+
+    .flatpickr-current-month .flatpickr-monthDropdown-months option {
+        background: var(--card-bg);
+        color: var(--text-color);
+    }
+
+.flatpickr-weekdays {
+    background: var(--card-bg);
+}
+
+.flatpickr-weekday {
+    color: var(--text-color) !important;
+    background: var(--card-bg) !important;
+}
+
+.flatpickr-day {
+    color: var(--text-color);
+}
+
+    .flatpickr-day:hover {
+        background: var(--table-hover);
+        border-color: var(--border-color);
+    }
+
+    .flatpickr-day.selected {
+        background: var(--accent);
+        border-color: var(--accent);
+        color: white;
+    }
+
+    .flatpickr-day.today {
+        border-color: var(--accent);
+    }
+
+/* ===== FLATPICKR — темна тема ===== */
+body.theme-dark .flatpickr-calendar {
+    background: #16213e;
+    border-color: #2d3561;
+    box-shadow: 0 5px 20px rgba(0,0,0,0.5);
+}
+
+body.theme-dark .flatpickr-months .flatpickr-month {
+    background: #0f3460;
+    color: white;
+}
+
+body.theme-dark .flatpickr-months .flatpickr-prev-month svg,
+body.theme-dark .flatpickr-months .flatpickr-next-month svg {
+    fill: white;
+}
+
+body.theme-dark .flatpickr-current-month input.cur-year {
+    color: white !important;
+}
+
+body.theme-dark .flatpickr-current-month .flatpickr-monthDropdown-months {
+    background: #0f3460;
+    color: white;
+}
+
+    body.theme-dark .flatpickr-current-month .flatpickr-monthDropdown-months option {
+        background: #0f3460;
+        color: white;
+    }
+
+body.theme-dark .flatpickr-weekdays {
+    background: #0f3460;
+}
+
+body.theme-dark .flatpickr-weekday {
+    background: #0f3460 !important;
+    color: rgba(255,255,255,0.6) !important;
+}
+
+body.theme-dark .flatpickr-day {
+    color: white;
+}
+
+    body.theme-dark .flatpickr-day:hover {
+        background: #2d3561;
+        border-color: #2d3561;
+    }
+
+    body.theme-dark .flatpickr-day.selected {
+        background: var(--accent);
+        border-color: var(--accent);
+    }
+
+    body.theme-dark .flatpickr-day.today {
+        border-color: var(--accent);
+    }
+
+    body.theme-dark .flatpickr-day.disabled {
+        color: rgba(255,255,255,0.2);
+    }
+
+body.theme-dark .numInputWrapper input {
+    background: #0f3460;
+    color: white;
+}
+
+body.theme-dark #rangeStart,
+body.theme-dark #rangeEnd,
+body.theme-dark #rangeDayOfWeek {
+    background: #0f3460;
+    color: white;
+    border-color: #6c5ce7 !important;
+    border-width: 2px !important;
+}
+
+    body.theme-dark #rangeStart:focus,
+    body.theme-dark #rangeEnd:focus,
+    body.theme-dark #rangeDayOfWeek:focus {
+        border-color: #a29bfe !important;
+        box-shadow: 0 0 10px rgba(108,92,231,0.3);
+    }
+
+/* ===== ЗЕЛЕНА ТЕМА — таблиці ===== */
+body.theme-green .table {
+    background: #f0fff4;
+    color: #1a2e1a;
+}
+
+    body.theme-green .table td,
+    body.theme-green .table th {
+        background: #f0fff4;
+        color: #1a2e1a !important;
+        border-color: #9ae6b4;
+    }
+
+body.theme-green .table-striped tbody tr:nth-of-type(odd) td {
+    background-color: #c6f6d5;
+}
+
+body.theme-green .table-hover tbody tr:hover td {
+    background-color: #9ae6b4;
+}
+
+body.theme-green .table-responsive {
+    background: #f0fff4;
+}
+
+/* ===== СИНЯ ТЕМА — таблиці ===== */
+body.theme-blue .table {
+    background: #ebf8ff;
+    color: #1a1f2e;
+}
+
+    body.theme-blue .table td,
+    body.theme-blue .table th {
+        background: #ebf8ff;
+        color: #1a1f2e !important;
+        border-color: #90cdf4;
+    }
+
+body.theme-blue .table-striped tbody tr:nth-of-type(odd) td {
+    background-color: #bee3f8;
+}
+
+body.theme-blue .table-hover tbody tr:hover td {
+    background-color: #90cdf4;
+}
+
+body.theme-blue .table-responsive {
+    background: #ebf8ff;
 }
