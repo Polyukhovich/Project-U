@@ -1,6 +1,7 @@
 ﻿@{
     ViewData["Title"] = "Завдання";
     var grouped = ViewBag.GroupedAssignments as IEnumerable<dynamic>;
+    var currentUserId = ViewBag.CurrentUserId as string;
 }
 
 <div class="d-flex justify-content-between align-items-center mb-4">
@@ -34,7 +35,6 @@
                     }
                 </div>
             </div>
-
             <div class="card-body">
                 <div class="row">
                     @foreach (ProjectU.Core.Models.Assignment item in group.Assignments)
@@ -44,17 +44,18 @@
                         var borderColor = isExpired ? "#d63031" : hoursLeft < 24 ? "#fdcb6e" : "#00b894";
                         var statusEmoji = isExpired ? "❌" : hoursLeft < 24 ? "⚠️" : "✅";
 
+                        // Здача поточного студента
+                        var mySubmission = item.Submissions?.FirstOrDefault(s => s.StudentId == currentUserId);
+                        var submissionsCount = item.Submissions?.Count ?? 0;
+
                         <div class="col-md-6 mb-3">
-                            <!-- Клікабельна картка -->
                             <a asp-action="Details" asp-route-id="@item.Id" class="text-decoration-none d-block">
-                                <div class="card"
-                                     style="border-top: 3px solid @borderColor; cursor: pointer; transition: transform 0.2s ease, box-shadow 0.2s ease;"
+                                <div class="card h-100" style="border-top: 3px solid @borderColor; cursor: pointer; transition: transform 0.2s ease, box-shadow 0.2s ease;"
                                      onmouseover="this.style.transform='translateY(-5px)'; this.style.boxShadow='0 10px 25px rgba(0,0,0,0.15)'"
                                      onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow=''">
-
                                     <div class="card-body p-3">
                                         <div class="d-flex justify-content-between align-items-start mb-2">
-                                            <h6 class="mb-0 text-dark">@item.Title</h6>
+                                            <h6 class="mb-0">@item.Title</h6>
                                             <span style="font-size:1.3rem;">@statusEmoji</span>
                                         </div>
 
@@ -80,22 +81,55 @@
                                         }
 
                                         <div class="mb-1">
-                                            <small class="text-muted">📅 Створено: @item.CreatedAt.ToString("dd.MM.yyyy HH:mm")</small>
-                                        </div>
-
-                                        <div class="mb-1">
                                             <small class="text-muted">⏰ Дедлайн:</small>
                                             <span class="badge fs-6 text-white" style="background: @borderColor;">
                                                 @item.Deadline.ToString("dd.MM.yyyy HH:mm")
                                                 @if (isExpired)
                                                 {
-                                                    <text> (прострочено)</text>
+                                                    <text>(прострочено)</text>
                                                 }
                                                 else if (hoursLeft < 24)
                                                 {
-                                                    <text> (залишилось @((int)hoursLeft) год)</text>
+
+                                                    <text>(залишилось @((int)hoursLeft) год)</text>
                                                 }
                                             </span>
+                                        </div>
+
+                                        <!-- Статус здачі -->
+                                        <div class="mt-2">
+                                            @if (User.IsInRole("Student"))
+                                            {
+                                                @if (mySubmission != null)
+                                                {
+                                                    @if (mySubmission.IsGraded)
+                                                    {
+                                                        <span class="badge bg-success">✅ Здано та оцінено</span>
+                                                    }
+                                                    else
+                                                    {
+                                                        <span class="badge bg-warning">⏳ Здано — очікує оцінки</span>
+                                                    }
+                                                }
+                                                else if (!isExpired)
+                                                {
+                                                    <span class="badge bg-danger">📤 Не здано</span>
+                                                }
+                                                else
+                                                {
+                                                    <span class="badge bg-secondary">❌ Не здано (прострочено)</span>
+                                                }
+                                            }
+                                            else if (User.IsInRole("Teacher") || User.IsInRole("Admin"))
+                                            {
+                                                <span class="badge bg-secondary">
+                                                    📤 Здач: @submissionsCount
+                                                </span>
+                                                var gradedCount = item.Submissions?.Count(s => s.IsGraded) ?? 0;
+                                                <span class="badge bg-success ms-1">
+                                                    ✅ Оцінено: @gradedCount
+                                                </span>
+                                            }
                                         </div>
                                     </div>
                                 </div>

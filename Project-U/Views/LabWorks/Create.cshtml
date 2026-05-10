@@ -1,39 +1,67 @@
 ﻿@model ProjectU.Core.Models.LabWork
 @{
-    ViewData["Title"] = "Здати лабораторну";
+    ViewData["Title"] = "Здати роботу";
+    var assignmentId = ViewBag.AssignmentId as int?;
 }
 
-<h2>Здати лабораторну роботу</h2>
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2>📤 Здати роботу</h2>
+    @if (assignmentId != null)
+    {
+        <a asp-controller="Assignments" asp-action="Details" asp-route-id="@assignmentId" class="btn btn-outline-secondary">← Назад</a>
+    }
+    else
+    {
+        <a asp-controller="Assignments" asp-action="Index" class="btn btn-outline-secondary">← Назад</a>
+    }
+</div>
 
 <div class="row">
-    <div class="col-md-6">
-        <form asp-action="Create" method="post" enctype="multipart/form-data">
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+    <div class="col-md-5">
+        <div class="card" style="border-top: 4px solid var(--accent);">
+            <div class="card-body">
+                <form asp-action="Create" method="post" enctype="multipart/form-data">
+                    <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+                    <input type="hidden" name="StudentId" value="@ViewData["CurrentUserId"]" />
 
-            <input type="hidden" name="StudentId" value="@ViewData["CurrentUserId"]" />
+                    @if (ViewBag.AssignmentName != null)
+                    {
+                        <div class="mb-3">
+                            <label class="form-label">📋 Завдання</label>
+                            <input type="text" class="form-control" value="@ViewBag.AssignmentName" disabled />
+                            <input type="hidden" asp-for="AssignmentId" />
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="mb-3">
+                            <label asp-for="AssignmentId" class="form-label">📋 Завдання</label>
+                            <select asp-for="AssignmentId" asp-items="ViewBag.Assignments" class="form-select">
+                                <option value="">— Оберіть завдання —</option>
+                            </select>
+                            <span asp-validation-for="AssignmentId" class="text-danger"></span>
+                        </div>
+                    }
 
-            <div class="mb-3">
-                <label asp-for="AssignmentId" class="form-label">Завдання</label>
-                <select asp-for="AssignmentId" asp-items="ViewBag.AssignmentId" class="form-select">
-                    <option value="">— Оберіть завдання —</option>
-                </select>
-                <span asp-validation-for="AssignmentId" class="text-danger"></span>
+                    <div class="mb-3">
+                        <label asp-for="Title" class="form-label">Назва роботи</label>
+                        <input asp-for="Title" class="form-control" placeholder="Наприклад: Лабораторна робота №1" />
+                        <span asp-validation-for="Title" class="text-danger"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">📄 Файл роботи (.docx або .pdf)</label>
+                        <input type="file" name="uploadedFile" class="form-control" accept=".docx,.pdf" />
+                        <small class="text-muted">Максимальний розмір: 10MB</small>
+                    </div>
+
+                    <div class="d-flex gap-2">
+                        <button type="submit" class="btn btn-primary flex-fill">📤 Здати роботу</button>
+                        <a asp-controller="Assignments" asp-action="Index" class="btn btn-outline-secondary">Скасувати</a>
+                    </div>
+                </form>
             </div>
-
-            <div class="mb-3">
-                <label asp-for="Title" class="form-label">Назва роботи</label>
-                <input asp-for="Title" class="form-control" placeholder="Наприклад: Лабораторна робота №1" />
-                <span asp-validation-for="Title" class="text-danger"></span>
-            </div>
-
-            <div class="mb-3">
-                <label class="form-label">Файл роботи (.docx або .pdf)</label>
-                <input type="file" name="uploadedFile" class="form-control" accept=".docx,.pdf" />
-            </div>
-
-            <button type="submit" class="btn btn-primary">📤 Здати</button>
-            <a asp-action="Index" class="btn btn-secondary">Назад</a>
-        </form>
+        </div>
     </div>
 </div>
 

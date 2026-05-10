@@ -3,7 +3,36 @@ html, body {
     overflow-x: hidden;
     max-width: 100vw;
 }
+/* ===== ПРОФІЛЬ ===== */
+.avatar {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    background: #6c5ce7;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2rem;
+    color: white;
+    font-weight: bold;
+}
 
+.stat-card {
+    border-radius: 12px;
+    padding: 20px;
+    text-align: center;
+    color: white;
+}
+
+.stat-number {
+    font-size: 2rem;
+    font-weight: bold;
+}
+
+.stat-label {
+    font-size: 0.85rem;
+    opacity: 0.9;
+}
 /* ===== CSS ЗМІННІ ДЛЯ ТЕМ ===== */
 :root {
     --sidebar-bg: #1a1a2e;

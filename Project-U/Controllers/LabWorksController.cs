@@ -78,7 +78,6 @@ namespace Controllers
         }
 
         // GET: LabWorks/Details/5
-        [Authorize(Roles = "Admin,Teacher,Student")]
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null) return NotFound();
@@ -86,32 +85,51 @@ namespace Controllers
             var labWork = await _context.LabWorks
                 .Include(l => l.Student)
                 .Include(l => l.Course)
+                .Include(l => l.Assignment)
                 .Include(l => l.PlagiarismResults)
                     .ThenInclude(p => p.ComparedWith)
                 .FirstOrDefaultAsync(m => m.Id == id);
 
             if (labWork == null) return NotFound();
 
+            // Завантажуємо оцінку для цієї роботи
+            var grade = await _context.Grades
+                .FirstOrDefaultAsync(g => g.LabWorkId == id);
+
+            ViewBag.Grade = grade;
             return View(labWork);
         }
 
         // GET: LabWorks/Create — Student та Admin
-        [Authorize(Roles = "Admin,Student")]
-        public async Task<IActionResult> Create(int? assignmentId = null)
+        [Authorize(Roles = "Student")]
+        public async Task<IActionResult> Create(int? assignmentId)
         {
             var currentUser = await _context.Users
                 .FirstOrDefaultAsync(u => u.UserName == User.Identity!.Name);
 
-            if (currentUser == null) return NotFound();
+            ViewData["CurrentUserId"] = currentUser?.Id;
 
-            // Показуємо завдання для групи студента
+            if (assignmentId != null)
+            {
+                var assignment = await _context.Assignments
+                    .Include(a => a.Course)
+                    .FirstOrDefaultAsync(a => a.Id == assignmentId);
+
+                if (assignment != null)
+                {
+                    ViewBag.AssignmentName = assignment.Title;
+                    ViewBag.AssignmentId = assignmentId;
+                    return View(new LabWork { AssignmentId = assignmentId.Value });
+                }
+            }
+
+            // Якщо без assignmentId — показуємо список завдань
             var assignments = await _context.Assignments
                 .Include(a => a.Course)
-                .Where(a => a.Course.GroupId == currentUser.GroupId && a.Deadline > DateTime.UtcNow)
+                .Where(a => a.Course.GroupId == currentUser!.GroupId)
                 .ToListAsync();
 
-            ViewData["AssignmentId"] = new SelectList(assignments, "Id", "Title", assignmentId);
-            ViewData["CurrentUserId"] = currentUser.Id;
+            ViewBag.Assignments = new SelectList(assignments, "Id", "Title");
             return View();
         }
 
@@ -310,22 +328,18 @@ namespace Controllers
         }
 
         // GET: LabWorks/Delete/5 — тільки Admin
-        [Authorize(Roles = "Admin")]
+        [Authorize(Roles = "Admin,Student")]
         public async Task<IActionResult> Delete(int? id)
         {
-            if (id == null)
-            {
-                return NotFound();
-            }
+            if (id == null) return NotFound();
 
             var labWork = await _context.LabWorks
-                .Include(l => l.Course)
                 .Include(l => l.Student)
+                .Include(l => l.Course)
+                .Include(l => l.Assignment)
                 .FirstOrDefaultAsync(m => m.Id == id);
-            if (labWork == null)
-            {
-                return NotFound();
-            }
+
+            if (labWork == null) return NotFound();
 
             return View(labWork);
         }
@@ -333,16 +347,38 @@ namespace Controllers
         // POST: LabWorks/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
-        [Authorize(Roles = "Admin")]
+        [Authorize(Roles = "Admin,Student")]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
             var labWork = await _context.LabWorks.FindAsync(id);
-            if (labWork != null)
+            if (labWork == null) return NotFound();
+
+            // Студент може видалити тільки свою роботу
+            if (User.IsInRole("Student"))
             {
-                _context.LabWorks.Remove(labWork);
+                var currentUser = await _context.Users
+                    .FirstOrDefaultAsync(u => u.UserName == User.Identity!.Name);
+                if (labWork.StudentId != currentUser?.Id)
+                    return Forbid();
             }
 
+            // Видаляємо оцінку якщо є
+            var grade = await _context.Grades
+                .FirstOrDefaultAsync(g => g.LabWorkId == id);
+            if (grade != null)
+            {
+                _context.Grades.Remove(grade);
+            }
+
+            // Видаляємо результати антиплагіату
+            var plagiarismResults = await _context.PlagiarismResults
+                .Where(p => p.LabWorkId == id)
+                .ToListAsync();
+            _context.PlagiarismResults.RemoveRange(plagiarismResults);
+
+            _context.LabWorks.Remove(labWork);
             await _context.SaveChangesAsync();
+
             return RedirectToAction(nameof(Index));
         }
 

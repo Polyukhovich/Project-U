@@ -4,39 +4,6 @@
     var role = ViewBag.Role as string ?? "Student";
     var initials = $"{Model?.FirstName?.FirstOrDefault()}{Model?.LastName?.FirstOrDefault()}";
 }
-
-<style>
-    .avatar {
-        width: 80px;
-        height: 80px;
-        border-radius: 50%;
-        background: #6c5ce7;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 2rem;
-        color: white;
-        font-weight: bold;
-    }
-
-    .stat-card {
-        border-radius: 12px;
-        padding: 20px;
-        text-align: center;
-        color: white;
-    }
-
-    .stat-number {
-        font-size: 2rem;
-        font-weight: bold;
-    }
-
-    .stat-label {
-        font-size: 0.85rem;
-        opacity: 0.9;
-    }
-</style>
-
 <!-- Шапка профілю -->
 <div class="card mb-4">
     <div class="card-body d-flex align-items-center gap-4 p-4 flex-wrap">
@@ -107,7 +74,7 @@
                             <tbody>
                                 @foreach (var grade in grades)
                                 {
-                                    <tr>
+                                    <tr onclick="window.location='/Grades/Details/@grade.Id'" style="cursor:pointer;">
                                         <td>@grade.Course?.Name</td>
                                         <td>
                                             <span class="badge @(grade.Value >= 90 ? "bg-success" : grade.Value >= 60 ? "bg-warning" : "bg-danger")">
@@ -141,7 +108,7 @@
                             <tbody>
                                 @foreach (var work in labWorks)
                                 {
-                                    <tr>
+                                    <tr onclick="window.location='/LabWorks/Details/@work.Id'" style="cursor:pointer;">
                                         <td>@work.Assignment?.Title</td>
                                         <td>@work.UploadedAt.ToShortDateString()</td>
                                         <td>
@@ -202,7 +169,7 @@
                             <tbody>
                                 @foreach (var course in courses)
                                 {
-                                    <tr>
+                                    <tr onclick="window.location='/Courses/Details/@course.Id'" style="cursor:pointer;">
                                         <td>@course.Name</td>
                                         <td><span class="badge bg-secondary">@course.Group?.Name</span></td>
                                     </tr>
@@ -229,7 +196,7 @@
                             <tbody>
                                 @foreach (var assignment in assignments)
                                 {
-                                    <tr>
+                                    <tr onclick="window.location='/Assignments/Details/@assignment.Id'" style="cursor:pointer;">
                                         <td>@assignment.Title</td>
                                         <td>
                                             <span class="badge @(assignment.Deadline < DateTime.Now ? "bg-danger" : "bg-success")">

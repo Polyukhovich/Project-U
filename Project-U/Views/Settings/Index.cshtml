@@ -3,12 +3,12 @@
     ViewData["Title"] = "Налаштування";
 }
 
-<h2>⚙️ Налаштування</h2>
+<h2 class="mb-4">⚙️ Налаштування</h2>
 
 <div class="row">
     <!-- Акаунт -->
     <div class="col-md-6 mb-4">
-        <div class="card">
+        <div class="card" style="border-top: 4px solid var(--accent);">
             <div class="card-header">👤 Акаунт</div>
             <div class="card-body">
                 <a asp-area="Identity" asp-page="/Account/Manage/Index" class="btn btn-outline-primary w-100 mb-2">✏️ Редагувати профіль</a>
@@ -19,7 +19,7 @@
 
     <!-- Мова -->
     <div class="col-md-6 mb-4">
-        <div class="card">
+        <div class="card" style="border-top: 4px solid var(--accent);">
             <div class="card-header">🌐 Мова інтерфейсу</div>
             <div class="card-body">
                 <form asp-controller="SelectLanguage" asp-action="SetLanguage" method="post">
@@ -35,7 +35,7 @@
 
     <!-- Тема -->
     <div class="col-md-6 mb-4">
-        <div class="card">
+        <div class="card" style="border-top: 4px solid var(--accent);">
             <div class="card-header">🎨 Тема оформлення</div>
             <div class="card-body">
                 <div class="d-flex flex-wrap gap-2">
@@ -50,7 +50,7 @@
 
     <!-- Вихід -->
     <div class="col-md-6 mb-4">
-        <div class="card border-danger">
+        <div class="card" style="border-top: 4px solid #d63031;">
             <div class="card-header text-danger">⚠️ Небезпечна зона</div>
             <div class="card-body">
                 <form asp-area="Identity" asp-page="/Account/Logout" method="post">

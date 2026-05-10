@@ -37,6 +37,8 @@ namespace Controllers
 
             var assignmentsQuery = _context.Assignments
                 .Include(a => a.Course)
+                .Include(a => a.Submissions)
+                    .ThenInclude(s => s.Student)
                 .AsQueryable();
 
             // Студент бачить тільки завдання своєї групи
@@ -72,6 +74,7 @@ namespace Controllers
                 .ToList();
 
             ViewBag.GroupedAssignments = grouped;
+            ViewBag.CurrentUserId = currentUser?.Id;
             return View();
         }
 
@@ -95,12 +98,17 @@ namespace Controllers
 
             if (assignment == null) return NotFound();
 
-            // Поточний користувач
             var currentUser = await _context.Users
                 .FirstOrDefaultAsync(u => u.UserName == User.Identity!.Name);
 
-            ViewBag.CurrentUserId = currentUser?.Id;
+            // Завантажуємо оцінки для цього завдання
+            var labWorkIds = assignment.Submissions.Select(s => s.Id).ToList();
+            var grades = await _context.Grades
+                .Where(g => g.LabWorkId != null && labWorkIds.Contains(g.LabWorkId.Value))
+                .ToListAsync();
 
+            ViewBag.CurrentUserId = currentUser?.Id;
+            ViewBag.Grades = grades;
             return View(assignment);
         }
 

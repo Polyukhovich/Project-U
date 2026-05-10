@@ -81,57 +81,6 @@ public async Task<IActionResult> Index(int page = 1)
 
             return View(grade);
         }
-
-        // GET: Grades/Create
-        public IActionResult Create()
-        {
-            ViewData["CourseId"] = new SelectList(_context.Courses, "Id", "Description");
-            ViewData["LabWorkId"] = new SelectList(_context.LabWorks, "Id", "Content");
-            ViewData["StudentId"] = new SelectList(_context.Users, "Id", "Id");
-            return View();
-        }
-
-        // POST: Grades/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        [Authorize(Roles = "Admin,Teacher")]
-        public async Task<IActionResult> Create([Bind("Id,Value,CreatedAt,StudentId,CourseId,LabWorkId")] Grade grade)
-        {
-            if (ModelState.IsValid)
-            {
-                _context.Add(grade);
-                await _context.SaveChangesAsync();
-                // Надсилаємо сповіщення студенту через SignalR
-                var student = await _context.Users.FindAsync(grade.StudentId);
-                var course = await _context.Courses.FindAsync(grade.CourseId);
-
-                if (student != null && course != null)
-                {
-                    var message = $"Вам виставлено оцінку {grade.Value} з курсу {course.Name}";
-                    await _hubContext.Clients
-                        .Group($"user_{student.Id}")
-                        .SendAsync("ReceiveNotification", message);
-
-                    // Зберігаємо сповіщення в БД
-                    _context.Notifications.Add(new Notification
-                    {
-                        UserId = student.Id,
-                        Message = message,
-                        IsRead = false,
-                        CreatedAt = DateTime.UtcNow
-                    });
-                    await _context.SaveChangesAsync();
-                }
-                return RedirectToAction(nameof(Index));
-            }
-            ViewData["CourseId"] = new SelectList(_context.Courses, "Id", "Description", grade.CourseId);
-            ViewData["LabWorkId"] = new SelectList(_context.LabWorks, "Id", "Content", grade.LabWorkId);
-            ViewData["StudentId"] = new SelectList(_context.Users, "Id", "Id", grade.StudentId);
-            return View(grade);
-        }
-
         // GET: Grades/Edit/5 — тільки Teacher та Admin
         [Authorize(Roles = "Admin,Teacher")]
         public async Task<IActionResult> Edit(int? id)

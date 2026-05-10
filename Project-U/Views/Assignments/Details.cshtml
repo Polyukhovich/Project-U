@@ -157,17 +157,20 @@
                                         @if (User.IsInRole("Admin") || User.IsInRole("Teacher"))
                                         {
                                             <td>
-                                                @if (submission != null && submission.IsGraded)
-                                                {
-                                                    <span class="badge bg-success">✅ Оцінено</span>
+                                                @{
+                                                    var grades = ViewBag.Grades as List<ProjectU.Core.Models.Grade>;
+                                                    var grade = submission != null ? grades?.FirstOrDefault(g => g.LabWorkId.HasValue && g.LabWorkId.Value == submission.Id) : null;
+                                                    var gradeColor = grade != null ? (grade.Value >= 90 ? "#00b894" : grade.Value >= 75 ? "#0984e3" : grade.Value >= 60 ? "#fdcb6e" : "#d63031") : "";
                                                 }
-                                                else if (submission != null)
+                                                @if (grade != null)
                                                 {
-                                                    <span class="badge bg-warning">⏳ Не оцінено</span>
+                                                    <span class="badge" style="background: @gradeColor; font-size: 1rem;">
+                                                        @grade.Value
+                                                    </span>
                                                 }
                                                 else
                                                 {
-                                                    <span class="text-muted">—</span>
+                                                    <span class="badge bg-warning">⏳ Очікує</span>
                                                 }
                                             </td>
                                             <td>

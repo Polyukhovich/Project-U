@@ -45,9 +45,21 @@
 
                     <dt class="col-sm-5">Статус</dt>
                     <dd class="col-sm-7">
-                        @if (Model.IsGraded)
+                        @{
+                            var grade = ViewBag.Grade as ProjectU.Core.Models.Grade;
+                            var gradeColor = grade != null ? (grade.Value >= 90 ? "#00b894" : grade.Value >= 75 ? "#0984e3" : grade.Value >= 60 ? "#fdcb6e" : "#d63031") : "";
+                        }
+                        @if (grade != null)
                         {
-                            <span class="badge bg-success">✅ Оцінено</span>
+                            <div class="d-flex align-items-center gap-2">
+                                <div style="width:45px;height:45px;border-radius:50%;background:@gradeColor;display:flex;align-items:center;justify-content:center;font-size:1.1rem;font-weight:bold;color:white;">
+                                    @grade.Value
+                                </div>
+                                <div>
+                                    <div class="badge bg-success">✅ Оцінено</div>
+                                    <div class="small text-muted">@grade.CreatedAt.ToShortDateString()</div>
+                                </div>
+                            </div>
                         }
                         else
                         {
@@ -56,19 +68,37 @@
                     </dd>
                 </dl>
             </div>
-            @if (User.IsInRole("Admin") || User.IsInRole("Student"))
-            {
-                <div class="card-footer d-flex gap-2">
-                    @if (!Model.IsGraded)
+            <div class="card-footer d-flex gap-2">
+                @if (!Model.IsGraded && (User.IsInRole("Admin") || User.IsInRole("Student")))
+                {
+                    <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-warning btn-sm flex-fill">✏️ Редагувати</a>
+                }
+                @if (User.IsInRole("Admin") || User.IsInRole("Teacher"))
+                {
+                    @if (ViewBag.Grade != null)
                     {
-                        <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-warning btn-sm flex-fill">✏️ Редагувати</a>
+                        <a asp-controller="Grades" asp-action="Edit" asp-route-id="@((ViewBag.Grade as ProjectU.Core.Models.Grade)!.Id)"
+                           class="btn btn-outline-warning btn-sm flex-fill">✏️ Змінити оцінку</a>
+                        <a asp-controller="Grades" asp-action="Delete" asp-route-id="@((ViewBag.Grade as ProjectU.Core.Models.Grade)!.Id)"
+                           class="btn btn-outline-danger btn-sm">🗑️ Видалити оцінку</a>
                     }
-                    @if (User.IsInRole("Admin"))
+                }
+                @if (User.IsInRole("Admin") || User.IsInRole("Student"))
+                {
+                    @if (Model.IsGraded)
                     {
-                        <a asp-action="Delete" asp-route-id="@Model.Id" class="btn btn-danger btn-sm">🗑️</a>
+                        <button type="button" class="btn btn-danger btn-sm"
+                                onclick="if(confirm('⚠️ Увага! Робота оцінена. Якщо ви її видалите — оцінка також буде видалена. Продовжити?')) window.location='/LabWorks/Delete/@Model.Id'">
+                            🗑️ Видалити
+                        </button>
                     }
-                </div>
-            }
+                    else
+                    {
+                        <a asp-action="Delete" asp-route-id="@Model.Id" class="btn btn-danger btn-sm">🗑️ Видалити</a>
+                    }
+                }
+            </div>
+            
         </div>
     </div>
 
