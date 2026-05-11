@@ -138,8 +138,14 @@
   <data name="Online" xml:space="preserve">
     <value>Online</value>
   </data>
+  <data name="PastDates" xml:space="preserve">
+    <value>Past dates</value>
+  </data>
   <data name="Room" xml:space="preserve">
     <value>Room</value>
+  </data>
+  <data name="Teacher" xml:space="preserve">
+    <value>Teacher</value>
   </data>
   <data name="Time" xml:space="preserve">
     <value>Time</value>

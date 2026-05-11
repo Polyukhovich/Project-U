@@ -138,8 +138,14 @@
   <data name="Online" xml:space="preserve">
     <value>Онлайн</value>
   </data>
+  <data name="PastDates" xml:space="preserve">
+    <value>Минулі дати</value>
+  </data>
   <data name="Room" xml:space="preserve">
     <value>Аудиторія</value>
+  </data>
+  <data name="Teacher" xml:space="preserve">
+    <value>Викладач</value>
   </data>
   <data name="Time" xml:space="preserve">
     <value>Час</value>

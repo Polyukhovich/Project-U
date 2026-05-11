@@ -289,6 +289,7 @@ namespace Controllers
             // Завантажуємо всі розклади з датами
             var allSchedules = await _context.Schedules
                 .Include(s => s.Course)
+                .ThenInclude(c => c.Teacher)
                 .Include(s => s.Group)
                 .Include(s => s.Dates)
                 .ToListAsync();
@@ -296,8 +297,7 @@ namespace Controllers
             // Фільтруємо в пам'яті
             var schedules = allSchedules
                 .Where(s => s.Dates.Any(d =>
-                    d.Date.DayOfWeek == dayOfWeek &&
-                    d.Date >= today))
+                d.Date.DayOfWeek == dayOfWeek))
                 .ToList();
 
             // Фільтрація по ролі

@@ -31,6 +31,7 @@ namespace Project_U.Controllers
 
             var schedulesQuery = _context.Schedules
                 .Include(s => s.Course)
+                .ThenInclude(c => c.Teacher)
                 .Include(s => s.Group)
                 .Include(s => s.Dates)
                 .Where(s => s.Dates.Any(d => d.Date == today));
