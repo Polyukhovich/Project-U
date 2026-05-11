@@ -29,7 +29,7 @@ namespace Controllers
         // GET: Assignments — всі ролі можуть переглядати
         [HttpGet]
         [Authorize(Roles = "Admin,Teacher,Student")]
-        public async Task<IActionResult> Index(int page = 1)
+        public async Task<IActionResult> Index(int? courseId)
         {
             var currentUser = await _context.Users
                 .Include(u => u.Group)
@@ -41,25 +41,21 @@ namespace Controllers
                     .ThenInclude(s => s.Student)
                 .AsQueryable();
 
-            // Студент бачить тільки завдання своєї групи
             if (User.IsInRole("Student") && currentUser?.GroupId != null)
-            {
                 assignmentsQuery = assignmentsQuery
                     .Where(a => a.Course.GroupId == currentUser.GroupId);
-            }
 
-            // Викладач бачить тільки свої курси
             if (User.IsInRole("Teacher"))
-            {
                 assignmentsQuery = assignmentsQuery
                     .Where(a => a.Course.TeacherId == currentUser!.Id);
-            }
+
+            if (courseId != null)
+                assignmentsQuery = assignmentsQuery.Where(a => a.CourseId == courseId);
 
             var assignments = await assignmentsQuery
                 .OrderByDescending(a => a.Deadline)
                 .ToListAsync();
 
-            // Групуємо по курсах
             var grouped = assignments
                 .GroupBy(a => a.Course?.Name ?? "—")
                 .Select(g => new
@@ -73,7 +69,10 @@ namespace Controllers
                 .OrderBy(g => g.CourseName)
                 .ToList();
 
+            var courses = await _context.Courses.ToListAsync();
             ViewBag.GroupedAssignments = grouped;
+            ViewBag.Courses = courses;
+            ViewBag.SelectedCourseId = courseId;
             ViewBag.CurrentUserId = currentUser?.Id;
             return View();
         }
@@ -142,6 +141,34 @@ namespace Controllers
                 // Обробка файлу матеріалу
                 if (assignment.MaterialType == "File" && materialFile != null && materialFile.Length > 0)
                 {
+                    // Перевірка розміру (максимум 20MB)
+                    if (materialFile.Length > 20 * 1024 * 1024)
+                    {
+                        ModelState.AddModelError("", "Файл занадто великий. Максимальний розмір — 20MB");
+                        var currentUserErr = await _context.Users
+                            .FirstOrDefaultAsync(u => u.UserName == User.Identity!.Name);
+                        var coursesErr = await _context.Courses
+                            .Where(c => c.TeacherId == currentUserErr!.Id)
+                            .ToListAsync();
+                        ViewData["CourseId"] = new SelectList(coursesErr, "Id", "Name");
+                        return View(assignment);
+                    }
+
+                    // Перевірка типу файлу
+                    var allowedExtensions = new[] { ".pdf", ".docx" };
+                    var extension = Path.GetExtension(materialFile.FileName).ToLowerInvariant();
+                    if (!allowedExtensions.Contains(extension))
+                    {
+                        ModelState.AddModelError("", "Дозволені тільки файли .pdf та .docx");
+                        var currentUserErr = await _context.Users
+                            .FirstOrDefaultAsync(u => u.UserName == User.Identity!.Name);
+                        var coursesErr = await _context.Courses
+                            .Where(c => c.TeacherId == currentUserErr!.Id)
+                            .ToListAsync();
+                        ViewData["CourseId"] = new SelectList(coursesErr, "Id", "Name");
+                        return View(assignment);
+                    }
+
                     var uploadsFolder = Path.Combine(_environment.WebRootPath, "uploads", "materials");
                     Directory.CreateDirectory(uploadsFolder);
 

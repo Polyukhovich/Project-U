@@ -1,9 +1,9 @@
 ﻿function getNotificationUrl(message) {
-    if (message.includes('оцінку')) return '/Grades';
-    if (message.includes('здав роботу') || message.includes('роботу')) return '/Assignments';
+    if (message.includes('оцінку') || message.includes('оцінено')) return '/Grades';
+    if (message.includes('здав роботу')) return '/Assignments';
     if (message.includes('розклад')) return '/Schedules';
-    if (message.includes('дедлайн') || message.includes('Дедлайн')) return '/Assignments';
-    if (message.includes('схожість') || message.includes('перевірку')) return '/LabWorks';
+    if (message.includes('завдання') || message.includes('Завдання') || message.includes('дедлайн')) return '/Assignments';
+    if (message.includes('схожість') || message.includes('перевірку') || message.includes('схожості')) return '/Assignments';
     return '/';
 }
 

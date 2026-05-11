@@ -27,7 +27,7 @@ namespace Controllers
 
         // GET: Courses — всі ролі можуть переглядати
         [Authorize(Roles = "Admin,Teacher,Student")]
-        public async Task<IActionResult> Index(int page = 1)
+        public async Task<IActionResult> Index(string? search)
         {
             var currentUser = await _context.Users
                 .Include(u => u.Group)
@@ -53,7 +53,16 @@ namespace Controllers
             }
 
             var courses = await coursesQuery.ToListAsync();
-
+            // Пошук в пам'яті
+            if (!string.IsNullOrEmpty(search))
+            {
+                var searchLower = search.ToLower();
+                courses = courses.Where(c =>
+                    c.Name.ToLower().Contains(searchLower) ||
+                    (c.Teacher != null && $"{c.Teacher.FirstName} {c.Teacher.LastName}".ToLower().Contains(searchLower)) ||
+                    (c.Group != null && c.Group.Name.ToLower().Contains(searchLower)))
+                    .ToList();
+            }
             // Групуємо по групах
             var grouped = courses
                 .GroupBy(c => c.Group?.Name ?? "—")
@@ -66,6 +75,7 @@ namespace Controllers
                 .ToList();
 
             ViewBag.GroupedCourses = grouped;
+            ViewBag.Search = search;
             return View();
         }
 

@@ -37,46 +37,6 @@ namespace Controllers
             _environment = environment;
             _hubContext = hubContext;
         }
-
-        // GET: LabWorks — всі ролі можуть переглядати
-        [Authorize(Roles = "Admin,Teacher,Student")]
-        public async Task<IActionResult> Index(int page = 1)
-        {
-            var currentUser = await _context.Users
-                .FirstOrDefaultAsync(u => u.UserName == User.Identity!.Name);
-
-            IQueryable<LabWork> query = _context.LabWorks
-                .Include(l => l.Student)
-                .Include(l => l.Course)
-                .Include(l => l.Assignment);
-
-            // Студент бачить тільки свої роботи
-            if (User.IsInRole("Student"))
-            {
-                query = query.Where(l => l.StudentId == currentUser!.Id);
-            }
-
-            var labWorks = await query
-                .OrderByDescending(l => l.UploadedAt)
-                .ToListAsync();
-
-            // Групуємо по курсах
-            var grouped = labWorks
-                .GroupBy(l => l.Course?.Name ?? "—")
-                .Select(g => new
-                {
-                    CourseName = g.Key,
-                    LabWorks = g.ToList(),
-                    GradedCount = g.Count(l => l.IsGraded),
-                    TotalCount = g.Count()
-                })
-                .OrderBy(g => g.CourseName)
-                .ToList();
-
-            ViewBag.GroupedLabWorks = grouped;
-            return View();
-        }
-
         // GET: LabWorks/Details/5
         public async Task<IActionResult> Details(int? id)
         {
@@ -148,7 +108,12 @@ namespace Controllers
                     labWork.CourseId = assignment.CourseId;
                 // Обробка завантаженого файлу
                 if (uploadedFile != null && uploadedFile.Length > 0)
-                {
+                {    // Перевірка розміру (максимум 10MB)
+                    if (uploadedFile.Length > 10 * 1024 * 1024)
+                    {
+                        ModelState.AddModelError("", "Файл занадто великий. Максимальний розмір — 10MB");
+                        return View(labWork);
+                    }
                     var allowedExtensions = new[] { ".docx", ".pdf" };
                     var extension = Path.GetExtension(uploadedFile.FileName).ToLower();
 

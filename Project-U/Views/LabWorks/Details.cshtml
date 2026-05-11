@@ -5,7 +5,7 @@
 
 <div class="d-flex justify-content-between align-items-center mb-4">
     <h2>🔬 @Model.Title</h2>
-    <a asp-action="Index" class="btn btn-outline-secondary">← Назад</a>
+    <a asp-controller="Assignments" asp-action="Index" class="btn btn-outline-secondary">← Назад</a>
 </div>
 
 <div class="row">
@@ -84,19 +84,10 @@
                     }
                 }
                 @if (User.IsInRole("Admin") || User.IsInRole("Student"))
-                {
-                    @if (Model.IsGraded)
-                    {
-                        <button type="button" class="btn btn-danger btn-sm"
-                                onclick="if(confirm('⚠️ Увага! Робота оцінена. Якщо ви її видалите — оцінка також буде видалена. Продовжити?')) window.location='/LabWorks/Delete/@Model.Id'">
-                            🗑️ Видалити
-                        </button>
-                    }
-                    else
                     {
                         <a asp-action="Delete" asp-route-id="@Model.Id" class="btn btn-danger btn-sm">🗑️ Видалити</a>
                     }
-                }
+                
             </div>
             
         </div>

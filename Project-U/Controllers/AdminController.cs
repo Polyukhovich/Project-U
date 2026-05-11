@@ -27,17 +27,31 @@ namespace Project_U.Controllers
         }
 
         // GET: Admin — список всіх користувачів
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(string? search)
         {
+            var originalSearch = search; // зберігаємо оригінал
             var users = await _userManager.Users
                 .Include(u => u.Group)
                 .ToListAsync();
+
+            if (!string.IsNullOrEmpty(search))
+            {
+                var searchLower = search.ToLower(); // конвертуємо тільки для порівняння
+                users = users.Where(u =>
+                    u.FirstName.ToLower().Contains(searchLower) ||
+                    u.LastName.ToLower().Contains(searchLower) ||
+                    $"{u.FirstName} {u.LastName}".ToLower().Contains(searchLower) ||
+                    $"{u.LastName} {u.FirstName}".ToLower().Contains(searchLower) ||
+                    u.Email!.ToLower().Contains(searchLower))
+                    .ToList();
+            }
 
             var userRoles = new Dictionary<string, IList<string>>();
             foreach (var user in users)
                 userRoles[user.Id] = await _userManager.GetRolesAsync(user);
 
             ViewBag.UserRoles = userRoles;
+            ViewBag.Search = originalSearch; // передаємо оригінал
             return View(users);
         }
 
@@ -122,16 +136,28 @@ namespace Project_U.Controllers
 
             return RedirectToAction(nameof(Index));
         }
+        // GET: Admin/DeleteUser
+        public async Task<IActionResult> DeleteUser(string id)
+        {
+            var user = await _userManager.Users
+                .Include(u => u.Group)
+                .FirstOrDefaultAsync(u => u.Id == id);
+
+            if (user == null) return NotFound();
+
+            var roles = await _userManager.GetRolesAsync(user);
+            ViewBag.CurrentRole = roles.FirstOrDefault() ?? "—";
+            return View(user);
+        } 
 
         // POST: Admin/DeleteUser
-        [HttpPost]
+        [HttpPost, ActionName("DeleteUser")]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteUser(string id)
+        public async Task<IActionResult> DeleteUserConfirmed(string id)
         {
             var user = await _userManager.FindByIdAsync(id);
             if (user != null)
                 await _userManager.DeleteAsync(user);
-
             return RedirectToAction(nameof(Index));
         }
     }

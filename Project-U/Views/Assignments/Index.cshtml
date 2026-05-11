@@ -11,7 +11,27 @@
         <a asp-action="Create" class="btn btn-primary">➕ Створити завдання</a>
     }
 </div>
-
+<!-- Фільтр по курсу -->
+<div class="card mb-4">
+    <div class="card-body">
+        <form asp-action="Index" method="get" class="d-flex gap-2 align-items-center flex-wrap">
+            <label class="form-label mb-0">📚 Фільтр по курсу:</label>
+            <select name="courseId" class="form-select" style="max-width: 250px;" onchange="this.form.submit()">
+                <option value="">— Всі курси —</option>
+                @foreach (var course in ViewBag.Courses as List<ProjectU.Core.Models.Course>)
+                {
+                    <option value="@course.Id" selected="@(ViewBag.SelectedCourseId != null && ViewBag.SelectedCourseId.ToString() == course.Id.ToString())">
+                        @course.Name
+                    </option>
+                }
+            </select>
+            @if (ViewBag.SelectedCourseId != null)
+            {
+                <a asp-action="Index" class="btn btn-outline-secondary btn-sm">✕ Скинути</a>
+            }
+        </form>
+    </div>
+</div>
 @if (grouped != null && grouped.Any())
 {
     @foreach (var group in grouped)

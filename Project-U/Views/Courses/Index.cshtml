@@ -14,6 +14,23 @@
     }
 </div>
 
+@if (User.IsInRole("Admin") || User.IsInRole("Teacher"))
+{
+    <div class="card mb-4">
+        <div class="card-body">
+            <form asp-action="Index" method="get" class="d-flex gap-2">
+                <input type="text" name="search" value="@ViewBag.Search"
+                       class="form-control" placeholder="🔍 Пошук по назві курсу, викладачу або групі..." />
+                <button type="submit" class="btn btn-primary">🔍</button>
+                @if (!string.IsNullOrEmpty(ViewBag.Search as string))
+                {
+                    <a asp-action="Index" class="btn btn-outline-secondary">✕</a>
+                }
+            </form>
+        </div>
+    </div>
+}
+
 @if (grouped != null && grouped.Any())
 {
     @foreach (var group in grouped)
