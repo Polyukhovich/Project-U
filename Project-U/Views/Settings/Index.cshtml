@@ -1,26 +1,27 @@
-﻿@model ProjectU.Core.Models.ApplicationUser
+﻿@using Microsoft.AspNetCore.Mvc.Localization
+@inject IViewLocalizer Localizer
+
+@model ProjectU.Core.Models.ApplicationUser
 @{
-    ViewData["Title"] = "Налаштування";
+    ViewData["Title"] = Localizer["Title"].Value;
 }
 
-<h2 class="mb-4">⚙️ Налаштування</h2>
+<h2 class="mb-4">⚙️ @Localizer["Title"]</h2>
 
 <div class="row">
-    <!-- Акаунт -->
     <div class="col-md-6 mb-4">
         <div class="card" style="border-top: 4px solid var(--accent);">
-            <div class="card-header">👤 Акаунт</div>
+            <div class="card-header">👤 @Localizer["Account"]</div>
             <div class="card-body">
-                <a asp-area="Identity" asp-page="/Account/Manage/Index" class="btn btn-outline-primary w-100 mb-2">✏️ Редагувати профіль</a>
-                <a asp-area="Identity" asp-page="/Account/Manage/ChangePassword" class="btn btn-outline-warning w-100">🔑 Змінити пароль</a>
+                <a asp-area="Identity" asp-page="/Account/Manage/Index" class="btn btn-outline-primary w-100 mb-2">✏️ @Localizer["EditProfile"]</a>
+                <a asp-area="Identity" asp-page="/Account/Manage/ChangePassword" class="btn btn-outline-warning w-100">🔑 @Localizer["ChangePassword"]</a>
             </div>
         </div>
     </div>
 
-    <!-- Мова -->
     <div class="col-md-6 mb-4">
         <div class="card" style="border-top: 4px solid var(--accent);">
-            <div class="card-header">🌐 Мова інтерфейсу</div>
+            <div class="card-header">🌐 @Localizer["Language"]</div>
             <div class="card-body">
                 <form asp-controller="SelectLanguage" asp-action="SetLanguage" method="post">
                     <input type="hidden" name="returnUrl" value="/Settings" />
@@ -33,28 +34,26 @@
         </div>
     </div>
 
-    <!-- Тема -->
     <div class="col-md-6 mb-4">
         <div class="card" style="border-top: 4px solid var(--accent);">
-            <div class="card-header">🎨 Тема оформлення</div>
+            <div class="card-header">🎨 @Localizer["Theme"]</div>
             <div class="card-body">
                 <div class="d-flex flex-wrap gap-2">
-                    <button onclick="setTheme('default')" class="btn btn-sm btn-outline-secondary">⚪ Стандартна</button>
-                    <button onclick="setTheme('dark')" class="btn btn-sm btn-dark">🌙 Темна</button>
-                    <button onclick="setTheme('green')" class="btn btn-sm btn-success">💚 Зелена</button>
-                    <button onclick="setTheme('blue')" class="btn btn-sm btn-primary">💙 Синя</button>
+                    <button onclick="setTheme('default')" class="btn btn-sm btn-outline-secondary">⚪ @Localizer["Default"]</button>
+                    <button onclick="setTheme('dark')" class="btn btn-sm btn-dark">🌙 @Localizer["Dark"]</button>
+                    <button onclick="setTheme('green')" class="btn btn-sm btn-success">💚 @Localizer["Green"]</button>
+                    <button onclick="setTheme('blue')" class="btn btn-sm btn-primary">💙 @Localizer["Blue"]</button>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Вихід -->
     <div class="col-md-6 mb-4">
         <div class="card" style="border-top: 4px solid #d63031;">
-            <div class="card-header text-danger">⚠️ Небезпечна зона</div>
+            <div class="card-header text-danger">⚠️ @Localizer["DangerZone"]</div>
             <div class="card-body">
                 <form asp-area="Identity" asp-page="/Account/Logout" method="post">
-                    <button type="submit" class="btn btn-danger w-100">🚪 Вийти з акаунту</button>
+                    <button type="submit" class="btn btn-danger w-100">🚪 @Localizer["Logout"]</button>
                 </form>
             </div>
         </div>

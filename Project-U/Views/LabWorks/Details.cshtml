@@ -1,34 +1,36 @@
-﻿@model ProjectU.Core.Models.LabWork
+﻿@using Microsoft.AspNetCore.Mvc.Localization
+@inject IViewLocalizer Localizer
+
+@model ProjectU.Core.Models.LabWork
 @{
-    ViewData["Title"] = "Деталі роботи";
+    ViewData["Title"] = Localizer["Title"].Value;
 }
 
 <div class="d-flex justify-content-between align-items-center mb-4">
     <h2>🔬 @Model.Title</h2>
-    <a asp-controller="Assignments" asp-action="Index" class="btn btn-outline-secondary">← Назад</a>
+    <a asp-controller="Assignments" asp-action="Index" class="btn btn-outline-secondary">← @Localizer["Back"]</a>
 </div>
 
 <div class="row">
-    <!-- Інформація про роботу -->
     <div class="col-md-4 mb-4">
         <div class="card" style="border-top: 4px solid @(Model.IsGraded ? "#00b894" : "#fdcb6e");">
-            <div class="card-header"><strong>📋 Інформація</strong></div>
+            <div class="card-header"><strong>📋 @Localizer["Info"]</strong></div>
             <div class="card-body">
                 <dl class="row mb-0">
-                    <dt class="col-sm-5">Студент</dt>
+                    <dt class="col-sm-5">@Localizer["Student"]</dt>
                     <dd class="col-sm-7">
                         @(Model.Student != null
                                                 ? $"{Model.Student.FirstName} {Model.Student.LastName}"
                                                 : "—")
                     </dd>
 
-                    <dt class="col-sm-5">Курс</dt>
+                    <dt class="col-sm-5">@Localizer["Course"]</dt>
                     <dd class="col-sm-7">@(Model.Course?.Name ?? "—")</dd>
 
-                    <dt class="col-sm-5">Завдання</dt>
+                    <dt class="col-sm-5">@Localizer["Assignment"]</dt>
                     <dd class="col-sm-7">@(Model.Assignment?.Title ?? "—")</dd>
 
-                    <dt class="col-sm-5">Файл</dt>
+                    <dt class="col-sm-5">@Localizer["File"]</dt>
                     <dd class="col-sm-7">
                         @if (!string.IsNullOrEmpty(Model.FileName))
                         {
@@ -40,10 +42,10 @@
                         }
                     </dd>
 
-                    <dt class="col-sm-5">Дата здачі</dt>
+                    <dt class="col-sm-5">@Localizer["SubmittedAt"]</dt>
                     <dd class="col-sm-7">@Model.UploadedAt.ToString("dd.MM.yyyy HH:mm")</dd>
 
-                    <dt class="col-sm-5">Статус</dt>
+                    <dt class="col-sm-5">@Localizer["Status"]</dt>
                     <dd class="col-sm-7">
                         @{
                             var grade = ViewBag.Grade as ProjectU.Core.Models.Grade;
@@ -56,47 +58,44 @@
                                     @grade.Value
                                 </div>
                                 <div>
-                                    <div class="badge bg-success">✅ Оцінено</div>
+                                    <div class="badge bg-success">✅ @Localizer["Graded"]</div>
                                     <div class="small text-muted">@grade.CreatedAt.ToShortDateString()</div>
                                 </div>
                             </div>
                         }
                         else
                         {
-                            <span class="badge bg-warning">⏳ Очікує оцінки</span>
+                            <span class="badge bg-warning">⏳ @Localizer["Waiting"]</span>
                         }
                     </dd>
                 </dl>
             </div>
-            <div class="card-footer d-flex gap-2">
+            <div class="card-footer d-flex gap-2 flex-wrap">
                 @if (!Model.IsGraded && (User.IsInRole("Admin") || User.IsInRole("Student")))
                 {
-                    <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-warning btn-sm flex-fill">✏️ Редагувати</a>
+                    <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-warning btn-sm flex-fill">✏️ @Localizer["Edit"]</a>
                 }
                 @if (User.IsInRole("Admin") || User.IsInRole("Teacher"))
                 {
                     @if (ViewBag.Grade != null)
                     {
                         <a asp-controller="Grades" asp-action="Edit" asp-route-id="@((ViewBag.Grade as ProjectU.Core.Models.Grade)!.Id)"
-                           class="btn btn-outline-warning btn-sm flex-fill">✏️ Змінити оцінку</a>
+                           class="btn btn-outline-warning btn-sm flex-fill">✏️ @Localizer["EditGrade"]</a>
                         <a asp-controller="Grades" asp-action="Delete" asp-route-id="@((ViewBag.Grade as ProjectU.Core.Models.Grade)!.Id)"
-                           class="btn btn-outline-danger btn-sm">🗑️ Видалити оцінку</a>
+                           class="btn btn-outline-danger btn-sm">🗑️ @Localizer["DeleteGrade"]</a>
                     }
                 }
                 @if (User.IsInRole("Admin") || User.IsInRole("Student"))
-                    {
-                        <a asp-action="Delete" asp-route-id="@Model.Id" class="btn btn-danger btn-sm">🗑️ Видалити</a>
-                    }
-                
+                {
+                    <a asp-action="Delete" asp-route-id="@Model.Id" class="btn btn-danger btn-sm">🗑️ @Localizer["Delete"]</a>
+                }
             </div>
-            
         </div>
     </div>
 
-    <!-- Результати антиплагіату -->
     <div class="col-md-8 mb-4">
         <div class="card">
-            <div class="card-header"><strong>🔍 Результати антиплагіату</strong></div>
+            <div class="card-header"><strong>🔍 @Localizer["PlagiarismResults"]</strong></div>
             <div class="card-body p-0">
                 @if (Model.PlagiarismResults != null && Model.PlagiarismResults.Any())
                 {
@@ -104,9 +103,9 @@
                         <table class="table table-hover mb-0">
                             <thead>
                                 <tr>
-                                    <th>Порівняно з роботою</th>
-                                    <th>Схожість</th>
-                                    <th>Дата перевірки</th>
+                                    <th>@Localizer["ComparedWith"]</th>
+                                    <th>@Localizer["Similarity"]</th>
+                                    <th>@Localizer["CheckedAt"]</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -126,15 +125,15 @@
                                             </div>
                                             @if (result.SimilarityPercent > 50)
                                             {
-                                                <small class="text-danger">Високий плагіат</small>
+                                                <small class="text-danger">@Localizer["HighPlagiarism"]</small>
                                             }
                                             else if (result.SimilarityPercent > 20)
                                             {
-                                                <small class="text-warning">Середній</small>
+                                                <small class="text-warning">@Localizer["MediumPlagiarism"]</small>
                                             }
                                             else
                                             {
-                                                <small class="text-success">Низький</small>
+                                                <small class="text-success">@Localizer["LowPlagiarism"]</small>
                                             }
                                         </td>
                                         <td>@result.CheckedAt.ToShortDateString()</td>
@@ -148,7 +147,7 @@
                 {
                     <div class="p-4 text-center text-muted">
                         <div style="font-size: 2rem;">🔍</div>
-                        <div>Результати перевірки відсутні</div>
+                        <div>@Localizer["NoResults"]</div>
                     </div>
                 }
             </div>

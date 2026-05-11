@@ -1,11 +1,14 @@
-﻿@model ProjectU.Core.Models.Course
+﻿@using Microsoft.AspNetCore.Mvc.Localization
+@inject IViewLocalizer Localizer
+
+@model ProjectU.Core.Models.Course
 @{
-    ViewData["Title"] = "Редагувати курс";
+    ViewData["Title"] = Localizer["Title"].Value;
 }
 
 <div class="d-flex justify-content-between align-items-center mb-4">
-    <h2>✏️ Редагувати курс</h2>
-    <a asp-action="Index" class="btn btn-outline-secondary">← Назад</a>
+    <h2>✏️ @Localizer["Title"]</h2>
+    <a asp-action="Index" class="btn btn-outline-secondary">← @Localizer["Back"]</a>
 </div>
 
 <div class="row justify-content-center">
@@ -18,26 +21,26 @@
                     <input type="hidden" asp-for="TeacherId" />
 
                     <div class="mb-3">
-                        <label asp-for="Name" class="form-label">Назва курсу</label>
+                        <label asp-for="Name" class="form-label">@Localizer["CourseName"]</label>
                         <input asp-for="Name" class="form-control" />
                         <span asp-validation-for="Name" class="text-danger"></span>
                     </div>
 
                     <div class="mb-3">
-                        <label class="form-label">👨‍🏫 Головний викладач</label>
+                        <label class="form-label">👨‍🏫 @Localizer["MainTeacher"]</label>
                         <input type="text" class="form-control" value="@ViewBag.CurrentUserName" disabled />
                     </div>
 
                     <div class="mb-3">
-                        <label asp-for="GroupId" class="form-label">Група</label>
+                        <label asp-for="GroupId" class="form-label">@Localizer["Group"]</label>
                         <select asp-for="GroupId" asp-items="@(ViewData["GroupId"] as SelectList)" class="form-select">
-                            <option value="">— Оберіть групу —</option>
+                            <option value="">@Localizer["SelectGroup"]</option>
                         </select>
                         <span asp-validation-for="GroupId" class="text-danger"></span>
                     </div>
 
                     <div class="mb-3">
-                        <label class="form-label">👨‍🏫 Додаткові викладачі</label>
+                        <label class="form-label">👨‍🏫 @Localizer["AdditionalTeachers"]</label>
                         @if (ViewBag.AllTeachers != null)
                         {
                             @foreach (var teacher in (IList<ProjectU.Core.Models.ApplicationUser>)ViewBag.AllTeachers)
@@ -59,13 +62,13 @@
                         }
                         else
                         {
-                            <p class="text-muted small">Інших викладачів немає</p>
+                            <p class="text-muted small">@Localizer["NoOtherTeachers"]</p>
                         }
                     </div>
 
                     <div class="d-flex gap-2">
-                        <button type="submit" class="btn btn-warning flex-fill">💾 Зберегти</button>
-                        <a asp-action="Index" class="btn btn-outline-secondary">Скасувати</a>
+                        <button type="submit" class="btn btn-warning flex-fill">💾 @Localizer["Save"]</button>
+                        <a asp-action="Index" class="btn btn-outline-secondary">@Localizer["Cancel"]</a>
                     </div>
                 </form>
             </div>

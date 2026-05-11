@@ -1,23 +1,27 @@
-﻿@{
-    ViewData["Title"] = "Завдання";
+﻿@using Microsoft.AspNetCore.Mvc.Localization
+@inject IViewLocalizer Localizer
+
+@{
+    ViewData["Title"] = Localizer["Title"].Value;
     var grouped = ViewBag.GroupedAssignments as IEnumerable<dynamic>;
     var currentUserId = ViewBag.CurrentUserId as string;
 }
 
 <div class="d-flex justify-content-between align-items-center mb-4">
-    <h2>📋 Завдання</h2>
+    <h2>📋 @Localizer["Title"]</h2>
     @if (User.IsInRole("Admin") || User.IsInRole("Teacher"))
     {
-        <a asp-action="Create" class="btn btn-primary">➕ Створити завдання</a>
+        <a asp-action="Create" class="btn btn-primary">➕ @Localizer["AddAssignment"]</a>
     }
 </div>
+
 <!-- Фільтр по курсу -->
 <div class="card mb-4">
     <div class="card-body">
         <form asp-action="Index" method="get" class="d-flex gap-2 align-items-center flex-wrap">
-            <label class="form-label mb-0">📚 Фільтр по курсу:</label>
+            <label class="form-label mb-0">📚 @Localizer["FilterByCourse"]:</label>
             <select name="courseId" class="form-select" style="max-width: 250px;" onchange="this.form.submit()">
-                <option value="">— Всі курси —</option>
+                <option value="">@Localizer["AllCourses"]</option>
                 @foreach (var course in ViewBag.Courses as List<ProjectU.Core.Models.Course>)
                 {
                     <option value="@course.Id" selected="@(ViewBag.SelectedCourseId != null && ViewBag.SelectedCourseId.ToString() == course.Id.ToString())">
@@ -27,11 +31,12 @@
             </select>
             @if (ViewBag.SelectedCourseId != null)
             {
-                <a asp-action="Index" class="btn btn-outline-secondary btn-sm">✕ Скинути</a>
+                <a asp-action="Index" class="btn btn-outline-secondary btn-sm">✕ @Localizer["Reset"]</a>
             }
         </form>
     </div>
 </div>
+
 @if (grouped != null && grouped.Any())
 {
     @foreach (var group in grouped)
@@ -41,17 +46,17 @@
                 <div>
                     <strong>📚 @group.CourseName</strong>
                     <span class="text-muted small ms-2">
-                        @((group.Assignments as IEnumerable<dynamic>)?.Count() ?? 0) завдань
+                        @((group.Assignments as IEnumerable<dynamic>)?.Count() ?? 0) @Localizer["Title"].Value.ToLower()
                     </span>
                 </div>
                 <div class="d-flex gap-1">
                     @if ((bool)group.HasExpired)
                     {
-                        <span class="badge bg-danger">❌ Є прострочені</span>
+                        <span class="badge bg-danger">❌ @Localizer["Expired"]</span>
                     }
                     @if ((bool)group.HasUrgent)
                     {
-                        <span class="badge bg-warning">⚠️ Є термінові</span>
+                        <span class="badge bg-warning">⚠️ @Localizer["Urgent"]</span>
                     }
                 </div>
             </div>
@@ -63,8 +68,6 @@
                         var hoursLeft = (item.Deadline - DateTime.Now).TotalHours;
                         var borderColor = isExpired ? "#d63031" : hoursLeft < 24 ? "#fdcb6e" : "#00b894";
                         var statusEmoji = isExpired ? "❌" : hoursLeft < 24 ? "⚠️" : "✅";
-
-                        // Здача поточного студента
                         var mySubmission = item.Submissions?.FirstOrDefault(s => s.StudentId == currentUserId);
                         var submissionsCount = item.Submissions?.Count ?? 0;
 
@@ -91,32 +94,31 @@
                                             <div class="mb-2">
                                                 @if (item.MaterialType == "Link")
                                                 {
-                                                    <span class="badge bg-info">🔗 Є посилання</span>
+                                                    <span class="badge bg-info">🔗 @Localizer["HasMaterialLink"]</span>
                                                 }
                                                 else
                                                 {
-                                                    <span class="badge bg-info">📄 Є файл</span>
+                                                    <span class="badge bg-info">📄 @Localizer["HasMaterialFile"]</span>
                                                 }
                                             </div>
                                         }
 
                                         <div class="mb-1">
-                                            <small class="text-muted">⏰ Дедлайн:</small>
+                                            <small class="text-muted">⏰ @Localizer["Deadline"]:</small>
                                             <span class="badge fs-6 text-white" style="background: @borderColor;">
                                                 @item.Deadline.ToString("dd.MM.yyyy HH:mm")
                                                 @if (isExpired)
                                                 {
-                                                    <text>(прострочено)</text>
+                                                    <text>(@Localizer["Overdue"])</text>
                                                 }
                                                 else if (hoursLeft < 24)
                                                 {
 
-                                                    <text>(залишилось @((int)hoursLeft) год)</text>
+                                                    <text>(@Localizer["HoursLeft"] @((int)hoursLeft) @Localizer["Hours"])</text>
                                                 }
                                             </span>
                                         </div>
 
-                                        <!-- Статус здачі -->
                                         <div class="mt-2">
                                             @if (User.IsInRole("Student"))
                                             {
@@ -124,31 +126,27 @@
                                                 {
                                                     @if (mySubmission.IsGraded)
                                                     {
-                                                        <span class="badge bg-success">✅ Здано та оцінено</span>
+                                                        <span class="badge bg-success">✅ @Localizer["SubmittedGraded"]</span>
                                                     }
                                                     else
                                                     {
-                                                        <span class="badge bg-warning">⏳ Здано — очікує оцінки</span>
+                                                        <span class="badge bg-warning">⏳ @Localizer["SubmittedWaiting"]</span>
                                                     }
                                                 }
                                                 else if (!isExpired)
                                                 {
-                                                    <span class="badge bg-danger">📤 Не здано</span>
+                                                    <span class="badge bg-danger">📤 @Localizer["NotSubmitted"]</span>
                                                 }
                                                 else
                                                 {
-                                                    <span class="badge bg-secondary">❌ Не здано (прострочено)</span>
+                                                    <span class="badge bg-secondary">❌ @Localizer["NotSubmittedExpired"]</span>
                                                 }
                                             }
                                             else if (User.IsInRole("Teacher") || User.IsInRole("Admin"))
                                             {
-                                                <span class="badge bg-secondary">
-                                                    📤 Здач: @submissionsCount
-                                                </span>
                                                 var gradedCount = item.Submissions?.Count(s => s.IsGraded) ?? 0;
-                                                <span class="badge bg-success ms-1">
-                                                    ✅ Оцінено: @gradedCount
-                                                </span>
+                                                <span class="badge bg-secondary">📤 @Localizer["Submissions"]: @submissionsCount</span>
+                                                <span class="badge bg-success ms-1">✅ @Localizer["Graded"]: @gradedCount</span>
                                             }
                                         </div>
                                     </div>
@@ -165,6 +163,6 @@ else
 {
     <div class="alert alert-info text-center p-4">
         <div style="font-size: 3rem;">📭</div>
-        <div>Завдань ще немає</div>
+        <div>@Localizer["NoAssignments"]</div>
     </div>
 }

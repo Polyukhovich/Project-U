@@ -1,11 +1,14 @@
-﻿@model ProjectU.Core.Models.Group
+﻿@using Microsoft.AspNetCore.Mvc.Localization
+@inject IViewLocalizer Localizer
+
+@model ProjectU.Core.Models.Group
 @{
-    ViewData["Title"] = "Редагувати групу";
+    ViewData["Title"] = Localizer["Title"].Value;
 }
 
 <div class="d-flex justify-content-between align-items-center mb-4">
-    <h2>✏️ Редагувати групу</h2>
-    <a asp-action="Index" class="btn btn-outline-secondary">← Назад</a>
+    <h2>✏️ @Localizer["Title"]</h2>
+    <a asp-action="Index" class="btn btn-outline-secondary">← @Localizer["Back"]</a>
 </div>
 
 <div class="row justify-content-center">
@@ -17,14 +20,14 @@
                     <input type="hidden" asp-for="Id" />
 
                     <div class="mb-3">
-                        <label asp-for="Name" class="form-label">Назва групи</label>
+                        <label asp-for="Name" class="form-label">@Localizer["GroupName"]</label>
                         <input asp-for="Name" class="form-control" />
                         <span asp-validation-for="Name" class="text-danger"></span>
                     </div>
 
                     <div class="d-flex gap-2">
-                        <button type="submit" class="btn btn-warning flex-fill">💾 Зберегти</button>
-                        <a asp-action="Index" class="btn btn-outline-secondary">Скасувати</a>
+                        <button type="submit" class="btn btn-warning flex-fill">💾 @Localizer["Save"]</button>
+                        <a asp-action="Index" class="btn btn-outline-secondary">@Localizer["Cancel"]</a>
                     </div>
                 </form>
             </div>

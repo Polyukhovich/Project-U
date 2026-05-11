@@ -1,19 +1,23 @@
-﻿@model IEnumerable<ProjectU.Core.Models.ApplicationUser>
+﻿@using Microsoft.AspNetCore.Mvc.Localization
+@inject IViewLocalizer Localizer
+
+@model IEnumerable<ProjectU.Core.Models.ApplicationUser>
 @{
-    ViewData["Title"] = "Управління користувачами";
+    ViewData["Title"] = Localizer["Title"].Value;
     var userRoles = ViewBag.UserRoles as Dictionary<string, IList<string>>;
 }
 
 <div class="d-flex justify-content-between align-items-center mb-4">
-    <h2>⚙️ Управління користувачами</h2>
-    <a asp-action="CreateUser" class="btn btn-primary">➕ Додати користувача</a>
+    <h2>⚙️ @Localizer["Title"]</h2>
+    <a asp-action="CreateUser" class="btn btn-primary">➕ @Localizer["AddUser"]</a>
 </div>
+
 <!-- Пошук -->
 <div class="card mb-4">
     <div class="card-body">
         <form asp-action="Index" method="get" class="d-flex gap-2">
             <input type="text" name="search" value="@ViewBag.Search"
-                   class="form-control" placeholder="🔍 Пошук по імені або email..." />
+                   class="form-control" placeholder="🔍 @Localizer["SearchPlaceholder"]" />
             <button type="submit" class="btn btn-primary">🔍</button>
             @if (!string.IsNullOrEmpty(ViewBag.Search as string))
             {
@@ -22,13 +26,14 @@
         </form>
     </div>
 </div>
+
 <!-- Статистика -->
 <div class="row mb-4">
     <div class="col-md-4 mb-3">
         <div class="card text-center p-3" style="border-top: 3px solid #6c5ce7;">
             <div style="font-size: 2rem;">👥</div>
             <div class="fw-bold fs-4">@Model.Count()</div>
-            <div class="text-muted small">Всього користувачів</div>
+            <div class="text-muted small">@Localizer["TotalUsers"]</div>
         </div>
     </div>
     <div class="col-md-4 mb-3">
@@ -37,7 +42,7 @@
             <div class="fw-bold fs-4">
                 @Model.Count(u => userRoles != null && userRoles.ContainsKey(u.Id) && userRoles[u.Id].Contains("Student"))
             </div>
-            <div class="text-muted small">Студентів</div>
+            <div class="text-muted small">@Localizer["Students"]</div>
         </div>
     </div>
     <div class="col-md-4 mb-3">
@@ -46,24 +51,24 @@
             <div class="fw-bold fs-4">
                 @Model.Count(u => userRoles != null && userRoles.ContainsKey(u.Id) && userRoles[u.Id].Contains("Teacher"))
             </div>
-            <div class="text-muted small">Викладачів</div>
+            <div class="text-muted small">@Localizer["Teachers"]</div>
         </div>
     </div>
 </div>
 
 <!-- Таблиця користувачів -->
 <div class="card">
-    <div class="card-header"><strong>👥 Список користувачів</strong></div>
+    <div class="card-header"><strong>👥 @Localizer["UserList"]</strong></div>
     <div class="card-body p-0">
         <div class="table-responsive">
             <table class="table table-hover mb-0">
                 <thead>
                     <tr>
-                        <th>Користувач</th>
-                        <th>Email</th>
-                        <th>Роль</th>
-                        <th>Група</th>
-                        <th>Дії</th>
+                        <th>@Localizer["User"]</th>
+                        <th>@Localizer["Email"]</th>
+                        <th>@Localizer["Role"]</th>
+                        <th>@Localizer["Group"]</th>
+                        <th>@Localizer["Actions"]</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -82,15 +87,9 @@
                         role == "Student" ? "👨‍🎓" : "👤";
 
                         <tr>
-                            <td>
-                                <div class="fw-bold">@user.FirstName @user.LastName</div>
-                            </td>
-                            <td>
-                                <small>@user.Email</small>
-                            </td>
-                            <td>
-                                <span class="badge @roleBadge">@roleEmoji @role</span>
-                            </td>
+                            <td><div class="fw-bold">@user.FirstName @user.LastName</div></td>
+                            <td><small>@user.Email</small></td>
+                            <td><span class="badge @roleBadge">@roleEmoji @role</span></td>
                             <td>
                                 @if (!string.IsNullOrEmpty(user.Group?.Name))
                                 {
@@ -104,11 +103,9 @@
                             <td>
                                 <div class="d-flex gap-1">
                                     <a asp-action="EditUser" asp-route-id="@user.Id"
-                                       class="btn btn-sm btn-outline-warning">✏️ Роль</a>
-                                    <form asp-action="DeleteUser" method="post" style="display:inline">
-                                        <input type="hidden" name="id" value="@user.Id" />
-                                        <a asp-action="DeleteUser" asp-route-id="@user.Id" class="btn btn-sm btn-outline-danger">🗑️</a>
-                                    </form>
+                                       class="btn btn-sm btn-outline-warning">✏️ @Localizer["EditRole"]</a>
+                                    <a asp-action="DeleteUser" asp-route-id="@user.Id"
+                                       class="btn btn-sm btn-outline-danger">🗑️</a>
                                 </div>
                             </td>
                         </tr>

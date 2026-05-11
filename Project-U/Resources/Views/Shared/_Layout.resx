@@ -141,9 +141,6 @@
   <data name="Home" xml:space="preserve">
     <value>Головна</value>
   </data>
-  <data name="LabWorks" xml:space="preserve">
-    <value>Лабораторні</value>
-  </data>
   <data name="Language" xml:space="preserve">
     <value>Мова</value>
   </data>
@@ -156,7 +153,13 @@
   <data name="Navigation" xml:space="preserve">
     <value>Навігація</value>
   </data>
+  <data name="OfflineBanner" xml:space="preserve">
+    <value>Ви зараз в режимі офлайн — деякі функції недоступні</value>
+  </data>
   <data name="Schedules" xml:space="preserve">
     <value>Розклад</value>
+  </data>
+  <data name="Settings" xml:space="preserve">
+    <value>Налаштування</value>
   </data>
 </root>

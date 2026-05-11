@@ -117,38 +117,20 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="Actions" xml:space="preserve">
-    <value>Дії</value>
-  </data>
-  <data name="AddSchedule" xml:space="preserve">
+  <data name="AddLesson" xml:space="preserve">
     <value>Додати заняття</value>
   </data>
-  <data name="Course" xml:space="preserve">
-    <value>Курс</value>
+  <data name="AllSchedules" xml:space="preserve">
+    <value>Загальний розклад</value>
   </data>
-  <data name="DayOfWeek" xml:space="preserve">
-    <value>День тижня</value>
+  <data name="NoLessons" xml:space="preserve">
+    <value>Занять немає</value>
   </data>
-  <data name="Delete" xml:space="preserve">
-    <value>Видалити</value>
+  <data name="NoSchedule" xml:space="preserve">
+    <value>Розклад ще не додано</value>
   </data>
-  <data name="Details" xml:space="preserve">
-    <value>Деталі</value>
-  </data>
-  <data name="Edit" xml:space="preserve">
-    <value>Редагувати</value>
-  </data>
-  <data name="EndTime" xml:space="preserve">
-    <value>Кінець</value>
-  </data>
-  <data name="Group" xml:space="preserve">
-    <value>Група</value>
-  </data>
-  <data name="Room" xml:space="preserve">
-    <value>Аудиторія</value>
-  </data>
-  <data name="StartTime" xml:space="preserve">
-    <value>Початок</value>
+  <data name="Online" xml:space="preserve">
+    <value>Онлайн</value>
   </data>
   <data name="Title" xml:space="preserve">
     <value>Розклад</value>

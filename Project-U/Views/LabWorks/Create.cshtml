@@ -1,18 +1,21 @@
-﻿@model ProjectU.Core.Models.LabWork
+﻿@using Microsoft.AspNetCore.Mvc.Localization
+@inject IViewLocalizer Localizer
+
+@model ProjectU.Core.Models.LabWork
 @{
-    ViewData["Title"] = "Здати роботу";
+    ViewData["Title"] = Localizer["Title"].Value;
     var assignmentId = ViewBag.AssignmentId as int?;
 }
 
 <div class="d-flex justify-content-between align-items-center mb-4">
-    <h2>📤 Здати роботу</h2>
+    <h2>📤 @Localizer["Title"]</h2>
     @if (assignmentId != null)
     {
-        <a asp-controller="Assignments" asp-action="Details" asp-route-id="@assignmentId" class="btn btn-outline-secondary">← Назад</a>
+        <a asp-controller="Assignments" asp-action="Details" asp-route-id="@assignmentId" class="btn btn-outline-secondary">← @Localizer["Back"]</a>
     }
     else
     {
-        <a asp-controller="Assignments" asp-action="Index" class="btn btn-outline-secondary">← Назад</a>
+        <a asp-controller="Assignments" asp-action="Index" class="btn btn-outline-secondary">← @Localizer["Back"]</a>
     }
 </div>
 
@@ -27,7 +30,7 @@
                     @if (ViewBag.AssignmentName != null)
                     {
                         <div class="mb-3">
-                            <label class="form-label">📋 Завдання</label>
+                            <label class="form-label">📋 @Localizer["Assignment"]</label>
                             <input type="text" class="form-control" value="@ViewBag.AssignmentName" disabled />
                             <input type="hidden" asp-for="AssignmentId" />
                         </div>
@@ -35,29 +38,29 @@
                     else
                     {
                         <div class="mb-3">
-                            <label asp-for="AssignmentId" class="form-label">📋 Завдання</label>
+                            <label asp-for="AssignmentId" class="form-label">📋 @Localizer["Assignment"]</label>
                             <select asp-for="AssignmentId" asp-items="ViewBag.Assignments" class="form-select">
-                                <option value="">— Оберіть завдання —</option>
+                                <option value="">@Localizer["SelectAssignment"]</option>
                             </select>
                             <span asp-validation-for="AssignmentId" class="text-danger"></span>
                         </div>
                     }
 
                     <div class="mb-3">
-                        <label asp-for="Title" class="form-label">Назва роботи</label>
-                        <input asp-for="Title" class="form-control" placeholder="Наприклад: Лабораторна робота №1" />
+                        <label asp-for="Title" class="form-label">@Localizer["WorkTitle"]</label>
+                        <input asp-for="Title" class="form-control" placeholder="@Localizer["WorkTitlePlaceholder"]" />
                         <span asp-validation-for="Title" class="text-danger"></span>
                     </div>
 
                     <div class="mb-3">
-                        <label class="form-label">📄 Файл роботи (.docx або .pdf)</label>
+                        <label class="form-label">📄 @Localizer["File"]</label>
                         <input type="file" name="uploadedFile" class="form-control" accept=".docx,.pdf" />
-                        <small class="text-muted">Максимальний розмір: 10MB</small>
+                        <small class="text-muted">@Localizer["MaxSize"]</small>
                     </div>
 
                     <div class="d-flex gap-2">
-                        <button type="submit" class="btn btn-primary flex-fill">📤 Здати роботу</button>
-                        <a asp-controller="Assignments" asp-action="Index" class="btn btn-outline-secondary">Скасувати</a>
+                        <button type="submit" class="btn btn-primary flex-fill">📤 @Localizer["Submit"]</button>
+                        <a asp-controller="Assignments" asp-action="Index" class="btn btn-outline-secondary">@Localizer["Cancel"]</a>
                     </div>
                 </form>
             </div>

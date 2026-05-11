@@ -1,19 +1,23 @@
-﻿@model ProjectU.Core.Models.ApplicationUser
+﻿@using Microsoft.AspNetCore.Mvc.Localization
+@inject IViewLocalizer Localizer
+
+@model ProjectU.Core.Models.ApplicationUser
 @{
-    ViewData["Title"] = "Редагувати користувача";
+    ViewData["Title"] = Localizer["Title"].Value;
     var currentRole = ViewBag.CurrentRole as string ?? "—";
-    var roleBadge = currentRole == "Admin"   ? "bg-danger" :
+    var roleBadge = currentRole == "Admin" ? "bg-danger" :
                     currentRole == "Teacher" ? "bg-success" :
                     currentRole == "Student" ? "bg-primary" : "bg-secondary";
-    var roleEmoji = currentRole == "Admin"   ? "⚙️" :
+    var roleEmoji = currentRole == "Admin" ? "⚙️" :
                     currentRole == "Teacher" ? "👨‍🏫" :
                     currentRole == "Student" ? "👨‍🎓" : "👤";
 }
 
 <div class="d-flex justify-content-between align-items-center mb-4">
-    <h2>✏️ Редагувати користувача</h2>
-    <a asp-action="Index" class="btn btn-outline-secondary">← Назад</a>
+    <h2>✏️ @Localizer["Title"]</h2>
+    <a asp-action="Index" class="btn btn-outline-secondary">← @Localizer["Back"]</a>
 </div>
+
 <div class="row justify-content-center">
     <div class="col-md-7">
         <div class="card" style="border-top: 4px solid var(--accent);">
@@ -26,37 +30,37 @@
                     <input type="hidden" name="id" value="@Model.Id" />
 
                     <div class="mb-3">
-                        <label class="form-label">Ім'я</label>
+                        <label class="form-label">@Localizer["FirstName"]</label>
                         <input name="firstName" class="form-control" value="@Model.FirstName" />
                     </div>
 
                     <div class="mb-3">
-                        <label class="form-label">Прізвище</label>
+                        <label class="form-label">@Localizer["LastName"]</label>
                         <input name="lastName" class="form-control" value="@Model.LastName" />
                     </div>
 
                     <div class="mb-3">
-                        <label class="form-label">Email</label>
+                        <label class="form-label">@Localizer["Email"]</label>
                         <input name="email" class="form-control" value="@Model.Email" />
                     </div>
 
                     <div class="mb-3">
-                        <label class="form-label">Роль</label>
+                        <label class="form-label">@Localizer["Role"]</label>
                         <select name="role" asp-items="@(ViewData["Roles"] as SelectList)" class="form-select">
-                            <option value="">— Оберіть роль —</option>
+                            <option value="">@Localizer["SelectRole"]</option>
                         </select>
                     </div>
 
                     <div class="mb-3">
-                        <label class="form-label">Група</label>
+                        <label class="form-label">@Localizer["Group"]</label>
                         <select name="groupId" asp-items="@(ViewData["GroupId"] as SelectList)" class="form-select">
-                            <option value="">— Без групи —</option>
+                            <option value="">@Localizer["NoGroup"]</option>
                         </select>
                     </div>
 
                     <div class="d-flex gap-2">
-                        <button type="submit" class="btn btn-warning flex-fill">💾 Зберегти</button>
-                        <a asp-action="Index" class="btn btn-outline-secondary">Скасувати</a>
+                        <button type="submit" class="btn btn-warning flex-fill">💾 @Localizer["Save"]</button>
+                        <a asp-action="Index" class="btn btn-outline-secondary">@Localizer["Cancel"]</a>
                     </div>
                 </form>
             </div>

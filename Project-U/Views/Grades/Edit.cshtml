@@ -1,11 +1,14 @@
-﻿@model ProjectU.Core.Models.Grade
+﻿@using Microsoft.AspNetCore.Mvc.Localization
+@inject IViewLocalizer Localizer
+
+@model ProjectU.Core.Models.Grade
 @{
-    ViewData["Title"] = "Редагувати оцінку";
+    ViewData["Title"] = Localizer["Title"].Value;
 }
 
 <div class="d-flex justify-content-between align-items-center mb-4">
-    <h2>✏️ Редагувати оцінку</h2>
-    <a asp-action="Index" class="btn btn-outline-secondary">← Назад</a>
+    <h2>✏️ @Localizer["Title"]</h2>
+    <a asp-action="Index" class="btn btn-outline-secondary">← @Localizer["Back"]</a>
 </div>
 
 <div class="row justify-content-center">
@@ -21,35 +24,35 @@
                     <input type="hidden" asp-for="CreatedAt" />
 
                     <div class="mb-3">
-                        <label class="form-label">👤 Студент</label>
+                        <label class="form-label">👤 @Localizer["Student"]</label>
                         <input type="text" class="form-control"
                                value="@(Model.Student != null ? $"{Model.Student.FirstName} {Model.Student.LastName}" : "—")"
                                disabled />
                     </div>
 
                     <div class="mb-3">
-                        <label class="form-label">📚 Курс</label>
+                        <label class="form-label">📚 @Localizer["Course"]</label>
                         <input type="text" class="form-control"
                                value="@(Model.Course?.Name ?? "—")"
                                disabled />
                     </div>
 
                     <div class="mb-3">
-                        <label class="form-label">🔬 Лабораторна</label>
+                        <label class="form-label">🔬 @Localizer["LabWork"]</label>
                         <input type="text" class="form-control"
                                value="@(Model.LabWork?.Title ?? "—")"
                                disabled />
                     </div>
 
                     <div class="mb-3">
-                        <label asp-for="Value" class="form-label">📊 Оцінка (0-100)</label>
+                        <label asp-for="Value" class="form-label">📊 @Localizer["GradeLabel"]</label>
                         <input asp-for="Value" class="form-control" type="number" min="0" max="100" />
                         <span asp-validation-for="Value" class="text-danger"></span>
                     </div>
 
                     <div class="d-flex gap-2">
-                        <button type="submit" class="btn btn-warning flex-fill">💾 Зберегти</button>
-                        <a asp-action="Index" class="btn btn-outline-secondary">Скасувати</a>
+                        <button type="submit" class="btn btn-warning flex-fill">💾 @Localizer["Save"]</button>
+                        <a asp-action="Index" class="btn btn-outline-secondary">@Localizer["Cancel"]</a>
                     </div>
                 </form>
             </div>

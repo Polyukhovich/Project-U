@@ -9,13 +9,14 @@
 <div class="d-flex justify-content-between align-items-center mb-4">
     <h2>📊 @Localizer["Title"]</h2>
 </div>
+
 <!-- Фільтр по курсу -->
 <div class="card mb-4">
     <div class="card-body">
         <form asp-action="Index" method="get" class="d-flex gap-2 align-items-center flex-wrap">
-            <label class="form-label mb-0">📚 Фільтр по курсу:</label>
+            <label class="form-label mb-0">📚 @Localizer["FilterByCourse"]:</label>
             <select name="courseId" class="form-select" style="max-width: 250px;" onchange="this.form.submit()">
-                <option value="">— Всі курси —</option>
+                <option value="">@Localizer["AllCourses"]</option>
                 @foreach (var course in ViewBag.Courses as List<ProjectU.Core.Models.Course>)
                 {
                     <option value="@course.Id" selected="@(ViewBag.SelectedCourseId != null && ViewBag.SelectedCourseId.ToString() == course.Id.ToString())">
@@ -25,11 +26,12 @@
             </select>
             @if (ViewBag.SelectedCourseId != null)
             {
-                <a asp-action="Index" class="btn btn-outline-secondary btn-sm">✕ Скинути</a>
+                <a asp-action="Index" class="btn btn-outline-secondary btn-sm">✕ @Localizer["Reset"]</a>
             }
         </form>
     </div>
 </div>
+
 @if (grouped != null && grouped.Any())
 {
     @foreach (var group in grouped)
@@ -42,10 +44,10 @@
                  style="border-left: 4px solid @avgColor;">
                 <div>
                     <strong>📚 @group.CourseName</strong>
-                    <span class="text-muted small ms-2">@((group.Grades as IEnumerable<dynamic>)?.Count() ?? 0) оцінок</span>
+                    <span class="text-muted small ms-2">@((group.Grades as IEnumerable<dynamic>)?.Count() ?? 0) @Localizer["Grades"]</span>
                 </div>
                 <div class="d-flex align-items-center gap-2">
-                    <span class="small text-muted">Середній бал:</span>
+                    <span class="small text-muted">@Localizer["Average"]:</span>
                     <span class="badge" style="background: @avgColor; font-size: 1rem;">
                         @avg.ToString("F1")
                     </span>
@@ -58,6 +60,7 @@
                         var badgeColor = item.Value >= 90 ? "#00b894" : item.Value >= 75 ? "#0984e3" : item.Value >= 60 ? "#fdcb6e" : "#d63031";
                         var emoji = item.Value >= 90 ? "🏆" : item.Value >= 75 ? "👍" : item.Value >= 60 ? "📝" : "❌";
                         var isAdminOrTeacher = User.IsInRole("Admin") || User.IsInRole("Teacher");
+                        var gradeLabel = item.Value >= 90 ? Localizer["Excellent"].Value : item.Value >= 75 ? Localizer["Good"].Value : item.Value >= 60 ? Localizer["Satisfactory"].Value : Localizer["Unsatisfactory"].Value;
 
                         <div class="col-md-6 col-lg-4 mb-3">
                             @if (isAdminOrTeacher)
@@ -71,28 +74,7 @@
                                             <div class="small text-muted">🔬 @(item.LabWork?.Title ?? "—")</div>
                                             <div class="small text-muted">📅 @item.CreatedAt.ToShortDateString()</div>
                                             <div class="d-flex justify-content-between align-items-center mt-2">
-                                                <small>
-                                                    @emoji
-                                                    @if (item.Value >= 90)
-                                                    {
-                                                        <text>Відмінно</text>
-                                                    }
-                                                    else if (item.Value >= 75)
-                                                    {
-
-                                                        <text>Добре</text>
-                                                    }
-                                                    else if (item.Value >= 60)
-                                                    {
-
-                                                        <text>Задовільно</text>
-                                                    }
-                                                    else
-                                                    {
-
-                                                        <text>Незадовільно</text>
-                                                    }
-                                                </small>
+                                                <small>@emoji @gradeLabel</small>
                                                 <div style="width:50px;height:50px;border-radius:50%;background:@badgeColor;display:flex;align-items:center;justify-content:center;font-size:1.1rem;font-weight:bold;color:white;">
                                                     @item.Value
                                                 </div>
@@ -111,28 +93,7 @@
                                         <div class="small text-muted">🔬 @(item.LabWork?.Title ?? "—")</div>
                                         <div class="small text-muted">📅 @item.CreatedAt.ToShortDateString()</div>
                                         <div class="d-flex justify-content-between align-items-center mt-2">
-                                            <small>
-                                                @emoji
-                                                @if (item.Value >= 90)
-                                                {
-                                                    <text>Відмінно</text>
-                                                }
-                                                else if (item.Value >= 75)
-                                                {
-
-                                                    <text>Добре</text>
-                                                }
-                                                else if (item.Value >= 60)
-                                                {
-
-                                                    <text>Задовільно</text>
-                                                }
-                                                else
-                                                {
-
-                                                    <text>Незадовільно</text>
-                                                }
-                                            </small>
+                                            <small>@emoji @gradeLabel</small>
                                             <div style="width:50px;height:50px;border-radius:50%;background:@badgeColor;display:flex;align-items:center;justify-content:center;font-size:1.1rem;font-weight:bold;color:white;">
                                                 @item.Value
                                             </div>
@@ -154,6 +115,6 @@ else
 {
     <div class="alert alert-info text-center p-4">
         <div style="font-size: 3rem;">📭</div>
-        <div>Оцінок ще немає</div>
+        <div>@Localizer["NoGrades"]</div>
     </div>
 }

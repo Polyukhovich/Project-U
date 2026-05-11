@@ -1,5 +1,8 @@
-﻿@{
-    ViewData["Title"] = "Помилка";
+﻿@using Microsoft.AspNetCore.Mvc.Localization
+@inject IViewLocalizer Localizer
+
+@{
+    ViewData["Title"] = Localizer["Title"].Value;
     Layout = "~/Views/Shared/_Layout.cshtml";
     var code = ViewBag.Code ?? 404;
 }
@@ -21,31 +24,35 @@
             <text>⚠️</text>
         }
     </div>
+
     <h1 style="font-size: 4rem; color: var(--accent);">@code</h1>
+
     <h3 class="mb-3">
         @if (code == 404)
         {
-            <text>Сторінку не знайдено</text>
+            <text>@Localizer["NotFound"]</text>
         }
         else if (code == 403)
         {
 
-            <text>Доступ заборонено</text>
+            <text>@Localizer["Forbidden"]</text>
         }
         else
         {
 
-            <text>Щось пішло не так</text>
+            <text>@Localizer["SomethingWrong"]</text>
         }
     </h3>
+
     <p class="text-muted mb-4">
         @if (code == 404)
         {
-            <text>Можливо сторінку було видалено або посилання застаріло</text>
+            <text>@Localizer["NotFoundDesc"]</text>
         }
     </p>
+
     <div class="d-flex justify-content-center gap-3">
-        <a asp-controller="Home" asp-action="Index" class="btn btn-primary">🏠 На головну</a>
-        <button onclick="history.back()" class="btn btn-outline-secondary">← Назад</button>
+        <a asp-controller="Home" asp-action="Index" class="btn btn-primary">🏠 @Localizer["Home"]</a>
+        <button onclick="history.back()" class="btn btn-outline-secondary">← @Localizer["Back"]</button>
     </div>
 </div>

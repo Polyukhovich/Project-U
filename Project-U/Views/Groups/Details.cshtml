@@ -1,27 +1,31 @@
-﻿@model ProjectU.Core.Models.Group
+﻿@using Microsoft.AspNetCore.Mvc.Localization
+@inject IViewLocalizer Localizer
+
+@model ProjectU.Core.Models.Group
 @{
-    ViewData["Title"] = "Деталі групи";
+    ViewData["Title"] = Localizer["Title"].Value;
 }
 
 <div class="d-flex justify-content-between align-items-center mb-4">
     <h2>👥 @Model.Name</h2>
-    <a asp-action="Index" class="btn btn-outline-secondary">← Назад</a>
+    <a asp-action="Index" class="btn btn-outline-secondary">← @Localizer["Back"]</a>
 </div>
 
 <div class="row">
-    <!-- Інформація про групу -->
     <div class="col-md-4 mb-4">
         <div class="card" style="border-top: 4px solid var(--accent);">
-            <div class="card-header"><strong>📋 Інформація</strong></div>
+            <div class="card-header"><strong>📋 @Localizer["Info"]</strong></div>
             <div class="card-body">
                 <dl class="row mb-0">
-                    <dt class="col-sm-5">Назва</dt>
+                    <dt class="col-sm-5">@Localizer["GroupName"]</dt>
                     <dd class="col-sm-7">@Model.Name</dd>
-                    <dt class="col-sm-5">Студентів</dt>
+
+                    <dt class="col-sm-5">@Localizer["Students"]</dt>
                     <dd class="col-sm-7">
                         <span class="badge bg-primary">@(Model.Students?.Count ?? 0)</span>
                     </dd>
-                    <dt class="col-sm-5">Курсів</dt>
+
+                    <dt class="col-sm-5">@Localizer["Courses"]</dt>
                     <dd class="col-sm-7">
                         <span class="badge bg-secondary">@(Model.Courses?.Count ?? 0)</span>
                     </dd>
@@ -30,18 +34,17 @@
             @if (User.IsInRole("Admin"))
             {
                 <div class="card-footer d-flex gap-2">
-                    <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-warning btn-sm flex-fill">✏️ Редагувати</a>
-                    <a asp-action="Delete" asp-route-id="@Model.Id" class="btn btn-danger btn-sm flex-fill">🗑️ Видалити</a>
+                    <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-warning btn-sm flex-fill">✏️ @Localizer["Edit"]</a>
+                    <a asp-action="Delete" asp-route-id="@Model.Id" class="btn btn-danger btn-sm flex-fill">🗑️ @Localizer["Delete"]</a>
                 </div>
             }
         </div>
     </div>
 
-    <!-- Студенти групи -->
     <div class="col-md-8 mb-4">
         <div class="card">
             <div class="card-header d-flex justify-content-between align-items-center">
-                <strong>👨‍🎓 Студенти</strong>
+                <strong>👨‍🎓 @Localizer["StudentsTitle"]</strong>
                 <span class="badge bg-primary">@(Model.Students?.Count ?? 0)</span>
             </div>
             <div class="card-body p-0">
@@ -51,8 +54,8 @@
                         <table class="table table-hover mb-0">
                             <thead>
                                 <tr>
-                                    <th>Ім'я</th>
-                                    <th>Email</th>
+                                    <th>@Localizer["Name"]</th>
+                                    <th>@Localizer["Email"]</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -71,18 +74,17 @@
                 {
                     <div class="p-4 text-center text-muted">
                         <div style="font-size: 2rem;">📭</div>
-                        <div>Студентів ще немає</div>
+                        <div>@Localizer["NoStudents"]</div>
                     </div>
                 }
             </div>
         </div>
     </div>
 
-    <!-- Курси групи -->
     <div class="col-12 mb-4">
         <div class="card">
             <div class="card-header d-flex justify-content-between align-items-center">
-                <strong>📚 Курси</strong>
+                <strong>📚 @Localizer["CoursesTitle"]</strong>
                 <span class="badge bg-secondary">@(Model.Courses?.Count ?? 0)</span>
             </div>
             <div class="card-body p-0">
@@ -92,8 +94,8 @@
                         <table class="table table-hover mb-0">
                             <thead>
                                 <tr>
-                                    <th>Назва курсу</th>
-                                    <th>Викладач</th>
+                                    <th>@Localizer["CourseName"]</th>
+                                    <th>@Localizer["Teacher"]</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -103,8 +105,8 @@
                                         <td>@course.Name</td>
                                         <td>
                                             @(course.Teacher != null
-                                                ? $"{course.Teacher.FirstName} {course.Teacher.LastName}"
-                                                : "—")
+                                                                                ? $"{course.Teacher.FirstName} {course.Teacher.LastName}"
+                                                                                : "—")
                                 </td>
                             </tr>
                                                         }
@@ -116,11 +118,10 @@
                 {
                     <div class="p-4 text-center text-muted">
                         <div style="font-size: 2rem;">📭</div>
-                        <div>Курсів ще немає</div>
+                        <div>@Localizer["NoCourses"]</div>
                     </div>
                 }
             </div>
         </div>
     </div>
-</div>
 </div>

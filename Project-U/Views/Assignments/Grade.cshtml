@@ -1,72 +1,88 @@
-﻿@using System.IO
+﻿@using Microsoft.AspNetCore.Mvc.Localization
+@inject IViewLocalizer Localizer
+
+@using System.IO
 @model ProjectU.Core.Models.LabWork
 @{
-    ViewData["Title"] = "Оцінити роботу";
+    ViewData["Title"] = Localizer["Title"].Value;
 }
 
-<h2>Оцінити роботу</h2>
-
-<div class="card mb-4">
-    <div class="card-body">
-        <dl class="row">
-            <dt class="col-sm-3">Студент</dt>
-            <dd class="col-sm-9">@(Model.Student?.Email ?? "—")</dd>
-
-            <dt class="col-sm-3">Назва роботи</dt>
-            <dd class="col-sm-9">@Model.Title</dd>
-
-            <dt class="col-sm-3">Завдання</dt>
-            <dd class="col-sm-9">@(Model.Assignment?.Title ?? "—")</dd>
-
-            <dt class="col-sm-3">Дата здачі</dt>
-            <dd class="col-sm-9">@Model.UploadedAt.ToString("dd.MM.yyyy HH:mm")</dd>
-
-            <dt class="col-sm-3">Файл</dt>
-            <dd class="col-sm-9">
-                @if (!string.IsNullOrEmpty(Model.FileName))
-                {
-                    <a href="/uploads/labworks/@Model.FileName"
-                       download="@Model.FileName"
-                       class="btn btn-sm btn-outline-primary">
-                        📥 @Model.FileName
-                    </a>
-                }
-            </dd>
-        </dl>
-    </div>
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2>📊 @Localizer["Title"]</h2>
+    <a asp-action="Details" asp-route-id="@Model.Assignment!.Id" class="btn btn-outline-secondary">← @Localizer["Back"]</a>
 </div>
 
-<!-- Результати антиплагіату -->
-@if (Model.PlagiarismResults != null && Model.PlagiarismResults.Any())
-{
-    <div class="card mb-4">
-        <div class="card-header">🔍 Результати антиплагіату</div>
-        <div class="card-body">
-            @foreach (var result in Model.PlagiarismResults)
-            {
-                <span class="badge @(result.SimilarityPercent > 50 ? "bg-danger" : result.SimilarityPercent > 20 ? "bg-warning" : "bg-success")">
-                    @(result.ComparedWith?.Title ?? "—"): @result.SimilarityPercent.ToString("F1")%
-                </span>
-            }
-        </div>
-    </div>
-}
+<div class="row justify-content-center">
+    <div class="col-md-7">
+        <!-- Інформація про роботу -->
+        <div class="card mb-4" style="border-top: 4px solid var(--accent);">
+            <div class="card-body">
+                <dl class="row mb-0">
+                    <dt class="col-sm-4">@Localizer["Student"]</dt>
+                    <dd class="col-sm-8">
+                        @(Model.Student != null
+                                                ? $"{Model.Student.FirstName} {Model.Student.LastName}"
+                                                : "—")
+                    </dd>
 
-<!-- Форма оцінювання -->
-<div class="card">
-    <div class="card-header">📊 Виставити оцінку</div>
-    <div class="card-body">
-        <form asp-action="Grade" method="post">
-            <input type="hidden" name="labWorkId" value="@Model.Id" />
+                    <dt class="col-sm-4">@Localizer["WorkTitle"]</dt>
+                    <dd class="col-sm-8">@Model.Title</dd>
 
-            <div class="mb-3">
-                <label class="form-label">Оцінка (0-100)</label>
-                <input type="number" name="value" class="form-control"
-                       min="0" max="100" required style="max-width: 150px;" />
+                    <dt class="col-sm-4">@Localizer["Assignment"]</dt>
+                    <dd class="col-sm-8">@(Model.Assignment?.Title ?? "—")</dd>
+
+                    <dt class="col-sm-4">@Localizer["SubmittedAt"]</dt>
+                    <dd class="col-sm-8">@Model.UploadedAt.ToString("dd.MM.yyyy HH:mm")</dd>
+
+                    <dt class="col-sm-4">@Localizer["File"]</dt>
+                    <dd class="col-sm-8">
+                        @if (!string.IsNullOrEmpty(Model.FileName))
+                        {
+                            <a href="/uploads/labworks/@Model.FileName"
+                               download="@Model.FileName"
+                               class="btn btn-sm btn-outline-primary">
+                                📥 @Model.FileName
+                            </a>
+                        }
+                    </dd>
+                </dl>
             </div>
+        </div>
 
-            <button type="submit" class="btn btn-success">✅ Виставити оцінку</button>
-            <a asp-action="Details" asp-route-id="@Model.Assignment!.Id" class="btn btn-secondary">Назад</a>
-        </form>
+        <!-- Результати антиплагіату -->
+        @if (Model.PlagiarismResults != null && Model.PlagiarismResults.Any())
+        {
+            <div class="card mb-4">
+                <div class="card-header">🔍 @Localizer["PlagiarismResults"]</div>
+                <div class="card-body">
+                    @foreach (var result in Model.PlagiarismResults)
+                    {
+                        var plagColor = result.SimilarityPercent > 50 ? "#d63031" : result.SimilarityPercent > 20 ? "#fdcb6e" : "#00b894";
+                        <span class="badge me-1" style="background: @plagColor;">
+                            @(result.ComparedWith?.Title ?? "—"): @result.SimilarityPercent.ToString("F1")%
+                        </span>
+                    }
+                </div>
+            </div>
+        }
+
+        <!-- Форма оцінювання -->
+        <div class="card" style="border-top: 4px solid #00b894;">
+            <div class="card-header">📊 @Localizer["GradeForm"]</div>
+            <div class="card-body">
+                <form asp-action="Grade" method="post">
+                    <input type="hidden" name="labWorkId" value="@Model.Id" />
+                    <div class="mb-3">
+                        <label class="form-label">@Localizer["GradeLabel"]</label>
+                        <input type="number" name="value" class="form-control"
+                               min="0" max="100" required style="max-width: 150px;" />
+                    </div>
+                    <div class="d-flex gap-2">
+                        <button type="submit" class="btn btn-success flex-fill">✅ @Localizer["Submit"]</button>
+                        <a asp-action="Details" asp-route-id="@Model.Assignment!.Id" class="btn btn-outline-secondary">@Localizer["Back"]</a>
+                    </div>
+                </form>
+            </div>
+        </div>
     </div>
 </div>

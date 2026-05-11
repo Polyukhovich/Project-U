@@ -117,7 +117,25 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="WelcomeMessage" xml:space="preserve">
-    <value>Ласкаво протувапмфЗЦУКЩПО</value>
+  <data name="Title" xml:space="preserve">
+    <value>Головна</value>
+  </data>
+  <data name="TodaySchedule" xml:space="preserve">
+    <value>Розклад на сьогодні</value>
+  </data>
+  <data name="Welcome" xml:space="preserve">
+    <value>Ласкаво просимо !</value>
+  </data>
+  <data name="AllSchedule" xml:space="preserve">
+    <value>Весь розклад →</value>
+  </data>
+  <data name="NoSchedule" xml:space="preserve">
+    <value>Сьогодні занять немає!</value>
+  </data>
+  <data name="Rest" xml:space="preserve">
+    <value>Можна відпочити 😊</value>
+  </data>
+  <data name="JoinOnline" xml:space="preserve">
+    <value>Приєднатись онлайн</value>
   </data>
 </root>

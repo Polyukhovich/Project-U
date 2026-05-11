@@ -20,7 +20,7 @@
         <div class="card-body">
             <form asp-action="Index" method="get" class="d-flex gap-2">
                 <input type="text" name="search" value="@ViewBag.Search"
-                       class="form-control" placeholder="🔍 Пошук по назві курсу, викладачу або групі..." />
+                       class="form-control" placeholder="🔍 @Localizer["SearchPlaceholder"]" />
                 <button type="submit" class="btn btn-primary">🔍</button>
                 @if (!string.IsNullOrEmpty(ViewBag.Search as string))
                 {
@@ -39,7 +39,7 @@
             <div class="card-header d-flex justify-content-between align-items-center">
                 <strong>👥 @group.GroupName</strong>
                 <span class="badge bg-secondary">
-                    @((group.Courses as IEnumerable<dynamic>)?.Count() ?? 0) курсів
+                    @((group.Courses as IEnumerable<dynamic>)?.Count() ?? 0) @Localizer["Courses"]
                 </span>
             </div>
             <div class="card-body">
@@ -68,15 +68,15 @@
                                                     👨‍🏫 @(ct.Teacher != null
                                                                                     ? $"{ct.Teacher.FirstName} {ct.Teacher.LastName}"
                                                                                     : "—")
-                                <span class="badge bg-secondary" style="font-size:0.6rem;">асистент</span>
+                                <span class="badge bg-secondary" style="font-size:0.6rem;">@Localizer["Assistant"]</span>
                             </div>
                                                         }
                                         }
-                        </div>
-                    </div>
-                </a>
+                                    </div>
+                                </div>
+                            </a>
 
-                @if (User.IsInRole("Admin") || User.IsInRole("Teacher"))
+                            @if (User.IsInRole("Admin") || User.IsInRole("Teacher"))
                             {
                                 <div class="d-flex gap-1 mt-1">
                                     <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-sm btn-outline-warning flex-fill">✏️</a>
@@ -97,6 +97,6 @@ else
 {
     <div class="alert alert-info text-center p-4">
         <div style="font-size: 3rem;">📭</div>
-        <div>Курсів ще немає</div>
+        <div>@Localizer["NoCourses"]</div>
     </div>
 }

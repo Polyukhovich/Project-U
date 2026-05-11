@@ -1,11 +1,14 @@
-﻿@model ProjectU.Core.Models.Schedule
+﻿@using Microsoft.AspNetCore.Mvc.Localization
+@inject IViewLocalizer Localizer
+
+@model ProjectU.Core.Models.Schedule
 @{
-    ViewData["Title"] = "Редагувати розклад";
+    ViewData["Title"] = Localizer["Title"].Value;
 }
 
 <div class="d-flex justify-content-between align-items-center mb-4">
-    <h2>✏️ Редагувати розклад</h2>
-    <a asp-action="Index" class="btn btn-outline-secondary">← Назад</a>
+    <h2>✏️ @Localizer["Title"]</h2>
+    <a asp-action="Index" class="btn btn-outline-secondary">← @Localizer["Back"]</a>
 </div>
 
 <div class="row justify-content-center">
@@ -16,89 +19,85 @@
                     <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
                     <input type="hidden" asp-for="Id" />
 
-                    <!-- Шаблон пари -->
                     <div class="mb-3">
-                        <label class="form-label">⏰ Пара</label>
+                        <label class="form-label">⏰ @Localizer["Pair"]</label>
                         <select id="pairTemplate" class="form-select" onchange="setPairTime(this.value)">
-                            <option value="">— Оберіть пару —</option>
-                            <option value="08:00,09:20">1 пара (08:00 — 09:20)</option>
-                            <option value="09:30,10:50">2 пара (09:30 — 10:50)</option>
-                            <option value="11:00,12:20">3 пара (11:00 — 12:20)</option>
-                            <option value="12:30,13:50">4 пара (12:30 — 13:50)</option>
-                            <option value="14:00,15:20">5 пара (14:00 — 15:20)</option>
-                            <option value="15:30,16:50">6 пара (15:30 — 16:50)</option>
-                            <option value="17:00,18:20">7 пара (17:00 — 18:20)</option>
+                            <option value="">@Localizer["SelectPair"]</option>
+                            <option value="08:00,09:20">1 @Localizer["Pair"] (08:00 — 09:20)</option>
+                            <option value="09:30,10:50">2 @Localizer["Pair"] (09:30 — 10:50)</option>
+                            <option value="11:00,12:20">3 @Localizer["Pair"] (11:00 — 12:20)</option>
+                            <option value="12:30,13:50">4 @Localizer["Pair"] (12:30 — 13:50)</option>
+                            <option value="14:00,15:20">5 @Localizer["Pair"] (14:00 — 15:20)</option>
+                            <option value="15:30,16:50">6 @Localizer["Pair"] (15:30 — 16:50)</option>
+                            <option value="17:00,18:20">7 @Localizer["Pair"] (17:00 — 18:20)</option>
                         </select>
                     </div>
 
                     <div class="row">
                         <div class="col-md-6 mb-3">
-                            <label asp-for="StartTime" class="form-label">Час початку</label>
+                            <label asp-for="StartTime" class="form-label">@Localizer["StartTime"]</label>
                             <input asp-for="StartTime" class="form-control" type="time" id="startTime" />
                             <span asp-validation-for="StartTime" class="text-danger"></span>
                         </div>
                         <div class="col-md-6 mb-3">
-                            <label asp-for="EndTime" class="form-label">Час завершення</label>
+                            <label asp-for="EndTime" class="form-label">@Localizer["EndTime"]</label>
                             <input asp-for="EndTime" class="form-control" type="time" id="endTime" />
                             <span asp-validation-for="EndTime" class="text-danger"></span>
                         </div>
                     </div>
 
                     <div class="mb-3">
-                        <label asp-for="Room" class="form-label">Аудиторія або посилання (необов'язково)</label>
-                        <input asp-for="Room" class="form-control" placeholder="Наприклад: 301 або https://meet.google.com/..." />
+                        <label asp-for="Room" class="form-label">@Localizer["Room"]</label>
+                        <input asp-for="Room" class="form-control" placeholder="@Localizer["RoomPlaceholder"]" />
                     </div>
 
                     <div class="mb-3">
-                        <label asp-for="CourseId" class="form-label">Курс</label>
+                        <label asp-for="CourseId" class="form-label">@Localizer["Course"]</label>
                         <select asp-for="CourseId" asp-items="@(ViewData["CourseId"] as SelectList)" class="form-select">
-                            <option value="">— Оберіть курс —</option>
+                            <option value="">@Localizer["SelectCourse"]</option>
                         </select>
                         <span asp-validation-for="CourseId" class="text-danger"></span>
                     </div>
 
                     <div class="mb-3">
-                        <label asp-for="GroupId" class="form-label">Група</label>
+                        <label asp-for="GroupId" class="form-label">@Localizer["Group"]</label>
                         <select asp-for="GroupId" asp-items="@(ViewData["GroupId"] as SelectList)" class="form-select">
-                            <option value="">— Оберіть групу —</option>
+                            <option value="">@Localizer["SelectGroup"]</option>
                         </select>
                         <span asp-validation-for="GroupId" class="text-danger"></span>
                     </div>
 
-                    <!-- Вибір дат -->
                     <div class="mb-3">
-                        <label class="form-label">📅 Дати занять</label>
-
-                        <!-- Швидкий вибір діапазону -->
+                        <label class="form-label">📅 @Localizer["Dates"]</label>
                         <div class="card mb-3 p-3" style="background: var(--input-bg);">
-                            <div class="fw-bold mb-2 small">⚡ Швидкий вибір</div>
+                            <div class="fw-bold mb-2 small">⚡ @Localizer["QuickSelect"]</div>
                             <div class="row g-2">
                                 <div class="col-md-4">
-                                    <label class="form-label small">Від</label>
+                                    <label class="form-label small">@Localizer["From"]</label>
                                     <input type="date" id="rangeStart" class="form-control form-control-sm" />
                                 </div>
                                 <div class="col-md-4">
-                                    <label class="form-label small">До</label>
+                                    <label class="form-label small">@Localizer["To"]</label>
                                     <input type="date" id="rangeEnd" class="form-control form-control-sm" />
                                 </div>
                                 <div class="col-md-4">
-                                    <label class="form-label small">День тижня</label>
+                                    <label class="form-label small">@Localizer["DayOfWeek"]</label>
                                     <select id="rangeDayOfWeek" class="form-select form-select-sm">
-                                        <option value="1">Понеділок</option>
-                                        <option value="2">Вівторок</option>
-                                        <option value="3">Середа</option>
-                                        <option value="4">Четвер</option>
-                                        <option value="5">П'ятниця</option>
-                                        <option value="6">Субота</option>
+                                        <option value="1">@Localizer["Monday"]</option>
+                                        <option value="2">@Localizer["Tuesday"]</option>
+                                        <option value="3">@Localizer["Wednesday"]</option>
+                                        <option value="4">@Localizer["Thursday"]</option>
+                                        <option value="5">@Localizer["Friday"]</option>
+                                        <option value="6">@Localizer["Saturday"]</option>
                                     </select>
                                 </div>
                             </div>
                             <div class="mt-2 d-flex gap-2">
                                 <button type="button" onclick="addDateRange()" id="addRangeBtn" class="btn btn-sm btn-outline-primary" disabled>
-                                    ➕ Додати діапазон
+                                    ➕ @Localizer["AddRange"]
                                 </button>
                                 <button type="button" onclick="clearDates()" class="btn btn-sm btn-outline-danger">
-                                    🗑️ Очистити всі
+                                    🗑️ @Localizer["ClearAll"]
                                 </button>
                             </div>
                         </div>
@@ -112,12 +111,12 @@
                         </div>
                         <input type="hidden" name="selectedDatesJson" id="selectedDatesJson"
                                value="@string.Join(",", Model.Dates.Select(d => d.Date.ToString("yyyy-MM-dd")))" />
-                        <small class="text-muted">Клікніть на дати щоб обрати/скасувати</small>
+                        <small class="text-muted">@Localizer["ClickToSelect"]</small>
                     </div>
 
                     <div class="d-flex gap-2">
-                        <button type="submit" class="btn btn-warning flex-fill">💾 Зберегти</button>
-                        <a asp-action="Index" class="btn btn-outline-secondary">Скасувати</a>
+                        <button type="submit" class="btn btn-warning flex-fill">💾 @Localizer["Save"]</button>
+                        <a asp-action="Index" class="btn btn-outline-secondary">@Localizer["Cancel"]</a>
                     </div>
                 </form>
             </div>
@@ -170,24 +169,20 @@
             const startVal = document.getElementById('rangeStart').value;
             const endVal = document.getElementById('rangeEnd').value;
             if (!startVal || !endVal) return;
-
             const start = new Date(startVal);
             const end = new Date(endVal);
             const dayOfWeek = parseInt(document.getElementById('rangeDayOfWeek').value);
-
-            if (start > end) { alert('Дата початку має бути раніше дати завершення!'); return; }
-
+            if (start > end) { alert('@Localizer["From"] > @Localizer["To"]'); return; }
             const datesToAdd = [];
             const current = new Date(start);
             while (current.getDay() !== dayOfWeek % 7) { current.setDate(current.getDate() + 1); }
             while (current <= end) { datesToAdd.push(new Date(current)); current.setDate(current.getDate() + 7); }
-
             fp.setDate([...fp.selectedDates, ...datesToAdd], true);
         }
 
         function clearDates() {
-            if (fp.selectedDates.length === 0) { alert('Немає дат для очищення!'); return; }
-            if (confirm('Очистити всі обрані дати?')) {
+            if (fp.selectedDates.length === 0) return;
+            if (confirm('@Localizer["ClearAll"]?')) {
                 fp.clear();
                 document.getElementById('selectedDatesJson').value = '';
                 document.getElementById('selectedDates').innerHTML = '';

@@ -1,9 +1,13 @@
-﻿@model ProjectU.Core.Models.ApplicationUser
+﻿@using Microsoft.AspNetCore.Mvc.Localization
+@inject IViewLocalizer Localizer
+
+@model ProjectU.Core.Models.ApplicationUser
 @{
-    ViewData["Title"] = "Профіль";
+    ViewData["Title"] = Localizer["Title"].Value;
     var role = ViewBag.Role as string ?? "Student";
     var initials = $"{Model?.FirstName?.FirstOrDefault()}{Model?.LastName?.FirstOrDefault()}";
 }
+
 <!-- Шапка профілю -->
 <div class="card mb-4">
     <div class="card-body d-flex align-items-center gap-4 p-4 flex-wrap">
@@ -13,21 +17,21 @@
             <p class="text-muted mb-1">@Model?.Email</p>
             @if (role == "Student")
             {
-                <span class="badge bg-primary">👨‍🎓 Студент</span>
-                <span class="badge bg-secondary ms-1">@(Model?.Group?.Name ?? "Без групи")</span>
+                <span class="badge bg-primary">👨‍🎓 @Localizer["Student"]</span>
+                <span class="badge bg-secondary ms-1">@(Model?.Group?.Name ?? Localizer["NoGroup"].Value)</span>
             }
             else if (role == "Teacher")
             {
-                <span class="badge bg-success">👨‍🏫 Викладач</span>
+                <span class="badge bg-success">👨‍🏫 @Localizer["Teacher"]</span>
             }
             else if (role == "Admin")
             {
-                <span class="badge bg-danger">⚙️ Адміністратор</span>
+                <span class="badge bg-danger">⚙️ @Localizer["Admin"]</span>
             }
         </div>
         <div class="ms-auto">
-            <a asp-area="Identity" asp-page="/Account/Manage/Index" class="btn btn-outline-primary btn-sm">✏️ Редагувати</a>
-            <a asp-area="Identity" asp-page="/Account/Manage/ChangePassword" class="btn btn-outline-warning btn-sm ms-1">🔑 Пароль</a>
+            <a asp-area="Identity" asp-page="/Account/Manage/Index" class="btn btn-outline-primary btn-sm">✏️ @Localizer["Edit"]</a>
+            <a asp-area="Identity" asp-page="/Account/Manage/ChangePassword" class="btn btn-outline-warning btn-sm ms-1">🔑 @Localizer["Password"]</a>
         </div>
     </div>
 </div>
@@ -43,19 +47,19 @@
         <div class="col-md-4 mb-3">
             <div class="stat-card" style="background: linear-gradient(135deg, #6c5ce7, #a29bfe);">
                 <div class="stat-number">@(grades?.Count ?? 0)</div>
-                <div class="stat-label">📊 Оцінок</div>
+                <div class="stat-label">📊 @Localizer["GradesCount"]</div>
             </div>
         </div>
         <div class="col-md-4 mb-3">
             <div class="stat-card" style="background: linear-gradient(135deg, #00b894, #55efc4);">
                 <div class="stat-number">@avgGrade.ToString("F1")</div>
-                <div class="stat-label">⭐ Середній бал</div>
+                <div class="stat-label">⭐ @Localizer["AverageGrade"]</div>
             </div>
         </div>
         <div class="col-md-4 mb-3">
             <div class="stat-card" style="background: linear-gradient(135deg, #0984e3, #74b9ff);">
                 <div class="stat-number">@(labWorks?.Count ?? 0)</div>
-                <div class="stat-label">🔬 Зданих робіт</div>
+                <div class="stat-label">🔬 @Localizer["WorksCount"]</div>
             </div>
         </div>
     </div>
@@ -63,13 +67,17 @@
     <div class="row">
         <div class="col-md-6 mb-4">
             <div class="card h-100">
-                <div class="card-header">📊 Останні оцінки</div>
+                <div class="card-header">📊 @Localizer["RecentGrades"]</div>
                 <div class="card-body p-0">
                     @if (grades != null && grades.Any())
                     {
                         <table class="table table-sm mb-0">
                             <thead>
-                                <tr><th>Курс</th><th>Оцінка</th><th>Дата</th></tr>
+                                <tr>
+                                    <th>@Localizer["Course"]</th>
+                                    <th>@Localizer["Grade"]</th>
+                                    <th>@Localizer["Date"]</th>
+                                </tr>
                             </thead>
                             <tbody>
                                 @foreach (var grade in grades)
@@ -89,7 +97,7 @@
                     }
                     else
                     {
-                        <p class="text-muted p-3 text-center">Оцінок ще немає</p>
+                        <p class="text-muted p-3 text-center">@Localizer["NoGrades"]</p>
                     }
                 </div>
             </div>
@@ -97,13 +105,17 @@
 
         <div class="col-md-6 mb-4">
             <div class="card h-100">
-                <div class="card-header">🔬 Останні роботи</div>
+                <div class="card-header">🔬 @Localizer["RecentWorks"]</div>
                 <div class="card-body p-0">
                     @if (labWorks != null && labWorks.Any())
                     {
                         <table class="table table-sm mb-0">
                             <thead>
-                                <tr><th>Завдання</th><th>Дата</th><th>Статус</th></tr>
+                                <tr>
+                                    <th>@Localizer["Assignment"]</th>
+                                    <th>@Localizer["Date"]</th>
+                                    <th>@Localizer["Status"]</th>
+                                </tr>
                             </thead>
                             <tbody>
                                 @foreach (var work in labWorks)
@@ -114,11 +126,11 @@
                                         <td>
                                             @if (work.IsGraded)
                                             {
-                                                <span class="badge bg-success">✅ Оцінено</span>
+                                                <span class="badge bg-success">✅ @Localizer["Graded"]</span>
                                             }
                                             else
                                             {
-                                                <span class="badge bg-warning">⏳ Очікує</span>
+                                                <span class="badge bg-warning">⏳ @Localizer["Waiting"]</span>
                                             }
                                         </td>
                                     </tr>
@@ -128,7 +140,7 @@
                     }
                     else
                     {
-                        <p class="text-muted p-3 text-center">Робіт ще немає</p>
+                        <p class="text-muted p-3 text-center">@Localizer["NoWorks"]</p>
                     }
                 </div>
             </div>
@@ -146,13 +158,13 @@
         <div class="col-md-6 mb-3">
             <div class="stat-card" style="background: linear-gradient(135deg, #6c5ce7, #a29bfe);">
                 <div class="stat-number">@(courses?.Count ?? 0)</div>
-                <div class="stat-label">📚 Курсів</div>
+                <div class="stat-label">📚 @Localizer["CoursesCount"]</div>
             </div>
         </div>
         <div class="col-md-6 mb-3">
             <div class="stat-card" style="background: linear-gradient(135deg, #00b894, #55efc4);">
                 <div class="stat-number">@(assignments?.Count ?? 0)</div>
-                <div class="stat-label">📋 Завдань</div>
+                <div class="stat-label">📋 @Localizer["AssignmentsCount"]</div>
             </div>
         </div>
     </div>
@@ -160,12 +172,17 @@
     <div class="row">
         <div class="col-md-6 mb-4">
             <div class="card">
-                <div class="card-header">📚 Мої курси</div>
+                <div class="card-header">📚 @Localizer["MyCourses"]</div>
                 <div class="card-body p-0">
                     @if (courses != null && courses.Any())
                     {
                         <table class="table table-sm mb-0">
-                            <thead><tr><th>Курс</th><th>Група</th></tr></thead>
+                            <thead>
+                                <tr>
+                                    <th>@Localizer["Course"]</th>
+                                    <th>@Localizer["Group"]</th>
+                                </tr>
+                            </thead>
                             <tbody>
                                 @foreach (var course in courses)
                                 {
@@ -179,7 +196,7 @@
                     }
                     else
                     {
-                        <p class="text-muted p-3 text-center">Курсів ще немає</p>
+                        <p class="text-muted p-3 text-center">@Localizer["NoCourses"]</p>
                     }
                 </div>
             </div>
@@ -187,12 +204,17 @@
 
         <div class="col-md-6 mb-4">
             <div class="card">
-                <div class="card-header">📋 Останні завдання</div>
+                <div class="card-header">📋 @Localizer["RecentAssignments"]</div>
                 <div class="card-body p-0">
                     @if (assignments != null && assignments.Any())
                     {
                         <table class="table table-sm mb-0">
-                            <thead><tr><th>Завдання</th><th>Дедлайн</th></tr></thead>
+                            <thead>
+                                <tr>
+                                    <th>@Localizer["Assignment"]</th>
+                                    <th>@Localizer["Deadline"]</th>
+                                </tr>
+                            </thead>
                             <tbody>
                                 @foreach (var assignment in assignments)
                                 {
@@ -210,7 +232,7 @@
                     }
                     else
                     {
-                        <p class="text-muted p-3 text-center">Завдань ще немає</p>
+                        <p class="text-muted p-3 text-center">@Localizer["NoAssignments"]</p>
                     }
                 </div>
             </div>
@@ -225,25 +247,25 @@
         <div class="col-md-3 mb-3">
             <div class="stat-card" style="background: linear-gradient(135deg, #6c5ce7, #a29bfe);">
                 <div class="stat-number">@ViewBag.TotalUsers</div>
-                <div class="stat-label">👥 Користувачів</div>
+                <div class="stat-label">👥 @Localizer["UsersCount"]</div>
             </div>
         </div>
         <div class="col-md-3 mb-3">
             <div class="stat-card" style="background: linear-gradient(135deg, #00b894, #55efc4);">
                 <div class="stat-number">@ViewBag.TotalCourses</div>
-                <div class="stat-label">📚 Курсів</div>
+                <div class="stat-label">📚 @Localizer["CoursesCount"]</div>
             </div>
         </div>
         <div class="col-md-3 mb-3">
             <div class="stat-card" style="background: linear-gradient(135deg, #0984e3, #74b9ff);">
                 <div class="stat-number">@ViewBag.TotalGroups</div>
-                <div class="stat-label">👥 Груп</div>
+                <div class="stat-label">👥 @Localizer["GroupsCount"]</div>
             </div>
         </div>
         <div class="col-md-3 mb-3">
             <div class="stat-card" style="background: linear-gradient(135deg, #e17055, #fab1a0);">
                 <div class="stat-number">@ViewBag.TotalLabWorks</div>
-                <div class="stat-label">🔬 Робіт</div>
+                <div class="stat-label">🔬 @Localizer["WorksCount"]</div>
             </div>
         </div>
     </div>

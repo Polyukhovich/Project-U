@@ -1,4 +1,7 @@
-﻿@{
+﻿@using Microsoft.AspNetCore.Mvc.Localization
+@inject IViewLocalizer Localizer
+
+@{
     ViewData["Title"] = $"Розклад — {ViewBag.Day}";
     var schedules = ViewBag.Schedules as List<ProjectU.Core.Models.Schedule>;
     var today = DateOnly.FromDateTime(DateTime.Today);
@@ -6,7 +9,7 @@
 
 <div class="d-flex justify-content-between align-items-center mb-4">
     <h2>📅 @ViewBag.Day</h2>
-    <a asp-action="Index" class="btn btn-outline-secondary">← Назад</a>
+    <a asp-action="Index" class="btn btn-outline-secondary">← @Localizer["Back"]</a>
 </div>
 
 @if (schedules != null && schedules.Any())
@@ -27,18 +30,18 @@
                     </div>
                     <div class="card-body">
                         <dl class="row mb-0">
-                            <dt class="col-sm-5">⏰ Час</dt>
+                            <dt class="col-sm-5">⏰ @Localizer["Time"]</dt>
                             <dd class="col-sm-7">
                                 @schedule.StartTime.ToString("HH:mm") — @schedule.EndTime.ToString("HH:mm")
                             </dd>
 
-                            <dt class="col-sm-5">🏫 Аудиторія</dt>
+                            <dt class="col-sm-5">🏫 @Localizer["Room"]</dt>
                             <dd class="col-sm-7">
                                 @if (!string.IsNullOrEmpty(schedule.Room))
                                 {
                                     @if (schedule.Room.StartsWith("http"))
                                     {
-                                        <a href="@schedule.Room" target="_blank" class="btn btn-sm btn-outline-info">🔗 Онлайн</a>
+                                        <a href="@schedule.Room" target="_blank" class="btn btn-sm btn-outline-info">🔗 @Localizer["Online"]</a>
                                     }
                                     else
                                     {
@@ -51,7 +54,7 @@
                                 }
                             </dd>
 
-                            <dt class="col-sm-5">📅 Наступне</dt>
+                            <dt class="col-sm-5">📅 @Localizer["NextDate"]</dt>
                             <dd class="col-sm-7">
                                 @if (nextDate != null)
                                 {
@@ -59,12 +62,11 @@
                                 }
                                 else
                                 {
-                                    <span class="badge bg-secondary">Немає дат</span>
+                                    <span class="badge bg-secondary">@Localizer["NoDates"]</span>
                                 }
                             </dd>
                         </dl>
 
-                        <!-- Всі майбутні дати -->
                         @{
                             var futureDates = schedule.Dates?
                             .Where(d => d.Date >= today)
@@ -74,7 +76,7 @@
                         @if (futureDates != null && futureDates.Any())
                         {
                             <div class="mt-3">
-                                <small class="text-muted">Всі дати:</small>
+                                <small class="text-muted">@Localizer["AllDates"]:</small>
                                 <div class="d-flex flex-wrap gap-1 mt-1">
                                     @foreach (var date in futureDates)
                                     {
@@ -88,7 +90,7 @@
                     @if (User.IsInRole("Admin") || User.IsInRole("Teacher"))
                     {
                         <div class="card-footer d-flex gap-2">
-                            <a asp-action="Edit" asp-route-id="@schedule.Id" class="btn btn-warning btn-sm flex-fill">✏️ Редагувати</a>
+                            <a asp-action="Edit" asp-route-id="@schedule.Id" class="btn btn-warning btn-sm flex-fill">✏️ @Localizer["Edit"]</a>
                             <a asp-action="Delete" asp-route-id="@schedule.Id" class="btn btn-danger btn-sm">🗑️</a>
                         </div>
                     }
@@ -101,6 +103,6 @@ else
 {
     <div class="alert alert-info text-center p-4">
         <div style="font-size: 3rem;">😴</div>
-        <div>Занять у @ViewBag.Day немає</div>
+        <div>@Localizer["NoLessons"] @ViewBag.Day</div>
     </div>
 }

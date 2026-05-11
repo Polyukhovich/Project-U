@@ -2,13 +2,13 @@
 @inject IViewLocalizer Localizer
 
 @{
-    ViewData["Title"] = "Головна";
+    ViewData["Title"] = Localizer["Title"].Value;
 }
 
 <!-- Привітання -->
 <div class="card mb-4" style="border-top: 4px solid var(--accent);">
     <div class="card-body p-4">
-        <h3 class="mb-1">👋 Ласкаво просимо до Project U!</h3>
+        <h3 class="mb-1">👋 @Localizer["Welcome"]</h3>
         <p class="text-muted mb-0">📅 @ViewBag.Today</p>
     </div>
 </div>
@@ -16,9 +16,9 @@
 <!-- Розклад на сьогодні -->
 <div class="card">
     <div class="card-header d-flex justify-content-between align-items-center">
-        <strong>📅 Розклад на сьогодні</strong>
+        <strong>📅 @Localizer["TodaySchedule"]</strong>
         <a asp-controller="Schedules" asp-action="Index" class="btn btn-sm btn-outline-primary">
-            Весь розклад →
+            @Localizer["AllSchedule"]
         </a>
     </div>
     <div class="card-body p-0">
@@ -39,7 +39,7 @@
                                     <div class="mt-2">
                                         @if (schedule.Room.StartsWith("http"))
                                         {
-                                            <a href="@schedule.Room" target="_blank" class="btn btn-sm btn-outline-info w-100">🔗 Приєднатись онлайн</a>
+                                            <a href="@schedule.Room" target="_blank" class="btn btn-sm btn-outline-info w-100">🔗 @Localizer["JoinOnline"]</a>
                                         }
                                         else
                                         {
@@ -57,8 +57,8 @@
         {
             <div class="p-5 text-center">
                 <div style="font-size: 4rem;">🎉</div>
-                <h5 class="mt-2">Сьогодні занять немає!</h5>
-                <p class="text-muted">Можна відпочити 😊</p>
+                <h5 class="mt-2">@Localizer["NoSchedule"]</h5>
+                <p class="text-muted">@Localizer["Rest"]</p>
             </div>
         }
     </div>

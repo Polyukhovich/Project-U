@@ -2,17 +2,17 @@
 @inject IViewLocalizer Localizer
 
 @{
-    ViewData["Title"] = "Розклад";
+    ViewData["Title"] = Localizer["Title"].Value;
     var grouped = ViewBag.GroupedSchedules as IEnumerable<dynamic>;
 }
 
 <div class="d-flex justify-content-between align-items-center mb-4">
-    <h2>📅 Розклад</h2>
+    <h2>📅 @Localizer["Title"]</h2>
     <div class="d-flex gap-2">
-        <a asp-action="All" class="btn btn-outline-secondary">🌍 Загальний розклад</a>
+        <a asp-action="All" class="btn btn-outline-secondary">🌍 @Localizer["AllSchedules"]</a>
         @if (User.IsInRole("Admin") || User.IsInRole("Teacher"))
         {
-            <a asp-action="Create" class="btn btn-primary">➕ Додати заняття</a>
+            <a asp-action="Create" class="btn btn-primary">➕ @Localizer["AddLesson"]</a>
         }
     </div>
 </div>
@@ -90,7 +90,7 @@
                                             {
                                                 @if (schedule.Room.StartsWith("http"))
                                                 {
-                                                    <a href="@schedule.Room" target="_blank" class="btn btn-sm btn-outline-info mt-1 w-100">🔗 Онлайн</a>
+                                                    <a href="@schedule.Room" target="_blank" class="btn btn-sm btn-outline-info mt-1 w-100">🔗 @Localizer["Online"]</a>
                                                 }
                                                 else
                                                 {
@@ -119,7 +119,7 @@
                         {
                             <div class="text-center text-muted p-3">
                                 <div style="font-size:2rem;">😴</div>
-                                <div class="small">Занять немає</div>
+                                <div class="small">@Localizer["NoLessons"]</div>
                             </div>
                         }
                     </div>
@@ -130,5 +130,5 @@
 }
 else
 {
-    <div class="alert alert-info">📭 Розклад ще не додано</div>
+    <div class="alert alert-info">📭 @Localizer["NoSchedule"]</div>
 }

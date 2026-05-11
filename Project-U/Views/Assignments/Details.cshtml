@@ -1,6 +1,9 @@
-﻿@model ProjectU.Core.Models.Assignment
+﻿@using Microsoft.AspNetCore.Mvc.Localization
+@inject IViewLocalizer Localizer
+
+@model ProjectU.Core.Models.Assignment
 @{
-    ViewData["Title"] = "Деталі завдання";
+    ViewData["Title"] = Localizer["Title"].Value;
     var isExpired = Model.Deadline < DateTime.Now;
     var hoursLeft = (Model.Deadline - DateTime.Now).TotalHours;
     var borderColor = isExpired ? "#d63031" : hoursLeft < 24 ? "#fdcb6e" : "#00b894";
@@ -11,63 +14,62 @@
 
 <div class="d-flex justify-content-between align-items-center mb-4">
     <h2>📋 @Model.Title</h2>
-    <a asp-action="Index" class="btn btn-outline-secondary">← Назад</a>
+    <a asp-action="Index" class="btn btn-outline-secondary">← @Localizer["Back"]</a>
 </div>
 
 <div class="row">
-    <!-- Інформація про завдання -->
     <div class="col-md-4 mb-4">
         <div class="card" style="border-top: 4px solid @borderColor;">
-            <div class="card-header"><strong>📋 Інформація</strong></div>
+            <div class="card-header"><strong>📋 @Localizer["Info"]</strong></div>
             <div class="card-body">
                 <dl class="row mb-0">
-                    <dt class="col-sm-5">Курс</dt>
+                    <dt class="col-sm-5">@Localizer["Course"]</dt>
                     <dd class="col-sm-7"><span class="badge bg-secondary">@(Model.Course?.Name ?? "—")</span></dd>
 
-                    <dt class="col-sm-5">Дедлайн</dt>
+                    <dt class="col-sm-5">@Localizer["Deadline"]</dt>
                     <dd class="col-sm-7">
                         <span class="badge" style="background: @borderColor;">
                             @Model.Deadline.ToString("dd.MM.yyyy HH:mm")
                             @if (isExpired)
                             {
-                                <text>(прострочено)</text>
+                                <text>(@Localizer["Overdue"])</text>
                             }
                             else if (hoursLeft < 24)
                             {
 
-                                <text>(залишилось @((int)hoursLeft) год)</text>
+                                <text>(@Localizer["HoursLeft"] @((int)hoursLeft) @Localizer["Hours"])</text>
                             }
                         </span>
                     </dd>
 
-                    <dt class="col-sm-5">Створено</dt>
+                    <dt class="col-sm-5">@Localizer["Created"]</dt>
                     <dd class="col-sm-7">@Model.CreatedAt.ToShortDateString()</dd>
 
                     @if (!string.IsNullOrEmpty(Model.Description))
                     {
-                        <dt class="col-sm-5">Опис</dt>
+                        <dt class="col-sm-5">@Localizer["Description"]</dt>
                         <dd class="col-sm-7">@Model.Description</dd>
                     }
 
                     @if (Model.MaterialType != "None")
                     {
-                        <dt class="col-sm-5">📎 Матеріал</dt>
+                        <dt class="col-sm-5">📎 @Localizer["Material"]</dt>
                         <dd class="col-sm-7">
                             @if (Model.MaterialType == "Link" && !string.IsNullOrEmpty(Model.MaterialUrl))
                             {
-                                <a href="@Model.MaterialUrl" target="_blank" class="btn btn-sm btn-outline-info w-100">🔗 Відкрити</a>
+                                <a href="@Model.MaterialUrl" target="_blank" class="btn btn-sm btn-outline-info w-100">🔗 @Localizer["OpenLink"]</a>
                             }
                             else if (Model.MaterialType == "File" && !string.IsNullOrEmpty(Model.MaterialFilePath))
                             {
                                 @if (Model.MaterialFileName!.EndsWith(".pdf"))
                                 {
                                     <a asp-controller="Assignments" asp-action="ViewMaterial" asp-route-id="@Model.Id"
-                                       target="_blank" class="btn btn-sm btn-outline-primary w-100 mb-1">👁️ Переглянути PDF</a>
+                                       target="_blank" class="btn btn-sm btn-outline-primary w-100 mb-1">👁️ @Localizer["ViewPDF"]</a>
                                 }
                                 @if (Model.AllowDownload)
                                 {
                                     <a asp-controller="Assignments" asp-action="DownloadMaterial" asp-route-id="@Model.Id"
-                                       class="btn btn-sm btn-outline-secondary w-100">📥 Завантажити</a>
+                                       class="btn btn-sm btn-outline-secondary w-100">📥 @Localizer["Download"]</a>
                                 }
                             }
                         </dd>
@@ -78,7 +80,7 @@
             @if (User.IsInRole("Admin") || User.IsInRole("Teacher"))
             {
                 <div class="card-footer d-flex gap-2">
-                    <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-warning btn-sm flex-fill">✏️ Редагувати</a>
+                    <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-warning btn-sm flex-fill">✏️ @Localizer["Edit"]</a>
                     <a asp-action="Delete" asp-route-id="@Model.Id" class="btn btn-danger btn-sm">🗑️</a>
                 </div>
             }
@@ -89,14 +91,14 @@
                     @if (mySubmission == null)
                     {
                         <a asp-controller="LabWorks" asp-action="Create" asp-route-assignmentId="@Model.Id"
-                           class="btn btn-primary w-100">📤 Здати роботу</a>
+                           class="btn btn-primary w-100">📤 @Localizer["SubmitWork"]</a>
                     }
                     else
                     {
                         <div class="text-center">
-                            <span class="badge bg-success mb-2">✅ Ви вже здали роботу</span>
+                            <span class="badge bg-success mb-2">✅ @Localizer["AlreadySubmitted"]</span>
                             <a asp-controller="LabWorks" asp-action="Details" asp-route-id="@mySubmission.Id"
-                               class="btn btn-outline-info w-100 btn-sm">👁️ Переглянути свою роботу</a>
+                               class="btn btn-outline-info w-100 btn-sm">👁️ @Localizer["ViewMyWork"]</a>
                         </div>
                     }
                 </div>
@@ -105,7 +107,6 @@
     </div>
 
     <div class="col-md-8">
-        <!-- Статус здачі по групі -->
         @if (groupStudents != null && groupStudents.Any())
         {
             var submittedIds = Model.Submissions?.Select(s => s.StudentId).ToHashSet() ?? new HashSet<string>();
@@ -113,20 +114,20 @@
 
             <div class="card mb-4">
                 <div class="card-header d-flex justify-content-between align-items-center">
-                    <strong>👥 Статус здачі групи</strong>
-                    <span class="badge bg-primary">@submittedCount / @groupStudents.Count здали</span>
+                    <strong>👥 @Localizer["GroupStatus"]</strong>
+                    <span class="badge bg-primary">@submittedCount / @groupStudents.Count @Localizer["Submitted"].Value.ToLower()</span>
                 </div>
                 <div class="card-body p-0">
                     <div class="table-responsive">
                         <table class="table table-hover mb-0">
                             <thead>
                                 <tr>
-                                    <th>Студент</th>
-                                    <th>Статус</th>
+                                    <th>@Localizer["Student"]</th>
+                                    <th>@Localizer["Status"]</th>
                                     @if (User.IsInRole("Admin") || User.IsInRole("Teacher"))
                                     {
-                                        <th>Оцінка</th>
-                                        <th>Дії</th>
+                                        <th>@Localizer["Grade"]</th>
+                                        <th>@Localizer["Actions"]</th>
                                     }
                                 </tr>
                             </thead>
@@ -141,17 +142,17 @@
                                             @student.FirstName @student.LastName
                                             @if (isMe)
                                             {
-                                                <span class="badge bg-primary ms-1">Ви</span>
+                                                <span class="badge bg-primary ms-1">@Localizer["You"]</span>
                                             }
                                         </td>
                                         <td>
                                             @if (submission != null)
                                             {
-                                                <span class="badge bg-success">✅ Здав</span>
+                                                <span class="badge bg-success">✅ @Localizer["Submitted"]</span>
                                             }
                                             else
                                             {
-                                                <span class="badge bg-danger">❌ Не здав</span>
+                                                <span class="badge bg-danger">❌ @Localizer["NotSubmitted"]</span>
                                             }
                                         </td>
                                         @if (User.IsInRole("Admin") || User.IsInRole("Teacher"))
@@ -164,13 +165,11 @@
                                                 }
                                                 @if (grade != null)
                                                 {
-                                                    <span class="badge" style="background: @gradeColor; font-size: 1rem;">
-                                                        @grade.Value
-                                                    </span>
+                                                    <span class="badge" style="background: @gradeColor; font-size: 1rem;">@grade.Value</span>
                                                 }
                                                 else
                                                 {
-                                                    <span class="badge bg-warning">⏳ Очікує</span>
+                                                    <span class="badge bg-warning">⏳ @Localizer["Waiting"]</span>
                                                 }
                                             </td>
                                             <td>
@@ -178,13 +177,11 @@
                                                 {
                                                     @if (!submission.IsGraded)
                                                     {
-                                                        <a asp-action="Grade" asp-route-id="@submission.Id"
-                                                           class="btn btn-sm btn-success">✅ Оцінити</a>
+                                                        <a asp-action="Grade" asp-route-id="@submission.Id" class="btn btn-sm btn-success">✅ @Localizer["GradeWork"]</a>
                                                     }
                                                     else
                                                     {
-                                                        <a asp-controller="LabWorks" asp-action="Details" asp-route-id="@submission.Id"
-                                                           class="btn btn-sm btn-outline-info">👁️ Переглянути</a>
+                                                        <a asp-controller="LabWorks" asp-action="Details" asp-route-id="@submission.Id" class="btn btn-sm btn-outline-info">👁️ @Localizer["ViewWork"]</a>
                                                     }
                                                 }
                                             </td>
@@ -198,12 +195,11 @@
             </div>
         }
 
-        <!-- Деталі здачі для викладача -->
         @if ((User.IsInRole("Admin") || User.IsInRole("Teacher")) && Model.Submissions != null && Model.Submissions.Any())
         {
             <div class="card">
                 <div class="card-header d-flex justify-content-between align-items-center">
-                    <strong>📤 Деталі здач</strong>
+                    <strong>📤 @Localizer["SubmissionsDetails"]</strong>
                     <span class="badge bg-secondary">@Model.Submissions.Count</span>
                 </div>
                 <div class="card-body p-0">
@@ -211,10 +207,10 @@
                         <table class="table table-hover mb-0">
                             <thead>
                                 <tr>
-                                    <th>Студент</th>
-                                    <th>Файл</th>
-                                    <th>Дата</th>
-                                    <th>Плагіат</th>
+                                    <th>@Localizer["Student"]</th>
+                                    <th>@Localizer["File"]</th>
+                                    <th>@Localizer["Date"]</th>
+                                    <th>@Localizer["Plagiarism"]</th>
                                 </tr>
                             </thead>
                             <tbody>
