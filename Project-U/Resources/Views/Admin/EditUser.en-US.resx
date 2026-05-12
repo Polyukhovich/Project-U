@@ -135,6 +135,12 @@
   <data name="LastName" xml:space="preserve">
     <value>Last name</value>
   </data>
+  <data name="NewPassword" xml:space="preserve">
+    <value>New password</value>
+  </data>
+  <data name="NewPasswordHint" xml:space="preserve">
+    <value>Leave empty to keep current</value>
+  </data>
   <data name="NoGroup" xml:space="preserve">
     <value>— No group —</value>
   </data>

@@ -135,6 +135,12 @@
   <data name="LastName" xml:space="preserve">
     <value>Прізвище</value>
   </data>
+  <data name="NewPassword" xml:space="preserve">
+    <value>Новий пароль</value>
+  </data>
+  <data name="NewPasswordHint" xml:space="preserve">
+    <value>Залиш порожнім щоб не змінювати</value>
+  </data>
   <data name="NoGroup" xml:space="preserve">
     <value>— Без групи —</value>
   </data>

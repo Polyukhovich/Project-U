@@ -117,70 +117,25 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="AddAssignment" xml:space="preserve">
-    <value>Створити завдання</value>
+  <data name="Goodbye" xml:space="preserve">
+    <value>Goodbye!</value>
   </data>
-  <data name="AllCourses" xml:space="preserve">
-    <value>— Всі курси —</value>
+  <data name="LoggedOut" xml:space="preserve">
+    <value>You have logged out of Account</value>
   </data>
-  <data name="Created" xml:space="preserve">
-    <value>Створено</value>
+  <data name="LoggedOutSuccess" xml:space="preserve">
+    <value>You have successfully logged out.</value>
   </data>
-  <data name="Deadline" xml:space="preserve">
-    <value>Дедлайн</value>
+  <data name="LoginAgain" xml:space="preserve">
+    <value>Login again</value>
   </data>
-  <data name="Details" xml:space="preserve">
-    <value>Деталі</value>
+  <data name="Logout" xml:space="preserve">
+    <value>Logout</value>
   </data>
-  <data name="Expired" xml:space="preserve">
-    <value>Є прострочені</value>
-  </data>
-  <data name="FilterByCourse" xml:space="preserve">
-    <value>Фільтр по курсу</value>
-  </data>
-  <data name="Graded" xml:space="preserve">
-    <value>Оцінено</value>
-  </data>
-  <data name="HasMaterialFile" xml:space="preserve">
-    <value>Є файл</value>
-  </data>
-  <data name="HasMaterialLink" xml:space="preserve">
-    <value>Є посилання</value>
-  </data>
-  <data name="Hours" xml:space="preserve">
-    <value>год</value>
-  </data>
-  <data name="HoursLeft" xml:space="preserve">
-    <value>залишилось</value>
-  </data>
-  <data name="NoAssignments" xml:space="preserve">
-    <value>Завдань ще немає</value>
-  </data>
-  <data name="NotSubmitted" xml:space="preserve">
-    <value>Не здано</value>
-  </data>
-  <data name="NotSubmittedExpired" xml:space="preserve">
-    <value>Не здано (прострочено)</value>
-  </data>
-  <data name="Overdue" xml:space="preserve">
-    <value>прострочено</value>
-  </data>
-  <data name="Reset" xml:space="preserve">
-    <value>Скинути</value>
-  </data>
-  <data name="Submissions" xml:space="preserve">
-    <value>Здач</value>
-  </data>
-  <data name="SubmittedGraded" xml:space="preserve">
-    <value>Здано та оцінено</value>
-  </data>
-  <data name="SubmittedWaiting" xml:space="preserve">
-    <value>Здано — очікує оцінки</value>
+  <data name="StillLoggedIn" xml:space="preserve">
+    <value>You are still logged in. Click the button to logout.</value>
   </data>
   <data name="Title" xml:space="preserve">
-    <value>Завдання</value>
-  </data>
-  <data name="Urgent" xml:space="preserve">
-    <value>Є термінові</value>
+    <value>Logout</value>
   </data>
 </root>

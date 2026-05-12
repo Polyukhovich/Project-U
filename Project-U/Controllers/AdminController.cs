@@ -3,9 +3,10 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.VisualStudio.Web.CodeGenerators.Mvc.Templates.BlazorIdentity.Pages.Manage;
+using Project_U.Models;
 using ProjectU.Core.Models;
 using ProjectU.Data;
-using Project_U.Models;
 
 namespace Project_U.Controllers
 {
@@ -115,7 +116,7 @@ namespace Project_U.Controllers
         // POST: Admin/EditUser
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> EditUser(string id, string firstName, string lastName, string email, string role, int? groupId)
+        public async Task<IActionResult> EditUser(string id, string firstName, string lastName, string email, string role, int? groupId, string? newPassword)
         {
             var user = await _userManager.FindByIdAsync(id);
             if (user == null) return NotFound();
@@ -129,6 +130,12 @@ namespace Project_U.Controllers
 
             await _userManager.UpdateAsync(user);
 
+            // Зміна пароля якщо введено
+            if (!string.IsNullOrEmpty(newPassword))
+            {
+                var token = await _userManager.GeneratePasswordResetTokenAsync(user);
+                await _userManager.ResetPasswordAsync(user, token, newPassword);
+            }
             // Оновлюємо роль
             var currentRoles = await _userManager.GetRolesAsync(user);
             await _userManager.RemoveFromRolesAsync(user, currentRoles);

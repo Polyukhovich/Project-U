@@ -1,16 +1,17 @@
 ﻿@page
 @model LogoutModel
+@using Microsoft.AspNetCore.Mvc.Localization
+@inject IViewLocalizer Localizer
 @{
-    ViewData["Title"] = "Вихід";
+    ViewData["Title"] = Localizer["Title"].Value;
     Layout = null;
 }
-
 <!DOCTYPE html>
 <html>
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Project U — Вихід</title>
+    <title>Project U — @Localizer["Title"]</title>
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/sidebar.css" />
     <style>
@@ -28,36 +29,33 @@
         <div class="card" style="border-radius: 20px; border: none; overflow: hidden;">
             <div style="background: linear-gradient(135deg, #1a1a2e, #6c5ce7); padding: 30px; text-align: center; color: white;">
                 <div style="font-size: 3rem;">👋</div>
-                <h1 style="color: white; font-size: 1.8rem;">До побачення!</h1>
-                <p style="opacity: 0.8; color: white;">Ви вийшли з Project U</p>
+                <h1 style="color: white; font-size: 1.8rem;">@Localizer["Goodbye"]</h1>
+                <p style="opacity: 0.8; color: white;">@Localizer["LoggedOut"]</p>
             </div>
-            <div style="padding: 30px; background: white; text-align: center;">
+            <div style="padding: 30px; background: var(--card-bg); text-align: center;">
                 @if (User.Identity?.IsAuthenticated ?? false)
                 {
-                    <p class="text-muted mb-4">Ви ще залогінені. Натисніть кнопку щоб вийти.</p>
+                    <p class="text-muted mb-4">@Localizer["StillLoggedIn"]</p>
                     <form asp-area="Identity" asp-page="/Account/Logout"
                           asp-route-returnUrl="@Url.Page("/", new { area = "" })" method="post">
                         <button type="submit" class="btn btn-danger w-100 btn-lg mb-3">
-                            🚪 Вийти
+                            🚪 @Localizer["Logout"]
                         </button>
                     </form>
                 }
                 else
                 {
-                    <p class="text-muted mb-4">Ви успішно вийшли з системи.</p>
+                    <p class="text-muted mb-4">@Localizer["LoggedOutSuccess"]</p>
                 }
-
                 <a asp-area="Identity" asp-page="/Account/Login" class="btn btn-primary w-100">
-                    🔑 Увійти знову
+                    🔑 @Localizer["LoginAgain"]
                 </a>
             </div>
         </div>
-
         <div class="text-center mt-3 text-white small">
             © 2026 Project U
         </div>
     </div>
-
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
 </body>

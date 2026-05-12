@@ -9,9 +9,10 @@
 <div class="d-flex justify-content-between align-items-center mb-4">
     <h2>📅 @Localizer["Title"]</h2>
     <div class="d-flex gap-2">
-        <a asp-action="All" class="btn btn-outline-secondary">🌍 @Localizer["AllSchedules"]</a>
         @if (User.IsInRole("Admin") || User.IsInRole("Teacher"))
         {
+            <a asp-action="All" class="btn btn-outline-secondary">🌍 @Localizer["AllSchedules"]</a>
+
             <a asp-action="Create" class="btn btn-primary">➕ @Localizer["AddLesson"]</a>
         }
     </div>

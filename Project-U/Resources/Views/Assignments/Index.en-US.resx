@@ -121,7 +121,7 @@
     <value>Create assignment</value>
   </data>
   <data name="AllCourses" xml:space="preserve">
-    <value>All courses</value>
+    <value>— All courses —</value>
   </data>
   <data name="Created" xml:space="preserve">
     <value>Created</value>

@@ -1,16 +1,17 @@
 ﻿@page
 @model LoginModel
+@using Microsoft.AspNetCore.Mvc.Localization
+@inject IViewLocalizer Localizer
 @{
-    ViewData["Title"] = "Вхід";
+    ViewData["Title"] = Localizer["Title"].Value;
     Layout = null;
 }
-
 <!DOCTYPE html>
 <html>
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Project U — Вхід</title>
+    <title>Project U — @Localizer["Title"]</title>
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/sidebar.css" />
     <style>
@@ -42,18 +43,18 @@
             color: white;
         }
 
-        .login-header h1 {
-            font-size: 2rem;
-            font-weight: bold;
-            margin: 0;
-            color: white;
-        }
+            .login-header h1 {
+                font-size: 2rem;
+                font-weight: bold;
+                margin: 0;
+                color: white;
+            }
 
-        .login-header p {
-            opacity: 0.8;
-            margin: 5px 0 0;
-            color: white;
-        }
+            .login-header p {
+                opacity: 0.8;
+                margin: 5px 0 0;
+                color: white;
+            }
 
         .login-body {
             padding: 30px;
@@ -67,49 +68,42 @@
             <div class="login-header">
                 <div style="font-size: 3rem;">🎓</div>
                 <h1>Project U</h1>
-                <p>Платформа управління навчанням</p>
+                <p>@Localizer["Subtitle"]</p>
             </div>
             <div class="login-body">
                 <form id="account" method="post">
                     <div asp-validation-summary="ModelOnly" class="alert alert-danger" role="alert"></div>
-
                     <div class="mb-3">
-                        <label asp-for="Input.Email" class="form-label">📧 Email</label>
+                        <label asp-for="Input.Email" class="form-label">📧 @Localizer["Email"]</label>
                         <input asp-for="Input.Email" class="form-control" autocomplete="username"
                                placeholder="your@email.com" />
                         <span asp-validation-for="Input.Email" class="text-danger"></span>
                     </div>
-
                     <div class="mb-3">
-                        <label asp-for="Input.Password" class="form-label">🔑 Пароль</label>
+                        <label asp-for="Input.Password" class="form-label">🔑 @Localizer["Password"]</label>
                         <input asp-for="Input.Password" class="form-control" autocomplete="current-password"
                                placeholder="••••••••" />
                         <span asp-validation-for="Input.Password" class="text-danger"></span>
                     </div>
-
                     <div class="form-check mb-3">
                         <input class="form-check-input" asp-for="Input.RememberMe" />
                         <label class="form-check-label" asp-for="Input.RememberMe">
-                            Запам'ятати мене
+                            @Localizer["RememberMe"]
                         </label>
                     </div>
-
                     <button id="login-submit" type="submit" class="w-100 btn btn-primary btn-lg">
-                        🚀 Увійти
+                        🚀 @Localizer["Login"]
                     </button>
-
                     <div class="text-center mt-3">
-                        <a asp-page="./ForgotPassword" class="text-muted small">Забули пароль?</a>
+                        <small class="text-muted">@Localizer["ForgotPassword"]</small>
                     </div>
                 </form>
             </div>
         </div>
-
         <div class="text-center mt-3 text-muted small">
             © 2026 Project U
         </div>
     </div>
-
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <partial name="_ValidationScriptsPartial" />
