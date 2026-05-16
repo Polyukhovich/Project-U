@@ -117,34 +117,16 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="Assignment" xml:space="preserve">
-    <value>Завдання</value>
+  <data name="FileTooLarge_LabWork" xml:space="preserve">
+    <value>Файл занадто великий. Максимальний розмір — 10MB</value>
   </data>
-  <data name="Back" xml:space="preserve">
-    <value>Назад</value>
+  <data name="FileTooLarge_Material" xml:space="preserve">
+    <value>Файл занадто великий. Максимальний розмір — 20MB</value>
   </data>
-  <data name="Cancel" xml:space="preserve">
-    <value>Скасувати</value>
+  <data name="InvalidFileType_LabWork" xml:space="preserve">
+    <value>Дозволені лише файли .docx та .pdf</value>
   </data>
-  <data name="Course" xml:space="preserve">
-    <value>Дисципліна</value>
-  </data>
-  <data name="CurrentFile" xml:space="preserve">
-    <value>Поточний файл</value>
-  </data>
-  <data name="NewFile" xml:space="preserve">
-    <value>Новий файл (залиш порожнім щоб не змінювати)</value>
-  </data>
-  <data name="Save" xml:space="preserve">
-    <value>Зберегти</value>
-  </data>
-  <data name="Student" xml:space="preserve">
-    <value>Студент</value>
-  </data>
-  <data name="Title" xml:space="preserve">
-    <value>Редагувати роботу</value>
-  </data>
-  <data name="WorkTitle" xml:space="preserve">
-    <value>Назва роботи</value>
+  <data name="InvalidFileType_Material" xml:space="preserve">
+    <value>Дозволені тільки файли .pdf та .docx</value>
   </data>
 </root>

@@ -124,7 +124,7 @@
     <value>Скасувати</value>
   </data>
   <data name="Course" xml:space="preserve">
-    <value>Курс</value>
+    <value>Дисципліна</value>
   </data>
   <data name="GradeLabel" xml:space="preserve">
     <value>Оцінка (0-100)</value>

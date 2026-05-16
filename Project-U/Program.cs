@@ -17,6 +17,18 @@ builder.Services.AddScoped<ProjectU.Core.Services.FileTextExtractorService>();
 // Фоновий сервіс для дедлайнів
 builder.Services.AddHostedService<Project_U.Services.DeadlineNotificationService>();
 
+builder.Services.AddScoped<Project_U.Helpers.NotificationHelper>();
+// збільшуємо ліміт ASP.NET Core на розмір запиту
+builder.Services.Configure<IISServerOptions>(options =>
+{
+    options.MaxRequestBodySize = 50 * 1024 * 1024; // 50MB
+});
+
+builder.WebHost.ConfigureKestrel(options =>
+{
+    options.Limits.MaxRequestBodySize = 50 * 1024 * 1024; // 50MB
+});
+
 // Підключення бази даних
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));

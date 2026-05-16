@@ -7,8 +7,11 @@ namespace ProjectU.Core.Models
     {
         public int Id { get; set; }
         // Назва роботи
-        [Required(ErrorMessage = "Назва роботи обов'язкова")]
-        [StringLength(200, MinimumLength = 3, ErrorMessage = "Назва має бути від 3 до 200 символів")]
+        [Required(ErrorMessageResourceType = typeof(Resources.ModelValidation),
+           ErrorMessageResourceName = "Required_LabWorkTitle")]
+        [StringLength(200, MinimumLength = 3,
+           ErrorMessageResourceType = typeof(Resources.ModelValidation),
+           ErrorMessageResourceName = "StringLength_LabWorkTitle")]
         public string Title { get; set; } = string.Empty;
         // Текст роботи (витягується з файлу для антиплагіату)
         public string Content { get; set; } = string.Empty;
@@ -21,17 +24,20 @@ namespace ProjectU.Core.Models
         // Чи оцінена робота
         public bool IsGraded { get; set; } = false;
         // Зовнішній ключ до студента
-        [Required(ErrorMessage = "Оберіть студента")]
+        [Required(ErrorMessageResourceType = typeof(Resources.ModelValidation),
+           ErrorMessageResourceName = "Required_LabWorkStudent")]
         public string StudentId { get; set; } = string.Empty;
         // Навігаційна властивість до студента
         public ApplicationUser? Student { get; set; }
         // Зовнішній ключ до завдання
-        [Required(ErrorMessage = "Оберіть завдання")]
+        [Required(ErrorMessageResourceType = typeof(Resources.ModelValidation),
+           ErrorMessageResourceName = "Required_LabWorkAssignment")]
         public int AssignmentId { get; set; }
         // Навігаційна властивість до завдання
         public Assignment? Assignment { get; set; }
         // Зовнішній ключ до курсу (для зручності)
-        [Required(ErrorMessage = "Оберіть курс")]
+        [Required(ErrorMessageResourceType = typeof(Resources.ModelValidation),
+           ErrorMessageResourceName = "Required_LabWorkCourse")]
         public int CourseId { get; set; }
         // Навігаційна властивість до курсу
         public Course? Course { get; set; }

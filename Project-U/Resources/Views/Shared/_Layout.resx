@@ -126,11 +126,14 @@
   <data name="Administration" xml:space="preserve">
     <value>Адміністрування</value>
   </data>
+  <data name="AppName" xml:space="preserve">
+    <value>AcademiX 🎓</value>
+  </data>
   <data name="Assignments" xml:space="preserve">
     <value>Завдання</value>
   </data>
   <data name="Courses" xml:space="preserve">
-    <value>Курси</value>
+    <value>Дисципліни</value>
   </data>
   <data name="Grades" xml:space="preserve">
     <value>Оцінки</value>
@@ -150,8 +153,20 @@
   <data name="Logout" xml:space="preserve">
     <value>Вийти</value>
   </data>
+  <data name="MarkAllRead" xml:space="preserve">
+    <value>Прочитано</value>
+  </data>
   <data name="Navigation" xml:space="preserve">
     <value>Навігація</value>
+  </data>
+  <data name="NewBadge" xml:space="preserve">
+    <value>Нове</value>
+  </data>
+  <data name="NoNotifications" xml:space="preserve">
+    <value>Немає нових сповіщень</value>
+  </data>
+  <data name="Notifications" xml:space="preserve">
+    <value>Сповіщення</value>
   </data>
   <data name="OfflineBanner" xml:space="preserve">
     <value>Ви зараз в режимі офлайн — деякі функції недоступні</value>

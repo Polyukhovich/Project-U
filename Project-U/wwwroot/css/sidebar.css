@@ -659,3 +659,40 @@ body.theme-blue .table-hover tbody tr:hover td {
 body.theme-blue .table-responsive {
     background: #ebf8ff;
 }
+/* ===== ТЕМНА ТЕМА — topbar текст ===== */
+body.theme-dark .topbar {
+    color: #ffffff;
+}
+
+    body.theme-dark .topbar .text-muted {
+        color: rgba(255,255,255,0.7) !important;
+    }
+
+    body.theme-dark .topbar .btn-outline-secondary {
+        color: #ffffff;
+        border-color: rgba(255,255,255,0.3);
+    }
+
+        body.theme-dark .topbar .btn-outline-secondary:hover {
+            background: rgba(255,255,255,0.1);
+            color: #ffffff;
+        }
+
+    body.theme-dark .topbar .btn-outline-success {
+        color: #55efc4;
+        border-color: #55efc4;
+    }
+
+        body.theme-dark .topbar .btn-outline-success:hover {
+            background: #55efc4;
+            color: #000000;
+        }
+
+body.theme-dark .notification-dropdown-header strong {
+    color: #ffffff;
+}
+
+body.theme-dark .notification-dropdown-header .btn-outline-success {
+    color: #55efc4;
+    border-color: #55efc4;
+}

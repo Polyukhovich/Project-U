@@ -175,7 +175,7 @@
     <value>Зберегти</value>
   </data>
   <data name="SelectCourse" xml:space="preserve">
-    <value>— Оберіть курс —</value>
+    <value>— Оберіть дисципліну —</value>
   </data>
   <data name="SelectGroup" xml:space="preserve">
     <value>— Оберіть групу —</value>

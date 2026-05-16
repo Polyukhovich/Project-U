@@ -14,17 +14,23 @@ namespace ProjectU.Core.Models
         public int Id { get; set; }
 
         // Назва завдання (наприклад: Лабораторна робота №1)
-        [Required(ErrorMessage = "Назва завдання обов'язкова")]
-        [StringLength(200, MinimumLength = 3, ErrorMessage = "Назва має бути від 3 до 200 символів")]
+        [Required(ErrorMessageResourceType = typeof(Resources.ModelValidation),
+           ErrorMessageResourceName = "Required_AssignmentTitle")]
+        [StringLength(200, MinimumLength = 3,
+           ErrorMessageResourceType = typeof(Resources.ModelValidation),
+           ErrorMessageResourceName = "StringLength_AssignmentTitle")]
         public string Title { get; set; } = string.Empty;
 
         // Опис завдання
-        [Required(ErrorMessage = "Опис завдання обов'язковий")]
+        [Required(ErrorMessageResourceType = typeof(Resources.ModelValidation),
+          ErrorMessageResourceName = "Required_AssignmentDescription")]
         public string Description { get; set; } = string.Empty;
 
         // Дедлайн здачі
-        [Required(ErrorMessage = "Дедлайн обов'язковий")]
-        [FutureDate(ErrorMessage = "Дедлайн має бути в майбутньому")]
+        [Required(ErrorMessageResourceType = typeof(Resources.ModelValidation),
+                  ErrorMessageResourceName = "Required_AssignmentDeadline")]
+        [FutureDate(ErrorMessageResourceType = typeof(Resources.ModelValidation),
+                  ErrorMessageResourceName = "FutureDate_AssignmentDeadline")]
         public DateTime Deadline { get; set; }
 
         // Дата створення
@@ -44,7 +50,8 @@ namespace ProjectU.Core.Models
         public bool AllowDownload { get; set; } = true;
 
         // Зовнішній ключ до курсу
-        [Required(ErrorMessage = "Оберіть курс")]
+        [Required(ErrorMessageResourceType = typeof(Resources.ModelValidation),
+                  ErrorMessageResourceName = "Required_AssignmentCourse")]
         public int CourseId { get; set; }
 
         // Навігаційна властивість до курсу

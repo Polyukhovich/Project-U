@@ -133,7 +133,7 @@
     <value>Клікніть на дати щоб обрати/скасувати</value>
   </data>
   <data name="Course" xml:space="preserve">
-    <value>Курс</value>
+    <value>Дисципліна</value>
   </data>
   <data name="Create" xml:space="preserve">
     <value>Створити</value>
@@ -175,7 +175,7 @@
     <value>Субота</value>
   </data>
   <data name="SelectCourse" xml:space="preserve">
-    <value>— Оберіть курс —</value>
+    <value>— Оберіть дисципліну —</value>
   </data>
   <data name="SelectDate" xml:space="preserve">
     <value>Оберіть хоча б одну дату заняття!</value>

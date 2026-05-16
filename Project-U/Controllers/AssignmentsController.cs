@@ -3,10 +3,13 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
+using Project_U.Helpers;
+using Project_U.Hubs;
 using ProjectU.Core.Models;
 using ProjectU.Data;
 using X.PagedList.Extensions;
-using Project_U.Hubs;
+using Project_U.Helpers;
+using Microsoft.Extensions.Localization;
 
 namespace Controllers
 {
@@ -16,14 +19,22 @@ namespace Controllers
         private readonly ApplicationDbContext _context;
         private readonly IHubContext<NotificationHub> _hubContext;
         private readonly IWebHostEnvironment _environment;
+        private readonly NotificationHelper _notificationHelper;
+        private readonly IStringLocalizer _localizer;
 
         public AssignmentsController(ApplicationDbContext context,
             IHubContext<NotificationHub> hubContext, 
-            IWebHostEnvironment environment)
+            IWebHostEnvironment environment,
+            NotificationHelper notificationHelper,
+            IStringLocalizerFactory localizerFactory)
         {
             _context = context;
             _hubContext = hubContext;
             _environment = environment;
+            _notificationHelper = notificationHelper;
+            _localizer = localizerFactory.Create(
+                "ModelValidation",
+                typeof(Program).Assembly.GetName().Name!);
         }
 
         // GET: Assignments — всі ролі можуть переглядати
@@ -129,6 +140,8 @@ namespace Controllers
         }
 
         // POST: Assignments/Create
+        [RequestSizeLimit(50 * 1024 * 1024)]
+        [RequestFormLimits(MultipartBodyLengthLimit = 50 * 1024 * 1024)]
         [HttpPost]
         [ValidateAntiForgeryToken]
         [Authorize(Roles = "Admin,Teacher")]
@@ -144,7 +157,7 @@ namespace Controllers
                     // Перевірка розміру (максимум 20MB)
                     if (materialFile.Length > 20 * 1024 * 1024)
                     {
-                        ModelState.AddModelError("", "Файл занадто великий. Максимальний розмір — 20MB");
+                        ModelState.AddModelError("", _localizer["FileTooLarge_Material"]);
                         var currentUserErr = await _context.Users
                             .FirstOrDefaultAsync(u => u.UserName == User.Identity!.Name);
                         var coursesErr = await _context.Courses
@@ -159,7 +172,7 @@ namespace Controllers
                     var extension = Path.GetExtension(materialFile.FileName).ToLowerInvariant();
                     if (!allowedExtensions.Contains(extension))
                     {
-                        ModelState.AddModelError("", "Дозволені тільки файли .pdf та .docx");
+                        ModelState.AddModelError("", _localizer["InvalidFileType_Material"]);
                         var currentUserErr = await _context.Users
                             .FirstOrDefaultAsync(u => u.UserName == User.Identity!.Name);
                         var coursesErr = await _context.Courses
@@ -195,10 +208,12 @@ namespace Controllers
 
                 if (course?.Group?.Students != null)
                 {
-                    var message = $"📋 Нове завдання: '{assignment.Title}' з курсу '{course.Name}'. Дедлайн: {assignment.Deadline:dd.MM.yyyy HH:mm}";
-
                     foreach (var student in course.Group.Students)
                     {
+                        var message = await _notificationHelper.GetLocalizedMessage(
+                            student.Id, "NewAssignment",
+                            assignment.Title, course.Name, assignment.Deadline.ToString("dd.MM.yyyy HH:mm"));
+
                         await _hubContext.Clients
                             .Group($"user_{student.Id}")
                             .SendAsync("ReceiveNotification", message);
@@ -289,10 +304,11 @@ namespace Controllers
 
                     if (editedCourse?.Group?.Students != null)
                     {
-                        var message = $"✏️ Завдання '{assignment.Title}' було оновлено. Новий дедлайн: {assignment.Deadline:dd.MM.yyyy HH:mm}";
-
                         foreach (var student in editedCourse.Group.Students)
                         {
+                            var message = await _notificationHelper.GetLocalizedMessage(
+                                student.Id, "AssignmentUpdated",
+                                assignment.Title, assignment.Deadline.ToString("dd.MM.yyyy HH:mm"));
                             await _hubContext.Clients
                                 .Group($"user_{student.Id}")
                                 .SendAsync("ReceiveNotification", message);
@@ -375,7 +391,9 @@ namespace Controllers
 
             // Надсилаємо сповіщення через SignalR
             var course = await _context.Courses.FindAsync(labWork.Assignment.CourseId);
-            var message = $"Вам виставлено оцінку {value} з курсу {course?.Name}";
+            var message = await _notificationHelper.GetLocalizedMessage(
+                labWork.StudentId, "GradeReceived",
+                value, course?.Name);
 
             await _hubContext.Clients
                 .Group($"user_{labWork.StudentId}")
@@ -493,9 +511,11 @@ namespace Controllers
 
                 if (deletedCourse?.Group?.Students != null)
                 {
-                    var message = $"❌ Завдання '{assignment.Title}' з курсу '{deletedCourse.Name}' було видалено";
                     foreach (var student in deletedCourse.Group.Students)
                     {
+                        var message = await _notificationHelper.GetLocalizedMessage(
+                            student.Id, "AssignmentDeleted",
+                            assignment.Title, deletedCourse.Name);
                         await _hubContext.Clients
                             .Group($"user_{student.Id}")
                             .SendAsync("ReceiveNotification", message);

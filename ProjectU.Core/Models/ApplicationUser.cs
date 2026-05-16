@@ -7,13 +7,19 @@ namespace ProjectU.Core.Models
     public class ApplicationUser : IdentityUser
     {
         // Ім'я користувача
-        [Required(ErrorMessage = "Ім'я обов'язкове")]
-        [StringLength(50, MinimumLength = 2, ErrorMessage = "Ім'я від 2 до 50 символів")]
+        [Required(ErrorMessageResourceType = typeof(Resources.ModelValidation),
+                   ErrorMessageResourceName = "Required_FirstName")]
+        [StringLength(50, MinimumLength = 2,
+                   ErrorMessageResourceType = typeof(Resources.ModelValidation),
+                   ErrorMessageResourceName = "StringLength_FirstName")]
         public string FirstName { get; set; } = string.Empty;
 
         // Прізвище користувача
-        [Required(ErrorMessage = "Прізвище обов'язкове")]
-        [StringLength(50, MinimumLength = 2, ErrorMessage = "Прізвище від 2 до 50 символів")]
+        [Required(ErrorMessageResourceType = typeof(Resources.ModelValidation),
+                  ErrorMessageResourceName = "Required_LastName")]
+        [StringLength(50, MinimumLength = 2,
+                  ErrorMessageResourceType = typeof(Resources.ModelValidation),
+                  ErrorMessageResourceName = "StringLength_LastName")]
         public string LastName { get; set; } = string.Empty;
 
         // Зовнішній ключ до групи (тільки для студентів)
@@ -21,5 +27,8 @@ namespace ProjectU.Core.Models
 
         // Навігаційна властивість до групи
         public Group? Group { get; set; }
+        // Мова інтерфейсу користувача
+        [StringLength(10)]
+        public string PreferredLanguage { get; set; } = "uk-UA";
     }
 }

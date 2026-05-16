@@ -130,10 +130,10 @@
     <value>Середній бал</value>
   </data>
   <data name="Course" xml:space="preserve">
-    <value>Курс</value>
+    <value>Дисципліна</value>
   </data>
   <data name="CoursesCount" xml:space="preserve">
-    <value>Курсів</value>
+    <value>Дисциплін</value>
   </data>
   <data name="Date" xml:space="preserve">
     <value>Дата</value>
@@ -160,13 +160,13 @@
     <value>Груп</value>
   </data>
   <data name="MyCourses" xml:space="preserve">
-    <value>Мої курси</value>
+    <value>Мої дисципліни</value>
   </data>
   <data name="NoAssignments" xml:space="preserve">
     <value>Завдань ще немає</value>
   </data>
   <data name="NoCourses" xml:space="preserve">
-    <value>Курсів ще немає</value>
+    <value>Дисциплін ще немає</value>
   </data>
   <data name="NoGrades" xml:space="preserve">
     <value>Оцінок ще немає</value>

@@ -1,9 +1,22 @@
-﻿function getNotificationUrl(message) {
+﻿// Отримуємо локалізовані рядки з HTML
+const config = document.getElementById('notificationConfig');
+const noNotificationsText = config?.dataset.noNotifications || 'Немає нових сповіщень';
+const newBadgeText = config?.dataset.newBadge || 'Нове';
+const appName = config?.dataset.appName || 'AcademiX 🎓';
+
+function getNotificationUrl(message) {
+    // Українські
     if (message.includes('оцінку') || message.includes('оцінено')) return '/Grades';
     if (message.includes('здав роботу')) return '/Assignments';
     if (message.includes('розклад')) return '/Schedules';
     if (message.includes('завдання') || message.includes('Завдання') || message.includes('дедлайн')) return '/Assignments';
     if (message.includes('схожість') || message.includes('перевірку') || message.includes('схожості')) return '/Assignments';
+    // Англійські
+    if (message.includes('grade') || message.includes('Grade')) return '/Grades';
+    if (message.includes('submitted') || message.includes('Submitted')) return '/Assignments';
+    if (message.includes('schedule') || message.includes('Schedule')) return '/Schedules';
+    if (message.includes('assignment') || message.includes('Assignment') || message.includes('deadline')) return '/Assignments';
+    if (message.includes('similarity') || message.includes('check')) return '/Assignments';
     return '/';
 }
 
@@ -14,7 +27,7 @@ function buildNotificationHtml(n) {
         : (isDark ? 'rgba(108,92,231,0.2)' : 'rgba(108,92,231,0.1)');
     var textColor = isDark ? '#ffffff' : '#333333';
     var borderColor = isDark ? '#2d3561' : '#f0f0f0';
-    var badge = n.isRead ? '' : '<span style="float:right; background:#6c5ce7; color:white; border-radius:10px; padding:1px 8px; font-size:0.7rem;">Нове</span>';
+    var badge = n.isRead ? '' : '<span style="float:right; background:#6c5ce7; color:white; border-radius:10px; padding:1px 8px; font-size:0.7rem;">' + newBadgeText + '</span>';
     var url = getNotificationUrl(n.message);
     return '<div style="padding:12px 15px; border-bottom:1px solid ' + borderColor + '; background:' + bg + '; cursor:pointer;" onclick="readAndGo(' + n.id + ', \'' + url + '\')">'
         + '<div style="font-size:0.85rem; color:' + textColor + ';">' + n.message + '</div>'
@@ -22,6 +35,7 @@ function buildNotificationHtml(n) {
         + badge
         + '</div>';
 }
+
 function loadNotifications() {
     fetch('/Notifications/GetNotifications')
         .then(r => r.json())
@@ -35,17 +49,15 @@ function loadNotifications() {
             badge.textContent = unread.length;
             if (markAllBtn) markAllBtn.style.display = unread.length > 0 ? 'inline' : 'none';
             if (unread.length === 0) {
-                list.innerHTML = '<p class="text-center text-muted p-3">Немає нових сповіщень</p>';
+                list.innerHTML = '<p class="text-center text-muted p-3">' + noNotificationsText + '</p>';
                 return;
             }
             list.innerHTML = unread.map(n => buildNotificationHtml(n)).join('');
 
-            // Ховаємо банер якщо є з'єднання
             const banner = document.getElementById('offlineBanner');
             if (banner) banner.style.display = 'none';
         })
         .catch(() => {
-            // Показуємо банер якщо немає з'єднання
             const banner = document.getElementById('offlineBanner');
             if (banner) banner.style.display = 'block';
         });
@@ -95,14 +107,13 @@ function showToast(message, url) {
 
 function sendBrowserNotification(message) {
     if ('Notification' in window && Notification.permission === 'granted') {
-        new Notification('Project U 🎓', {
+        new Notification(appName, {
             body: message,
             icon: '/favicon.ico'
         });
     }
 }
 
-// Закриваємо dropdown при кліку поза ним
 document.addEventListener('click', function (e) {
     const wrapper = document.querySelector('.notification-wrapper');
     if (wrapper && !wrapper.contains(e.target)) {
@@ -111,7 +122,6 @@ document.addEventListener('click', function (e) {
     }
 });
 
-// Запит дозволу на browser notifications
 if ('Notification' in window && Notification.permission === 'default') {
     Notification.requestPermission();
 }

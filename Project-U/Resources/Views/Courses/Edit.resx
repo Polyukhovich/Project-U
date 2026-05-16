@@ -127,7 +127,7 @@
     <value>Скасувати</value>
   </data>
   <data name="CourseName" xml:space="preserve">
-    <value>Назва курсу</value>
+    <value>Назва дисципліни</value>
   </data>
   <data name="Group" xml:space="preserve">
     <value>Група</value>
@@ -145,6 +145,6 @@
     <value>— Оберіть групу —</value>
   </data>
   <data name="Title" xml:space="preserve">
-    <value>Редагувати курс</value>
+    <value>Редагувати дисципліну</value>
   </data>
 </root>

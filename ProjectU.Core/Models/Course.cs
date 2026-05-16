@@ -8,19 +8,24 @@ namespace ProjectU.Core.Models
         public int Id { get; set; }
 
         // Назва курсу
-        [Required(ErrorMessage = "Назва курсу обов'язкова")]
-        [StringLength(200, MinimumLength = 3, ErrorMessage = "Назва має бути від 3 до 200 символів")]
+        [Required(ErrorMessageResourceType = typeof(Resources.ModelValidation),
+          ErrorMessageResourceName = "Required_CourseName")]
+        [StringLength(200, MinimumLength = 3,
+          ErrorMessageResourceType = typeof(Resources.ModelValidation),
+          ErrorMessageResourceName = "StringLength_CourseName")]
         public string Name { get; set; } = string.Empty;
 
         // Зовнішній ключ до викладача
-        [Required(ErrorMessage = "Оберіть викладача")]
+        [Required(ErrorMessageResourceType = typeof(Resources.ModelValidation),
+          ErrorMessageResourceName = "Required_CourseTeacher")]
         public string TeacherId { get; set; } = string.Empty;
 
         // Навігаційна властивість до викладача
         public ApplicationUser? Teacher { get; set; }
 
         // Зовнішній ключ до групи
-        [Required(ErrorMessage = "Оберіть групу")]
+        [Required(ErrorMessageResourceType = typeof(Resources.ModelValidation),
+                  ErrorMessageResourceName = "Required_CourseGroup")]
         public int GroupId { get; set; }
 
         // Навігаційна властивість до групи

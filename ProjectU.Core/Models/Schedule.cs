@@ -8,23 +8,27 @@ namespace ProjectU.Core.Models
         public int Id { get; set; }
 
         // Час початку заняття
-        [Required(ErrorMessage = "Час початку обов'язковий")]
+        [Required(ErrorMessageResourceType = typeof(Resources.ModelValidation),
+            ErrorMessageResourceName = "Required_ScheduleStart")]
         public TimeOnly StartTime { get; set; }
 
         // Час завершення заняття
-        [Required(ErrorMessage = "Час завершення обов'язковий")]
+        [Required(ErrorMessageResourceType = typeof(Resources.ModelValidation),
+           ErrorMessageResourceName = "Required_ScheduleEnd")]
         public TimeOnly EndTime { get; set; }
 
         // Аудиторія або посилання (необов'язково)
         public string Room { get; set; } = string.Empty;
 
         // Зовнішній ключ до курсу
-        [Required(ErrorMessage = "Оберіть курс")]
+        [Required(ErrorMessageResourceType = typeof(Resources.ModelValidation),
+           ErrorMessageResourceName = "Required_ScheduleCourse")]
         public int CourseId { get; set; }
         public Course? Course { get; set; }
 
         // Зовнішній ключ до групи
-        [Required(ErrorMessage = "Оберіть групу")]
+        [Required(ErrorMessageResourceType = typeof(Resources.ModelValidation),
+          ErrorMessageResourceName = "Required_ScheduleGroup")]
         public int GroupId { get; set; }
         public Group? Group { get; set; }
 

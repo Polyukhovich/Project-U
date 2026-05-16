@@ -8,8 +8,11 @@ namespace ProjectU.Core.Models
         public int Id { get; set; }
 
         // Назва групи
-        [Required(ErrorMessage = "Назва групи обов'язкова")]
-        [StringLength(50, MinimumLength = 2, ErrorMessage = "Назва має бути від 2 до 50 символів")]
+        [Required(ErrorMessageResourceType = typeof(Resources.ModelValidation),
+          ErrorMessageResourceName = "Required_GroupName")]
+        [StringLength(50, MinimumLength = 2,
+          ErrorMessageResourceType = typeof(Resources.ModelValidation),
+          ErrorMessageResourceName = "StringLength_GroupName")]
         public string Name { get; set; } = string.Empty;
 
         // Список студентів що належать до групи

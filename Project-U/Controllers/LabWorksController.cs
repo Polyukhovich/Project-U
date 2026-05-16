@@ -3,6 +3,8 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Localization;
+using Project_U.Helpers;
 using Project_U.Hubs;
 using ProjectU.Core.Models;
 using ProjectU.Core.Services;
@@ -24,18 +26,25 @@ namespace Controllers
         private readonly FileTextExtractorService _fileExtractor;
         private readonly IWebHostEnvironment _environment;
         private readonly IHubContext<NotificationHub> _hubContext;
-
+        private readonly NotificationHelper _notificationHelper;
+        private readonly IStringLocalizer _localizer;
         public LabWorksController(ApplicationDbContext context,
                PlagiarismService plagiarismService, 
                FileTextExtractorService fileExtractor,
                IWebHostEnvironment environment,
-               IHubContext<NotificationHub> hubContext)
+               IHubContext<NotificationHub> hubContext,
+               NotificationHelper notificationHelper,
+               IStringLocalizerFactory localizerFactory)
         {
             _context = context;
             _plagiarismService = plagiarismService;
             _fileExtractor = fileExtractor;
             _environment = environment;
             _hubContext = hubContext;
+            _notificationHelper = notificationHelper;
+            _localizer = localizerFactory.Create(
+                "ModelValidation",
+                typeof(Program).Assembly.GetName().Name!);
         }
         // GET: LabWorks/Details/5
         public async Task<IActionResult> Details(int? id)
@@ -95,6 +104,8 @@ namespace Controllers
 
         // POST: LabWorks/Create — при завантаженні запускається антиплагіат
         // To protect from overposting attacks, enable the specific properties you want to bind to.
+        [RequestSizeLimit(50 * 1024 * 1024)]
+        [RequestFormLimits(MultipartBodyLengthLimit = 50 * 1024 * 1024)]
         [HttpPost]
         [ValidateAntiForgeryToken]
         [Authorize(Roles = "Admin,Student")]
@@ -111,7 +122,7 @@ namespace Controllers
                 {    // Перевірка розміру (максимум 10MB)
                     if (uploadedFile.Length > 10 * 1024 * 1024)
                     {
-                        ModelState.AddModelError("", "Файл занадто великий. Максимальний розмір — 10MB");
+                        ModelState.AddModelError("", _localizer["FileTooLarge_LabWork"]);
                         return View(labWork);
                     }
                     var allowedExtensions = new[] { ".docx", ".pdf" };
@@ -119,7 +130,7 @@ namespace Controllers
 
                     if (!allowedExtensions.Any(e => e == extension))
                     {
-                        ModelState.AddModelError("", "Дозволені лише файли .docx та .pdf");
+                        ModelState.AddModelError("", _localizer["InvalidFileType_LabWork"]);
                         ViewData["StudentId"] = new SelectList(_context.Users, "Id", "Email", labWork.StudentId);
                         ViewData["CourseId"] = new SelectList(_context.Courses, "Id", "Name", labWork.CourseId);
                         return View(labWork);
@@ -181,11 +192,17 @@ namespace Controllers
 
                     string plagMessage;
                     if (maxSimilarity > 50)
-                        plagMessage = $"⚠️ Висока схожість ({maxSimilarity:F1}%) виявлена у вашій роботі '{labWork.Title}'";
+                        plagMessage = await _notificationHelper.GetLocalizedMessage(
+                            labWork.StudentId, "PlagiarismHigh",
+                            maxSimilarity.ToString("F1"), labWork.Title);
                     else if (maxSimilarity > 20)
-                        plagMessage = $"⚡ Середня схожість ({maxSimilarity:F1}%) виявлена у вашій роботі '{labWork.Title}'";
+                        plagMessage = await _notificationHelper.GetLocalizedMessage(
+                            labWork.StudentId, "PlagiarismMedium",
+                            maxSimilarity.ToString("F1"), labWork.Title);
                     else
-                        plagMessage = $"✅ Робота '{labWork.Title}' пройшла перевірку ({maxSimilarity:F1}% схожості)";
+                        plagMessage = await _notificationHelper.GetLocalizedMessage(
+                            labWork.StudentId, "PlagiarismLow",
+                            labWork.Title, maxSimilarity.ToString("F1"));
 
                     await _hubContext.Clients
                         .Group($"user_{labWork.StudentId}")
@@ -213,7 +230,9 @@ namespace Controllers
                     if (teacher != null)
                     {
                         var student = await _context.Users.FindAsync(labWork.StudentId);
-                        var message = $"Студент {student?.Email} здав роботу '{labWork.Title}' до завдання '{submittedAssignment.Title}'";
+                        var message = await _notificationHelper.GetLocalizedMessage(
+                            teacher.Id, "WorkSubmitted",
+                            student?.Email, labWork.Title, submittedAssignment.Title);
 
                         await _hubContext.Clients
                             .Group($"user_{teacher.Id}")

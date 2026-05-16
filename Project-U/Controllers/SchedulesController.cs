@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
+using Project_U.Helpers;
 using Project_U.Hubs;
 using ProjectU.Core.Models;
 using ProjectU.Data;
@@ -19,12 +20,14 @@ namespace Controllers
     {
         private readonly ApplicationDbContext _context;
         private readonly IHubContext<NotificationHub> _hubContext;
-
+        private readonly NotificationHelper _notificationHelper;
         public SchedulesController(ApplicationDbContext context,
-               IHubContext<NotificationHub> hubContext)
+               IHubContext<NotificationHub> hubContext,
+               NotificationHelper notificationHelper)
         {
             _context = context;
             _hubContext = hubContext;
+            _notificationHelper = notificationHelper;
         }
 
         // GET: Schedules — всі ролі можуть переглядати
@@ -192,10 +195,12 @@ namespace Controllers
 
                     if (updatedSchedule?.Group?.Students != null)
                     {
-                        var message = $"Змінено розклад: {updatedSchedule.Course?.Name} — {updatedSchedule.StartTime}";
-
                         foreach (var student in updatedSchedule.Group.Students)
                         {
+                            var message = await _notificationHelper.GetLocalizedMessage(
+                                student.Id, "ScheduleChanged",
+                                updatedSchedule.Course?.Name, updatedSchedule.StartTime.ToString("HH:mm"));
+
                             await _hubContext.Clients
                                 .Group($"user_{student.Id}")
                                 .SendAsync("ReceiveNotification", message);

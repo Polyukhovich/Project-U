@@ -117,34 +117,91 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="Assignment" xml:space="preserve">
-    <value>Завдання</value>
+  <data name="FutureDate_AssignmentDeadline" xml:space="preserve">
+    <value>Дедлайн має бути в майбутньому</value>
   </data>
-  <data name="Back" xml:space="preserve">
-    <value>Назад</value>
+  <data name="Range_GradeValue" xml:space="preserve">
+    <value>Оцінка має бути від 0 до 100</value>
   </data>
-  <data name="Cancel" xml:space="preserve">
-    <value>Скасувати</value>
+  <data name="Required_AssignmentCourse" xml:space="preserve">
+    <value>Оберіть дисципліну</value>
   </data>
-  <data name="Course" xml:space="preserve">
-    <value>Дисципліна</value>
+  <data name="Required_AssignmentDeadline" xml:space="preserve">
+    <value>Дедлайн обов'язковий</value>
   </data>
-  <data name="CurrentFile" xml:space="preserve">
-    <value>Поточний файл</value>
+  <data name="Required_AssignmentDescription" xml:space="preserve">
+    <value>Опис завдання обов'язковий</value>
   </data>
-  <data name="NewFile" xml:space="preserve">
-    <value>Новий файл (залиш порожнім щоб не змінювати)</value>
+  <data name="Required_AssignmentTitle" xml:space="preserve">
+    <value>Назва завдання обов'язкова</value>
   </data>
-  <data name="Save" xml:space="preserve">
-    <value>Зберегти</value>
+  <data name="Required_CourseGroup" xml:space="preserve">
+    <value>Оберіть групу</value>
   </data>
-  <data name="Student" xml:space="preserve">
-    <value>Студент</value>
+  <data name="Required_CourseName" xml:space="preserve">
+    <value>Назва дисципліни обов'язкова</value>
   </data>
-  <data name="Title" xml:space="preserve">
-    <value>Редагувати роботу</value>
+  <data name="Required_CourseTeacher" xml:space="preserve">
+    <value>Оберіть викладача</value>
   </data>
-  <data name="WorkTitle" xml:space="preserve">
-    <value>Назва роботи</value>
+  <data name="Required_FirstName" xml:space="preserve">
+    <value>Ім'я обов'язкове</value>
+  </data>
+  <data name="Required_GradeCourse" xml:space="preserve">
+    <value>Оберіть дисципліну</value>
+  </data>
+  <data name="Required_GradeStudent" xml:space="preserve">
+    <value>Оберіть студента</value>
+  </data>
+  <data name="Required_GradeValue" xml:space="preserve">
+    <value>Оцінка обов'язкова</value>
+  </data>
+  <data name="Required_GroupName" xml:space="preserve">
+    <value>Назва групи обов'язкова</value>
+  </data>
+  <data name="Required_LabWorkAssignment" xml:space="preserve">
+    <value>Оберіть завдання</value>
+  </data>
+  <data name="Required_LabWorkCourse" xml:space="preserve">
+    <value>Оберіть дисципліну</value>
+  </data>
+  <data name="Required_LabWorkStudent" xml:space="preserve">
+    <value>Оберіть студента</value>
+  </data>
+  <data name="Required_LabWorkTitle" xml:space="preserve">
+    <value>Назва роботи обов'язкова</value>
+  </data>
+  <data name="Required_LastName" xml:space="preserve">
+    <value>Прізвище обов'язкове</value>
+  </data>
+  <data name="Required_ScheduleCourse" xml:space="preserve">
+    <value>Оберіть дисципліну</value>
+  </data>
+  <data name="Required_ScheduleEnd" xml:space="preserve">
+    <value>Час завершення обов'язковий</value>
+  </data>
+  <data name="Required_ScheduleGroup" xml:space="preserve">
+    <value>Оберіть групу</value>
+  </data>
+  <data name="Required_ScheduleStart" xml:space="preserve">
+    <value>Час початку обов'язковий</value>
+  </data>
+  <data name="StringLength_AssignmentTitle" xml:space="preserve">
+    <value>Назва має бути від 3 до 200 символів</value>
+  </data>
+  <data name="StringLength_CourseName" xml:space="preserve">
+    <value>Назва має бути від 3 до 200 символів</value>
+  </data>
+  <data name="StringLength_FirstName" xml:space="preserve">
+    <value>Ім'я від 2 до 50 символів</value>
+  </data>
+  <data name="StringLength_GroupName" xml:space="preserve">
+    <value>Назва має бути від 2 до 50 символів</value>
+  </data>
+  <data name="StringLength_LabWorkTitle" xml:space="preserve">
+    <value>Назва має бути від 3 до 200 символів</value>
+  </data>
+  <data name="StringLength_LastName" xml:space="preserve">
+    <value>Прізвище від 2 до 50 символів</value>
   </data>
 </root>

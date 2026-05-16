@@ -123,8 +123,14 @@
   <data name="AddGrade" xml:space="preserve">
     <value>Додати оцінку</value>
   </data>
+  <data name="AllCourses" xml:space="preserve">
+    <value>— Всі дисципліни —</value>
+  </data>
+  <data name="Average" xml:space="preserve">
+    <value>Середній бал</value>
+  </data>
   <data name="Course" xml:space="preserve">
-    <value>Курс</value>
+    <value>Дисципліна</value>
   </data>
   <data name="Date" xml:space="preserve">
     <value>Дата</value>
@@ -138,14 +144,38 @@
   <data name="Edit" xml:space="preserve">
     <value>Редагувати</value>
   </data>
+  <data name="Excellent" xml:space="preserve">
+    <value>Відмінно</value>
+  </data>
+  <data name="FilterByCourse" xml:space="preserve">
+    <value>Фільтр по дисципліні</value>
+  </data>
+  <data name="Good" xml:space="preserve">
+    <value>Добре</value>
+  </data>
+  <data name="Grades" xml:space="preserve">
+    <value>оцінок</value>
+  </data>
   <data name="LabWork" xml:space="preserve">
     <value>Лабораторна</value>
+  </data>
+  <data name="NoGrades" xml:space="preserve">
+    <value>Оцінок ще немає</value>
+  </data>
+  <data name="Reset" xml:space="preserve">
+    <value>Скинути</value>
+  </data>
+  <data name="Satisfactory" xml:space="preserve">
+    <value>Задовільно</value>
   </data>
   <data name="Student" xml:space="preserve">
     <value>Студент</value>
   </data>
   <data name="Title" xml:space="preserve">
     <value>Оцінки</value>
+  </data>
+  <data name="Unsatisfactory" xml:space="preserve">
+    <value>Незадовільно</value>
   </data>
   <data name="Value" xml:space="preserve">
     <value>Оцінка</value>

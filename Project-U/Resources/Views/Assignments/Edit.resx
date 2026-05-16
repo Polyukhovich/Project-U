@@ -130,7 +130,7 @@
     <value>Скасувати</value>
   </data>
   <data name="Course" xml:space="preserve">
-    <value>Курс</value>
+    <value>Дисципліна</value>
   </data>
   <data name="CurrentMaterial" xml:space="preserve">
     <value>Поточний матеріал</value>
@@ -166,7 +166,7 @@
     <value>Зберегти</value>
   </data>
   <data name="SelectCourse" xml:space="preserve">
-    <value> — Оберіть курс —</value>
+    <value> — Оберіть дисципліна —</value>
   </data>
   <data name="Title" xml:space="preserve">
     <value>Редагувати завдання</value>

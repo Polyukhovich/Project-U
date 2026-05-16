@@ -118,13 +118,13 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <data name="AddCourse" xml:space="preserve">
-    <value>Додати курс</value>
+    <value>Додати дисципліну</value>
   </data>
   <data name="Assistant" xml:space="preserve">
     <value>асистент</value>
   </data>
   <data name="Courses" xml:space="preserve">
-    <value>курсів</value>
+    <value>дисциплін</value>
   </data>
   <data name="NoCourses" xml:space="preserve">
     <value>Курсів ще немає</value>
@@ -133,6 +133,6 @@
     <value>Пошук по назві курсу, викладачу або групі...</value>
   </data>
   <data name="Title" xml:space="preserve">
-    <value>Курси</value>
+    <value>Навчальні дисципліни</value>
   </data>
 </root>
