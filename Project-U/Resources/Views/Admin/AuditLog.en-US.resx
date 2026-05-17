@@ -117,46 +117,28 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="Actions" xml:space="preserve">
-    <value>Actions</value>
+  <data name="Action" xml:space="preserve">
+    <value>Action</value>
   </data>
-  <data name="AddUser" xml:space="preserve">
-    <value>Add user</value>
+  <data name="Back" xml:space="preserve">
+    <value>Back</value>
   </data>
-  <data name="AuditLog" xml:space="preserve">
-    <value>Audit Log</value>
+  <data name="Details" xml:space="preserve">
+    <value>Details</value>
   </data>
-  <data name="EditRole" xml:space="preserve">
-    <value>Role</value>
+  <data name="IP" xml:space="preserve">
+    <value>IP Address</value>
   </data>
-  <data name="Email" xml:space="preserve">
-    <value>Email</value>
+  <data name="Object" xml:space="preserve">
+    <value>Object</value>
   </data>
-  <data name="Group" xml:space="preserve">
-    <value>Group</value>
-  </data>
-  <data name="Role" xml:space="preserve">
-    <value>Role</value>
-  </data>
-  <data name="SearchPlaceholder" xml:space="preserve">
-    <value>Search by name or email...</value>
-  </data>
-  <data name="Students" xml:space="preserve">
-    <value>Students</value>
-  </data>
-  <data name="Teachers" xml:space="preserve">
-    <value>Teachers</value>
+  <data name="Time" xml:space="preserve">
+    <value>Time</value>
   </data>
   <data name="Title" xml:space="preserve">
-    <value>User Management</value>
-  </data>
-  <data name="TotalUsers" xml:space="preserve">
-    <value>Total users</value>
+    <value>Audit Log</value>
   </data>
   <data name="User" xml:space="preserve">
     <value>User</value>
-  </data>
-  <data name="UserList" xml:space="preserve">
-    <value>User list</value>
   </data>
 </root>

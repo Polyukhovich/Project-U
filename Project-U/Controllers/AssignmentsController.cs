@@ -21,12 +21,14 @@ namespace Controllers
         private readonly IWebHostEnvironment _environment;
         private readonly NotificationHelper _notificationHelper;
         private readonly IStringLocalizer _localizer;
+        private readonly AuditService _auditService;
 
         public AssignmentsController(ApplicationDbContext context,
             IHubContext<NotificationHub> hubContext, 
             IWebHostEnvironment environment,
             NotificationHelper notificationHelper,
-            IStringLocalizerFactory localizerFactory)
+            IStringLocalizerFactory localizerFactory,
+            AuditService auditService)
         {
             _context = context;
             _hubContext = hubContext;
@@ -35,6 +37,7 @@ namespace Controllers
             _localizer = localizerFactory.Create(
                 "ModelValidation",
                 typeof(Program).Assembly.GetName().Name!);
+            _auditService = auditService;
         }
 
         // GET: Assignments — всі ролі можуть переглядати
@@ -199,6 +202,14 @@ namespace Controllers
 
                 _context.Add(assignment);
                 await _context.SaveChangesAsync();
+                var currentUserFallback = await _context.Users
+                    .FirstOrDefaultAsync(u => u.UserName == User.Identity!.Name);
+                await _auditService.LogAsync(
+                    currentUserFallback!.Id,
+                    "Create",
+                    "Assignment",
+                    assignment.Id.ToString(),
+                    $"Створено завдання: {assignment.Title}");
 
                 // Сповіщення студентам
                 var course = await _context.Courses
@@ -322,6 +333,14 @@ namespace Controllers
                             });
                         }
                         await _context.SaveChangesAsync();
+                        var currentUserFallback = await _context.Users
+                            .FirstOrDefaultAsync(u => u.UserName == User.Identity!.Name);
+                        await _auditService.LogAsync(
+                            currentUserFallback!.Id,
+                            "Edit",
+                            "Assignment",
+                            assignment.Id.ToString(),
+                            $"Відредаговано завдання: {assignment.Title}");
                     }
                 }
                 catch (DbUpdateConcurrencyException)
@@ -408,6 +427,14 @@ namespace Controllers
             });
 
             await _context.SaveChangesAsync();
+            var currentUser = await _context.Users
+                .FirstOrDefaultAsync(u => u.UserName == User.Identity!.Name);
+            await _auditService.LogAsync(
+                currentUser!.Id,
+                "Grade",
+                "Grade",
+                grade.Id.ToString(),
+                $"Виставлено оцінку {value} студенту");
 
             return RedirectToAction(nameof(Details), new { id = labWork.Assignment.Id });
         }
@@ -531,6 +558,14 @@ namespace Controllers
                 }
 
                 await _context.SaveChangesAsync();
+                var currentUser = await _context.Users
+                    .FirstOrDefaultAsync(u => u.UserName == User.Identity!.Name);
+                await _auditService.LogAsync(
+                    currentUser!.Id,
+                    "Delete",
+                    "Assignment",
+                    id.ToString(),
+                    $"Видалено завдання: {assignment.Title}");
             }
 
             return RedirectToAction(nameof(Index));

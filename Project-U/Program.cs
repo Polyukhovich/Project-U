@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Project_U.Helpers;
 using Project_U.Middlewares;
 using ProjectU.Core.Interfaces;
 using ProjectU.Core.Models;
@@ -18,6 +19,10 @@ builder.Services.AddScoped<ProjectU.Core.Services.FileTextExtractorService>();
 builder.Services.AddHostedService<Project_U.Services.DeadlineNotificationService>();
 
 builder.Services.AddScoped<Project_U.Helpers.NotificationHelper>();
+builder.Services.AddScoped<AuditService>();
+builder.Services.AddHttpContextAccessor();
+
+
 // збільшуємо ліміт ASP.NET Core на розмір запиту
 builder.Services.Configure<IISServerOptions>(options =>
 {
@@ -69,10 +74,19 @@ builder.Services.Configure<RequestLocalizationOptions>(options =>
            .AddSupportedUICultures(supportedCultures);
 });
 // MVC + Razor Pages (для Identity Scaffolding)
+builder.Services.AddScoped<Project_U.Filters.LoginLogoutFilter>();
 builder.Services.AddControllersWithViews()
     .AddViewLocalization()
     .AddDataAnnotationsLocalization();
-builder.Services.AddRazorPages();
+builder.Services.AddRazorPages(options =>
+{
+    options.Conventions.AddAreaFolderApplicationModelConvention(
+        "Identity",
+        "/Account",
+        model => model.Filters.Add(
+            new Microsoft.AspNetCore.Mvc.ServiceFilterAttribute(
+                typeof(Project_U.Filters.LoginLogoutFilter))));
+});
 
 var app = builder.Build();
 

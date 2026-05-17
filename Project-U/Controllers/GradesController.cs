@@ -1,7 +1,10 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
+using Project_U.Helpers;
+using Project_U.Hubs;
 using ProjectU.Core.Models;
 using ProjectU.Data;
 using System;
@@ -9,8 +12,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using X.PagedList.Extensions;
-using Microsoft.AspNetCore.SignalR;
-using Project_U.Hubs;
 
 namespace Controllers
 {
@@ -19,11 +20,13 @@ namespace Controllers
     {
         private readonly ApplicationDbContext _context;
         private readonly IHubContext<NotificationHub> _hubContext;
+        private readonly AuditService _auditService;
 
-        public GradesController(ApplicationDbContext context, IHubContext<NotificationHub> hubContext)
+        public GradesController(ApplicationDbContext context, IHubContext<NotificationHub> hubContext, AuditService auditService)
         {
             _context = context;
             _hubContext = hubContext;
+            _auditService = auditService;
         }
 
         // GET: Grades — Student бачить тільки свої, Teacher/Admin бачать всі
@@ -51,16 +54,16 @@ namespace Controllers
                 .ToListAsync();
 
             var grouped = grades
-     .GroupBy(g => g.Course?.Name ?? "—")
-     .Select(g => new
-     {
-         CourseName = g.Key,
-         Grades = g.ToList(),
-         Average = g.Average(x => x.Value),
-         CourseType = g.First().Course?.CourseType ?? ProjectU.Core.Models.CourseType.Exam
-     })
-     .OrderBy(g => g.CourseName)
-     .ToList();
+                .GroupBy(g => g.Course?.Name ?? "—")
+                .Select(g => new
+                {
+                    CourseName = g.Key,
+                    Grades = g.ToList(),
+                    Average = g.Average(x => x.Value),
+                    CourseType = g.First().Course?.CourseType ?? ProjectU.Core.Models.CourseType.Exam
+                })
+                .OrderBy(g => g.CourseName)
+                .ToList();
 
             // Список курсів для фільтру
             var courses = await _context.Courses.ToListAsync();
@@ -70,7 +73,7 @@ namespace Controllers
             return View();
         }
 
-        // GET: Grades/Create — тільки Teacher та Admin
+
         [Authorize(Roles = "Admin,Teacher")]
         public async Task<IActionResult> Details(int? id)
         {
@@ -122,6 +125,14 @@ namespace Controllers
                 {
                     _context.Update(grade);
                     await _context.SaveChangesAsync();
+                    var currentUser = await _context.Users
+                        .FirstOrDefaultAsync(u => u.UserName == User.Identity!.Name);
+                    await _auditService.LogAsync(
+                        currentUser!.Id,
+                        "Edit",
+                        "Grade",
+                        grade.Id.ToString(),
+                        $"Відредаговано оцінку: {grade.Value}");
                 }
                 catch (DbUpdateConcurrencyException)
                 {
@@ -181,6 +192,14 @@ namespace Controllers
 
                 _context.Grades.Remove(grade);
                 await _context.SaveChangesAsync();
+                var currentUser = await _context.Users
+                    .FirstOrDefaultAsync(u => u.UserName == User.Identity!.Name);
+                await _auditService.LogAsync(
+                    currentUser!.Id,
+                    "Delete",
+                    "Grade",
+                    id.ToString(),
+                    $"Видалено оцінку");
             }
             return RedirectToAction(nameof(Index));
         }

@@ -143,6 +143,18 @@ namespace Project_U.Controllers
 
             return RedirectToAction(nameof(Index));
         }
+
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> AuditLog()
+        {
+            var logs = await _context.AuditLogs
+                .Include(l => l.User)
+                .OrderByDescending(l => l.CreatedAt)
+                .Take(200)
+                .ToListAsync();
+
+            return View(logs);
+        }
         // GET: Admin/DeleteUser
         public async Task<IActionResult> DeleteUser(string id)
         {

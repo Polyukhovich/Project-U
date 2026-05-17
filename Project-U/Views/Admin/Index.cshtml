@@ -9,7 +9,10 @@
 
 <div class="d-flex justify-content-between align-items-center mb-4">
     <h2>⚙️ @Localizer["Title"]</h2>
-    <a asp-action="CreateUser" class="btn btn-primary">➕ @Localizer["AddUser"]</a>
+    <div class="d-flex gap-2">
+        <a asp-action="AuditLog" class="btn btn-outline-info">📋 @Localizer["AuditLog"]</a>
+        <a asp-action="CreateUser" class="btn btn-primary">➕ @Localizer["AddUser"]</a>
+    </div>
 </div>
 
 <!-- Пошук -->

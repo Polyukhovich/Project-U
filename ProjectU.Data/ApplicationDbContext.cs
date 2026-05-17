@@ -20,7 +20,7 @@ namespace ProjectU.Data
         public DbSet<Assignment> Assignments { get; set; }
         public DbSet<ScheduleDate> ScheduleDates { get; set; }
         public DbSet<CourseTeacher> CourseTeachers { get; set; }
-
+        public DbSet<AuditLog> AuditLogs { get; set; }
         protected override void OnModelCreating(ModelBuilder builder)
         {
             base.OnModelCreating(builder);

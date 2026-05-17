@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
+using Project_U.Helpers;
 using ProjectU.Core.Models;
 using ProjectU.Data;
 using System;
@@ -18,11 +19,13 @@ namespace Controllers
     {
         private readonly ApplicationDbContext _context;
         private readonly UserManager<ApplicationUser> _userManager;
+        private readonly AuditService _auditService;
 
-        public CoursesController(ApplicationDbContext context, UserManager<ApplicationUser> userManager )
+        public CoursesController(ApplicationDbContext context, UserManager<ApplicationUser> userManager, AuditService auditService)
         {
             _context = context;
             _userManager = userManager;
+            _auditService = auditService;
         }
 
         // GET: Courses — всі ролі можуть переглядати
@@ -111,7 +114,12 @@ namespace Controllers
             ViewBag.CurrentUserId = currentUser?.Id;
             ViewBag.CurrentUserName = $"{currentUser?.FirstName} {currentUser?.LastName}";
             ViewData["GroupId"] = new SelectList(_context.Groups, "Id", "Name");
+            // Якщо адмін — передаємо список викладачів для вибору основного
+            if (User.IsInRole("Admin"))
+                ViewData["TeacherId"] = new SelectList(teachers, "Id", "FirstName");
+
             return View();
+
         }
 
         // POST: Courses/Create
@@ -140,6 +148,14 @@ namespace Controllers
                         });
                     }
                     await _context.SaveChangesAsync();
+                    var currentUser = await _context.Users
+                        .FirstOrDefaultAsync(u => u.UserName == User.Identity!.Name);
+                    await _auditService.LogAsync(
+                        currentUser!.Id,
+                        "Create",
+                        "Course",
+                        course.Id.ToString(),
+                        $"Створено дисципліну: {course.Name}");
                 }
 
                 return RedirectToAction(nameof(Index));
@@ -212,6 +228,14 @@ namespace Controllers
                     }
 
                     await _context.SaveChangesAsync();
+                    var currentUser = await _context.Users
+                        .FirstOrDefaultAsync(u => u.UserName == User.Identity!.Name);
+                    await _auditService.LogAsync(
+                        currentUser!.Id,
+                        "Edit",
+                        "Course",
+                        course.Id.ToString(),
+                        $"Відредаговано дисципліну: {course.Name}");
                 }
                 catch (DbUpdateConcurrencyException)
                 {
@@ -274,6 +298,14 @@ namespace Controllers
             {
                 _context.Courses.Remove(courseToDelete);
                 await _context.SaveChangesAsync();
+                var currentUser = await _context.Users
+                    .FirstOrDefaultAsync(u => u.UserName == User.Identity!.Name);
+                await _auditService.LogAsync(
+                    currentUser!.Id,
+                    "Delete",
+                    "Course",
+                    id.ToString(),
+                    $"Видалено дисципліну: {courseToDelete.Name}");
             }
             return RedirectToAction(nameof(Index));
         }

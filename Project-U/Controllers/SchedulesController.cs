@@ -21,13 +21,16 @@ namespace Controllers
         private readonly ApplicationDbContext _context;
         private readonly IHubContext<NotificationHub> _hubContext;
         private readonly NotificationHelper _notificationHelper;
+        private readonly AuditService _auditService;
         public SchedulesController(ApplicationDbContext context,
                IHubContext<NotificationHub> hubContext,
-               NotificationHelper notificationHelper)
+               NotificationHelper notificationHelper,
+               AuditService auditService)
         {
             _context = context;
             _hubContext = hubContext;
             _notificationHelper = notificationHelper;
+            _auditService = auditService;
         }
 
         // GET: Schedules — всі ролі можуть переглядати
@@ -104,7 +107,14 @@ namespace Controllers
             {
                 _context.Add(schedule);
                 await _context.SaveChangesAsync();
-
+                var currentUser = await _context.Users
+                    .FirstOrDefaultAsync(u => u.UserName == User.Identity!.Name);
+                await _auditService.LogAsync(
+                    currentUser!.Id,
+                    "Create",
+                    "Schedule",
+                    schedule.Id.ToString(),
+                    $"Створено розклад");
                 // Зберігаємо обрані дати
                 if (!string.IsNullOrEmpty(selectedDatesJson))
                 {
@@ -214,6 +224,14 @@ namespace Controllers
                             });
                         }
                         await _context.SaveChangesAsync();
+                        var currentUser = await _context.Users
+                            .FirstOrDefaultAsync(u => u.UserName == User.Identity!.Name);
+                        await _auditService.LogAsync(
+                            currentUser!.Id,
+                            "Edit",
+                            "Schedule",
+                            schedule.Id.ToString(),
+                            $"Відредаговано розклад");
                     }
                 }
                 catch (DbUpdateConcurrencyException)
@@ -357,6 +375,14 @@ namespace Controllers
                 _context.ScheduleDates.RemoveRange(schedule.Dates);
                 _context.Schedules.Remove(schedule);
                 await _context.SaveChangesAsync();
+                var currentUser = await _context.Users
+                    .FirstOrDefaultAsync(u => u.UserName == User.Identity!.Name);
+                await _auditService.LogAsync(
+                    currentUser!.Id,
+                    "Delete",
+                    "Schedule",
+                    id.ToString(),
+                    $"Видалено розклад");
             }
 
             return RedirectToAction(nameof(Index));

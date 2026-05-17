@@ -28,13 +28,15 @@ namespace Controllers
         private readonly IHubContext<NotificationHub> _hubContext;
         private readonly NotificationHelper _notificationHelper;
         private readonly IStringLocalizer _localizer;
+        private readonly AuditService _auditService;
         public LabWorksController(ApplicationDbContext context,
                PlagiarismService plagiarismService, 
                FileTextExtractorService fileExtractor,
                IWebHostEnvironment environment,
                IHubContext<NotificationHub> hubContext,
                NotificationHelper notificationHelper,
-               IStringLocalizerFactory localizerFactory)
+               IStringLocalizerFactory localizerFactory,
+               AuditService auditService)
         {
             _context = context;
             _plagiarismService = plagiarismService;
@@ -45,6 +47,7 @@ namespace Controllers
             _localizer = localizerFactory.Create(
                 "ModelValidation",
                 typeof(Program).Assembly.GetName().Name!);
+            _auditService = auditService;
         }
         // GET: LabWorks/Details/5
         public async Task<IActionResult> Details(int? id)
@@ -248,6 +251,12 @@ namespace Controllers
                         await _context.SaveChangesAsync();
                     }
                 }
+                await _auditService.LogAsync(
+                    labWork.StudentId,
+                    "Submit",
+                    "LabWork",
+                    labWork.Id.ToString(),
+                    $"Студент здав роботу: {labWork.Title}");
                 return RedirectToAction("Index", "Assignments");
             }
 
@@ -337,11 +346,12 @@ namespace Controllers
             var labWork = await _context.LabWorks.FindAsync(id);
             if (labWork == null) return NotFound();
 
+            var currentUser = await _context.Users
+                .FirstOrDefaultAsync(u => u.UserName == User.Identity!.Name);
+
             // Студент може видалити тільки свою роботу
             if (User.IsInRole("Student"))
             {
-                var currentUser = await _context.Users
-                    .FirstOrDefaultAsync(u => u.UserName == User.Identity!.Name);
                 if (labWork.StudentId != currentUser?.Id)
                     return Forbid();
             }
@@ -362,6 +372,13 @@ namespace Controllers
 
             _context.LabWorks.Remove(labWork);
             await _context.SaveChangesAsync();
+
+            await _auditService.LogAsync(
+                currentUser!.Id,
+                "Delete",
+                "LabWork",
+                id.ToString(),
+                $"Видалено роботу: {labWork.FileName}");
 
             return RedirectToAction("Index", "Assignments");
         }

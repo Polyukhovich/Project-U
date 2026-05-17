@@ -123,6 +123,9 @@
   <data name="AddUser" xml:space="preserve">
     <value>Додати користувача</value>
   </data>
+  <data name="AuditLog" xml:space="preserve">
+    <value>Журнал дій</value>
+  </data>
   <data name="EditRole" xml:space="preserve">
     <value>Роль</value>
   </data>
