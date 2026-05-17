@@ -43,5 +43,7 @@ namespace ProjectU.Core.Models
         public Course? Course { get; set; }
         // Результати перевірки на плагіат
         public ICollection<PlagiarismResult> PlagiarismResults { get; set; } = new List<PlagiarismResult>();
+
+        public ICollection<SubTaskGrade> SubTaskGrades { get; set; } = new List<SubTaskGrade>();
     }
 }

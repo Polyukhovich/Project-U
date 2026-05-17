@@ -50,7 +50,28 @@
                         <dt class="col-sm-5">@Localizer["Description"]</dt>
                         <dd class="col-sm-7">@Model.Description</dd>
                     }
-
+                    @if (Model.SubTasks != null && Model.SubTasks.Any())
+                    {
+                        <hr />
+                        <div class="fw-bold mb-2">📋 @Localizer["SubTasks"]:</div>
+                        @foreach (var subTask in Model.SubTasks)
+                        {
+                            <div class="d-flex justify-content-between align-items-center mb-2 p-2 rounded"
+                                 style="background: var(--table-stripe);">
+                                <div>
+                                    <div class="fw-bold small">@subTask.Title</div>
+                                    @if (!string.IsNullOrEmpty(subTask.Description))
+                                    {
+                                        <div class="small text-muted">@subTask.Description</div>
+                                    }
+                                </div>
+                                <span class="badge bg-primary">@subTask.MaxScore @Localizer["Points"]</span>
+                            </div>
+                        }
+                        <div class="small text-muted mt-1">
+                            @Localizer["TotalPoints"]: @Model.SubTasks.Sum(s => s.MaxScore)
+                        </div>
+                    }
                     @if (Model.MaterialType != "None")
                     {
                         <dt class="col-sm-5">📎 @Localizer["Material"]</dt>

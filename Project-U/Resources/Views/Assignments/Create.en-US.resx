@@ -117,6 +117,9 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <data name="AddSubTask" xml:space="preserve">
+    <value>Add subtask</value>
+  </data>
   <data name="AllowDownload" xml:space="preserve">
     <value>Allow download</value>
   </data>
@@ -162,6 +165,9 @@
   <data name="Material" xml:space="preserve">
     <value>Material for assignment</value>
   </data>
+  <data name="MaxScore" xml:space="preserve">
+    <value>Max score</value>
+  </data>
   <data name="NewFile" xml:space="preserve">
     <value>File</value>
   </data>
@@ -170,6 +176,15 @@
   </data>
   <data name="SelectCourse" xml:space="preserve">
     <value>— Select course —</value>
+  </data>
+  <data name="SubTasks" xml:space="preserve">
+    <value>Subtasks</value>
+  </data>
+  <data name="SubTasksHint" xml:space="preserve">
+    <value>Optional. Total subtask scores can be up to 100</value>
+  </data>
+  <data name="SubTaskTitle" xml:space="preserve">
+    <value>Subtask title</value>
   </data>
   <data name="Title" xml:space="preserve">
     <value>Create Assignment</value>

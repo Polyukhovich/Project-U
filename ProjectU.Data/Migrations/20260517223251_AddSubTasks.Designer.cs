@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using ProjectU.Data;
 
@@ -11,9 +12,11 @@ using ProjectU.Data;
 namespace ProjectU.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260517223251_AddSubTasks")]
+    partial class AddSubTasks
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -668,32 +671,6 @@ namespace ProjectU.Data.Migrations
                     b.ToTable("SubTasks");
                 });
 
-            modelBuilder.Entity("ProjectU.Core.Models.SubTaskGrade", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<int>("LabWorkId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("SubTaskId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("Value")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("LabWorkId");
-
-                    b.HasIndex("SubTaskId");
-
-                    b.ToTable("SubTaskGrades");
-                });
-
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
                 {
                     b.HasOne("Microsoft.AspNetCore.Identity.IdentityRole", null)
@@ -954,25 +931,6 @@ namespace ProjectU.Data.Migrations
                     b.Navigation("Assignment");
                 });
 
-            modelBuilder.Entity("ProjectU.Core.Models.SubTaskGrade", b =>
-                {
-                    b.HasOne("ProjectU.Core.Models.LabWork", "LabWork")
-                        .WithMany("SubTaskGrades")
-                        .HasForeignKey("LabWorkId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("ProjectU.Core.Models.SubTask", "SubTask")
-                        .WithMany()
-                        .HasForeignKey("SubTaskId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("LabWork");
-
-                    b.Navigation("SubTask");
-                });
-
             modelBuilder.Entity("ProjectU.Core.Models.Assignment", b =>
                 {
                     b.Navigation("SubTasks");
@@ -1001,8 +959,6 @@ namespace ProjectU.Data.Migrations
             modelBuilder.Entity("ProjectU.Core.Models.LabWork", b =>
                 {
                     b.Navigation("PlagiarismResults");
-
-                    b.Navigation("SubTaskGrades");
                 });
 
             modelBuilder.Entity("ProjectU.Core.Models.Schedule", b =>

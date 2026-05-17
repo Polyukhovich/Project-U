@@ -100,13 +100,14 @@ namespace Controllers
 
             var assignment = await _context.Assignments
                 .Include(a => a.Course)
-                    .ThenInclude(c => c.Group)
-                        .ThenInclude(g => g.Students)
+                .ThenInclude(c => c.Group)
+                .ThenInclude(g => g.Students)
                 .Include(a => a.Submissions)
-                    .ThenInclude(s => s.Student)
+                .ThenInclude(s => s.Student)
                 .Include(a => a.Submissions)
-                    .ThenInclude(s => s.PlagiarismResults)
-                        .ThenInclude(p => p.ComparedWith)
+                .ThenInclude(s => s.PlagiarismResults)
+                .ThenInclude(p => p.ComparedWith)
+                .Include(a => a.SubTasks)
                 .FirstOrDefaultAsync(m => m.Id == id);
 
             if (assignment == null) return NotFound();
@@ -201,6 +202,23 @@ namespace Controllers
                 }
 
                 _context.Add(assignment);
+                await _context.SaveChangesAsync();
+                // Зберігаємо підзавдання
+                var subTaskTitles = Request.Form["SubTaskTitles"].ToList();
+                var subTaskMaxScores = Request.Form["SubTaskMaxScores"].ToList();
+
+                for (int i = 0; i < subTaskTitles.Count; i++)
+                {
+                    if (!string.IsNullOrEmpty(subTaskTitles[i]))
+                    {
+                        _context.SubTasks.Add(new SubTask
+                        {
+                            Title = subTaskTitles[i],
+                            MaxScore = int.TryParse(subTaskMaxScores.ElementAtOrDefault(i), out var score) ? score : 10,
+                            AssignmentId = assignment.Id
+                        });
+                    }
+                }
                 await _context.SaveChangesAsync();
                 var currentUserFallback = await _context.Users
                     .FirstOrDefaultAsync(u => u.UserName == User.Identity!.Name);
@@ -370,7 +388,9 @@ namespace Controllers
 
             var submission = await _context.LabWorks
                 .Include(l => l.Student)
-                .Include(l => l.Assignment)
+                .Include(l => l.Assignment)           
+                    .ThenInclude(a => a.SubTasks)
+                .Include(l => l.SubTaskGrades)
                 .FirstOrDefaultAsync(l => l.Id == id);
 
             if (submission == null) return NotFound();
@@ -386,14 +406,87 @@ namespace Controllers
         {
             var labWork = await _context.LabWorks
                 .Include(l => l.Assignment)
+                    .ThenInclude(a => a.SubTasks)
                 .FirstOrDefaultAsync(l => l.Id == labWorkId);
 
             if (labWork == null) return NotFound();
 
-            // Зберігаємо оцінку
+            // Перевіряємо чи є підзавдання
+            var subTaskIds = Request.Form["subTaskIds"].ToList();
+            var subTaskValues = Request.Form["subTaskValues"].ToList();
+
+            int finalValue;
+
+            if (subTaskIds.Any() && labWork.Assignment?.SubTasks != null && labWork.Assignment.SubTasks.Any())
+            {
+                // Спочатку перевіряємо валідацію
+                for (int i = 0; i < subTaskIds.Count; i++)
+                {
+                    var subTaskId = int.Parse(subTaskIds[i]);
+                    var subTask = labWork.Assignment?.SubTasks?.FirstOrDefault(s => s.Id == subTaskId);
+                    var subTaskValue = int.TryParse(subTaskValues.ElementAtOrDefault(i), out var v) ? v : 0;
+
+                    if (subTask != null && subTaskValue > subTask.MaxScore)
+                    {
+                        ModelState.AddModelError("", $"Бал за підзавдання '{subTask.Title}' не може перевищувати {subTask.MaxScore}");
+                        var submissionErr = await _context.LabWorks
+                            .Include(l => l.Student)
+                            .Include(l => l.Assignment)
+                                .ThenInclude(a => a.SubTasks)
+                            .Include(l => l.SubTaskGrades)
+                            .FirstOrDefaultAsync(l => l.Id == labWorkId);
+                        return View(submissionErr);
+                    }
+                }
+
+                // Перевірка суми
+                int total = subTaskValues
+                    .Select(s => int.TryParse(s, out var v) ? v : 0)
+                    .Sum();
+
+                if (total > 100)
+                {
+                    ModelState.AddModelError("", "Сума балів не може перевищувати 100");
+                    var submissionErr = await _context.LabWorks
+                        .Include(l => l.Student)
+                        .Include(l => l.Assignment)
+                            .ThenInclude(a => a.SubTasks)
+                        .Include(l => l.SubTaskGrades)
+                        .FirstOrDefaultAsync(l => l.Id == labWorkId);
+                    return View(submissionErr);
+                }
+
+                // Видаляємо старі оцінки за підзавдання
+                var oldSubTaskGrades = await _context.SubTaskGrades
+                    .Where(g => g.LabWorkId == labWorkId)
+                    .ToListAsync();
+                _context.SubTaskGrades.RemoveRange(oldSubTaskGrades);
+
+                // Зберігаємо нові оцінки за підзавдання
+                for (int i = 0; i < subTaskIds.Count; i++)
+                {
+                    var subTaskId = int.Parse(subTaskIds[i]);
+                    var subTaskValue = int.TryParse(subTaskValues.ElementAtOrDefault(i), out var v2) ? v2 : 0;
+
+                    _context.SubTaskGrades.Add(new SubTaskGrade
+                    {
+                        SubTaskId = subTaskId,
+                        LabWorkId = labWorkId,
+                        Value = subTaskValue
+                    });
+                }
+
+                finalValue = Math.Min(total, 100);
+            }
+            else
+            {
+                finalValue = value;
+            }
+
+            // Зберігаємо підсумкову оцінку
             var grade = new Grade
             {
-                Value = value,
+                Value = finalValue,
                 StudentId = labWork.StudentId,
                 CourseId = labWork.Assignment!.CourseId,
                 LabWorkId = labWork.Id,
@@ -401,18 +494,15 @@ namespace Controllers
             };
 
             _context.Grades.Add(grade);
-
-            // Позначаємо роботу як оцінену
             labWork.IsGraded = true;
             _context.Update(labWork);
-
             await _context.SaveChangesAsync();
 
-            // Надсилаємо сповіщення через SignalR
+            // Надсилаємо сповіщення
             var course = await _context.Courses.FindAsync(labWork.Assignment.CourseId);
             var message = await _notificationHelper.GetLocalizedMessage(
                 labWork.StudentId, "GradeReceived",
-                value, course?.Name);
+                finalValue, course?.Name);
 
             await _hubContext.Clients
                 .Group($"user_{labWork.StudentId}")
@@ -427,6 +517,7 @@ namespace Controllers
             });
 
             await _context.SaveChangesAsync();
+
             var currentUser = await _context.Users
                 .FirstOrDefaultAsync(u => u.UserName == User.Identity!.Name);
             await _auditService.LogAsync(
@@ -434,54 +525,11 @@ namespace Controllers
                 "Grade",
                 "Grade",
                 grade.Id.ToString(),
-                $"Виставлено оцінку {value} студенту");
+                $"Виставлено оцінку {finalValue} студенту");
 
             return RedirectToAction(nameof(Details), new { id = labWork.Assignment.Id });
         }
-        // Перегляд матеріалу
-        [Authorize(Roles = "Admin,Teacher,Student")]
-        public async Task<IActionResult> ViewMaterial(int? id)
-        {
-            if (id == null) return NotFound();
 
-            var assignment = await _context.Assignments.FindAsync(id);
-            if (assignment == null) return NotFound();
-
-            if (string.IsNullOrEmpty(assignment.MaterialFilePath) ||
-                !System.IO.File.Exists(assignment.MaterialFilePath))
-                return NotFound("Файл не знайдено");
-
-            var fileBytes = await System.IO.File.ReadAllBytesAsync(assignment.MaterialFilePath);
-            var contentType = assignment.MaterialFileName!.EndsWith(".pdf")
-                ? "application/pdf"
-                : "application/vnd.openxmlformats-officedocument.wordprocessingml.document";
-
-            // Для перегляду без завантаження
-            var encodedFileName = Uri.EscapeDataString(assignment.MaterialFileName!);
-            Response.Headers.Add("Content-Disposition", $"inline; filename*=UTF-8''{encodedFileName}");
-            return File(fileBytes, contentType);
-        }
-
-        // Завантаження матеріалу
-        [Authorize(Roles = "Admin,Teacher,Student")]
-        public async Task<IActionResult> DownloadMaterial(int? id)
-        {
-            if (id == null) return NotFound();
-
-            var assignment = await _context.Assignments.FindAsync(id);
-            if (assignment == null || !assignment.AllowDownload) return NotFound();
-
-            if (string.IsNullOrEmpty(assignment.MaterialFilePath) ||
-                !System.IO.File.Exists(assignment.MaterialFilePath))
-                return NotFound("Файл не знайдено");
-
-            var fileBytes = await System.IO.File.ReadAllBytesAsync(assignment.MaterialFilePath);
-            var contentType = assignment.MaterialFileName!.EndsWith(".pdf")
-                ? "application/pdf"
-                : "application/vnd.openxmlformats-officedocument.wordprocessingml.document";
-
-            return File(fileBytes, contentType, assignment.MaterialFileName);
-        }
         // GET: Assignments/Delete/5 — тільки Admin та Teacher
         [HttpGet]
         [Authorize(Roles = "Admin,Teacher")]

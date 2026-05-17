@@ -56,6 +56,8 @@ namespace ProjectU.Core.Models
 
         // Навігаційна властивість до курсу
         public Course? Course { get; set; }
+        // Список підзавдань
+        public ICollection<SubTask> SubTasks { get; set; } = new List<SubTask>();
 
         // Список здач від студентів
         public ICollection<LabWork> Submissions { get; set; } = new List<LabWork>();

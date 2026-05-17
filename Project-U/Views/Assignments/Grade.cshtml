@@ -72,11 +72,47 @@
             <div class="card-body">
                 <form asp-action="Grade" method="post">
                     <input type="hidden" name="labWorkId" value="@Model.Id" />
-                    <div class="mb-3">
-                        <label class="form-label">@Localizer["GradeLabel"]</label>
-                        <input type="number" name="value" class="form-control"
-                               min="0" max="100" required style="max-width: 150px;" />
-                    </div>
+
+                    @if (Model.Assignment?.SubTasks != null && Model.Assignment.SubTasks.Any())
+                    {
+                        <!-- Оцінювання по підзавданнях -->
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">@Localizer["SubTaskGrades"]</label>
+                            @foreach (var subTask in Model.Assignment.SubTasks)
+                            {
+                                var existing = Model.SubTaskGrades?.FirstOrDefault(g => g.SubTaskId == subTask.Id);
+                                <div class="d-flex align-items-center gap-3 mb-2 p-2 rounded"
+                                     style="background: var(--table-stripe);">
+                                    <div class="flex-fill">
+                                        <div class="fw-bold small">@subTask.Title</div>
+                                        <div class="small text-muted">@Localizer["MaxScore"]: @subTask.MaxScore</div>
+                                    </div>
+                                    <input type="hidden" name="subTaskIds" value="@subTask.Id" />
+                                    <input type="number" name="subTaskValues"
+                                           class="form-control" style="max-width:100px;"
+                                           min="0" max="@subTask.MaxScore"
+                                           value="@(existing?.Value.ToString() ?? "")"
+                                           oninput="updateTotal()" />
+                                </div>
+                            }
+                            <div class="mt-2 fw-bold">
+                                @Localizer["Total"]: <span id="totalScore">0</span> / 100
+                            </div>
+                            <div id="totalWarning" class="alert alert-danger mt-2" style="display:none;">
+                                ⚠️  @Localizer["TotalOverLimit"]
+                            </div>
+                        </div>
+                    }
+                    else
+                    {
+                        <!-- Звичайне оцінювання -->
+                        <div class="mb-3">
+                            <label class="form-label">@Localizer["GradeLabel"]</label>
+                            <input type="number" name="value" class="form-control"
+                                   min="0" max="100" required style="max-width: 150px;" />
+                        </div>
+                    }
+
                     <div class="d-flex gap-2">
                         <button type="submit" class="btn btn-success flex-fill">✅ @Localizer["Submit"]</button>
                         <a asp-action="Details" asp-route-id="@Model.Assignment!.Id" class="btn btn-outline-secondary">@Localizer["Back"]</a>
@@ -84,5 +120,33 @@
                 </form>
             </div>
         </div>
+
+        @section Scripts {
+        <script>
+            function updateTotal() {
+                const inputs = document.querySelectorAll('input[name="subTaskValues"]');
+                let total = 0;
+                inputs.forEach(i => total += parseInt(i.value) || 0);
+
+                const display = document.getElementById('totalScore');
+                const warning = document.getElementById('totalWarning');
+                const submitBtn = document.querySelector('button[type="submit"]');
+
+                if (display) {
+                    display.textContent = total;
+                    display.style.color = total > 100 ? '#d63031' : '#00b894';
+                }
+
+                if (warning) {
+                    warning.style.display = total > 100 ? 'block' : 'none';
+                }
+
+                if (submitBtn) {
+                    submitBtn.disabled = total > 100;
+                }
+            }
+            updateTotal();
+        </script>
+        }
     </div>
 </div>
