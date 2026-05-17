@@ -120,8 +120,29 @@
 
                     @if (User.IsInRole("Admin") || User.IsInRole("Teacher"))
                     {
-                        <div class="card-footer d-flex gap-2">
+                        <div class="card-footer d-flex gap-2 flex-wrap">
                             <a asp-action="Edit" asp-route-id="@schedule.Id" class="btn btn-warning btn-sm flex-fill">✏️ @Localizer["Edit"]</a>
+                            @if (pastDates != null && pastDates.Any())
+                            {
+                                @foreach (var pastDate in pastDates.Take(3))
+                                {
+                                    <a asp-controller="Attendance" asp-action="Mark"
+                                       asp-route-scheduleId="@schedule.Id"
+                                       asp-route-date="@pastDate.Date.ToString("yyyy-MM-dd")"
+                                       class="btn btn-info btn-sm">
+                                        📋 @pastDate.Date.ToString("dd.MM")
+                                    </a>
+                                }
+                            }
+                            @if (nextDate != null)
+                            {
+                                <a asp-controller="Attendance" asp-action="Mark"
+                                   asp-route-scheduleId="@schedule.Id"
+                                   asp-route-date="@nextDate.Date.ToString("yyyy-MM-dd")"
+                                   class="btn btn-outline-info btn-sm">
+                                    📋 @Localizer["MarkAttendance"] @nextDate.Date.ToString("dd.MM")
+                                </a>
+                            }
                             <a asp-action="Delete" asp-route-id="@schedule.Id" class="btn btn-danger btn-sm">🗑️</a>
                         </div>
                     }

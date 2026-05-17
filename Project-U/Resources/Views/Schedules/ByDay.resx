@@ -126,6 +126,9 @@
   <data name="Edit" xml:space="preserve">
     <value>Редагувати</value>
   </data>
+  <data name="MarkAttendance" xml:space="preserve">
+    <value>Відвідуваність</value>
+  </data>
   <data name="NextDate" xml:space="preserve">
     <value>Наступне</value>
   </data>

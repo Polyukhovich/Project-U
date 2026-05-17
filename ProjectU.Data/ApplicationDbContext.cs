@@ -21,6 +21,7 @@ namespace ProjectU.Data
         public DbSet<ScheduleDate> ScheduleDates { get; set; }
         public DbSet<CourseTeacher> CourseTeachers { get; set; }
         public DbSet<AuditLog> AuditLogs { get; set; }
+        public DbSet<Attendance> Attendances { get; set; }
         protected override void OnModelCreating(ModelBuilder builder)
         {
             base.OnModelCreating(builder);

@@ -1,0 +1,200 @@
+﻿@using Microsoft.AspNetCore.Mvc.Localization
+@inject IViewLocalizer Localizer
+@{
+    ViewData["Title"] = Localizer["Title"].Value;
+    var grouped = ViewBag.GroupedAttendance as IEnumerable<dynamic>;
+    var currentPage = (int)ViewBag.CurrentPage;
+    var totalPages = (int)ViewBag.TotalPages;
+}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2>📋 @Localizer["Title"]</h2>
+</div>
+
+<!-- Фільтри -->
+<div class="card mb-4">
+    <div class="card-body">
+        <form asp-action="Index" method="get" class="row g-2 align-items-end">
+            <div class="col-md-3">
+                <label class="form-label small">📚 @Localizer["FilterByCourse"]</label>
+                <select name="courseId" class="form-select form-select-sm">
+                    <option value="">@Localizer["AllCourses"]</option>
+                    @foreach (var course in ViewBag.Courses as List<ProjectU.Core.Models.Course>)
+                    {
+                        <option value="@course.Id" selected="@(ViewBag.SelectedCourseId != null && ViewBag.SelectedCourseId.ToString() == course.Id.ToString())">
+                            @course.Name
+                        </option>
+                    }
+                </select>
+            </div>
+            <div class="col-md-3">
+                <label class="form-label small">👥 @Localizer["FilterByGroup"]</label>
+                <select name="groupId" class="form-select form-select-sm">
+                    <option value="">@Localizer["AllGroups"]</option>
+                    @foreach (var group in ViewBag.Groups as List<ProjectU.Core.Models.Group>)
+                    {
+                        <option value="@group.Id" selected="@(ViewBag.SelectedGroupId != null && ViewBag.SelectedGroupId.ToString() == group.Id.ToString())">
+                            @group.Name
+                        </option>
+                    }
+                </select>
+            </div>
+            <div class="col-md-2">
+                <label class="form-label small">📅 @Localizer["DateFrom"]</label>
+                <input type="date" name="dateFrom" class="form-control form-control-sm"
+                       value="@ViewBag.DateFrom?.ToString("yyyy-MM-dd")" />
+            </div>
+            <div class="col-md-2">
+                <label class="form-label small">📅 @Localizer["DateTo"]</label>
+                <input type="date" name="dateTo" class="form-control form-control-sm"
+                       value="@ViewBag.DateTo?.ToString("yyyy-MM-dd")" />
+            </div>
+            <div class="col-md-2">
+                <label class="form-label small">&nbsp;</label>
+                <div class="d-flex gap-1">
+                    <button type="submit" class="btn btn-primary flex-fill" style="height: 44px;">🔍</button>
+                    <a asp-action="Index" class="btn btn-outline-secondary" style="height: 44px;">✕</a>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+@if (grouped != null && grouped.Any())
+{
+    <div class="card">
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover mb-0">
+                    <thead class="table-dark">
+                        <tr>
+                            <th>📅 @Localizer["Date"]</th>
+                            <th>📚 @Localizer["Course"]</th>
+                            <th>👥 @Localizer["Group"]</th>
+                            <th class="text-center">✅ @Localizer["Present"]</th>
+                            <th class="text-center">❌ @Localizer["Absent"]</th>
+                            <th>⚙️ @Localizer["Actions"]</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var group in grouped)
+                        {
+                            var collapseId = $"collapse_{group.ScheduleId}_{group.Date.ToString("yyyyMMdd")}";
+                            <tr>
+                                <td>
+                                    <span class="badge bg-primary">@group.Date.ToString("dd.MM.yyyy")</span>
+                                </td>
+                                <td><strong>@group.CourseName</strong></td>
+                                <td><span class="badge bg-secondary">@group.GroupName</span></td>
+                                <td class="text-center">
+                                    <span class="badge bg-success">@group.PresentCount</span>
+                                </td>
+                                <td class="text-center">
+                                    <span class="badge bg-danger">@group.AbsentCount</span>
+                                </td>
+                                <td>
+                                    <div class="d-flex gap-1">
+                                        <button class="btn btn-sm btn-outline-secondary"
+                                                type="button"
+                                                data-bs-toggle="collapse"
+                                                data-bs-target="#@collapseId">
+                                            👁️
+                                        </button>
+                                        @if (User.IsInRole("Admin") || User.IsInRole("Teacher"))
+                                        {
+                                            <a asp-action="Mark"
+                                               asp-route-scheduleId="@group.ScheduleId"
+                                               asp-route-date="@group.Date.ToString("yyyy-MM-dd")"
+                                               class="btn btn-sm btn-outline-warning">✏️</a>
+                                        }
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr class="collapse" id="@collapseId">
+                                <td colspan="6" class="p-0">
+                                    <table class="table table-sm mb-0" style="background: var(--table-stripe);">
+                                        <thead>
+                                            <tr>
+                                                <th class="ps-4">👤 @Localizer["Student"]</th>
+                                                <th>✅ @Localizer["Status"]</th>
+                                                <th>💬 @Localizer["Comment"]</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            @foreach (ProjectU.Core.Models.Attendance item in group.Students)
+                                            {
+                                                <tr>
+                                                    <td class="ps-4">@(item.Student != null ? $"{item.Student.FirstName} {item.Student.LastName}" : "—")</td>
+                                                    <td>
+                                                        @if (item.IsPresent)
+                                                        {
+                                                            <span class="badge bg-success">✅ @Localizer["Present"]</span>
+                                                        }
+                                                        else
+                                                        {
+                                                            <span class="badge bg-danger">❌ @Localizer["Absent"]</span>
+                                                        }
+                                                    </td>
+                                                    <td>@(item.Comment ?? "—")</td>
+                                                </tr>
+                                            }
+                                        </tbody>
+                                    </table>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Пагінація -->
+    @if (totalPages > 1)
+    {
+        <nav class="mt-3">
+            <ul class="pagination justify-content-center">
+                @if (currentPage > 1)
+                {
+                    <li class="page-item">
+                        <a class="page-link" asp-action="Index"
+                           asp-route-page="@(currentPage - 1)"
+                           asp-route-courseId="@ViewBag.SelectedCourseId"
+                           asp-route-groupId="@ViewBag.SelectedGroupId"
+                           asp-route-dateFrom="@ViewBag.DateFrom?.ToString("yyyy-MM-dd")"
+                           asp-route-dateTo="@ViewBag.DateTo?.ToString("yyyy-MM-dd")">←</a>
+                    </li>
+                }
+                @for (int i = 1; i <= totalPages; i++)
+                {
+                    <li class="page-item @(i == currentPage ? "active" : "")">
+                        <a class="page-link" asp-action="Index"
+                           asp-route-page="@i"
+                           asp-route-courseId="@ViewBag.SelectedCourseId"
+                           asp-route-groupId="@ViewBag.SelectedGroupId"
+                           asp-route-dateFrom="@ViewBag.DateFrom?.ToString("yyyy-MM-dd")"
+                           asp-route-dateTo="@ViewBag.DateTo?.ToString("yyyy-MM-dd")">@i</a>
+                    </li>
+                }
+                @if (currentPage < totalPages)
+                {
+                    <li class="page-item">
+                        <a class="page-link" asp-action="Index"
+                           asp-route-page="@(currentPage + 1)"
+                           asp-route-courseId="@ViewBag.SelectedCourseId"
+                           asp-route-groupId="@ViewBag.SelectedGroupId"
+                           asp-route-dateFrom="@ViewBag.DateFrom?.ToString("yyyy-MM-dd")"
+                           asp-route-dateTo="@ViewBag.DateTo?.ToString("yyyy-MM-dd")">→</a>
+                    </li>
+                }
+            </ul>
+        </nav>
+    }
+}
+else
+{
+    <div class="alert alert-info text-center p-4">
+        <div style="font-size: 3rem;">📭</div>
+        <div>@Localizer["NoAttendance"]</div>
+    </div>
+}

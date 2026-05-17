@@ -132,6 +132,9 @@
   <data name="Assignments" xml:space="preserve">
     <value>Assignments</value>
   </data>
+  <data name="Attendance" xml:space="preserve">
+    <value>Attendance</value>
+  </data>
   <data name="Courses" xml:space="preserve">
     <value>Courses</value>
   </data>

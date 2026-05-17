@@ -117,40 +117,64 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="AllDates" xml:space="preserve">
-    <value>All dates</value>
+  <data name="Absent" xml:space="preserve">
+    <value>Absent</value>
   </data>
-  <data name="Back" xml:space="preserve">
-    <value>Back</value>
+  <data name="Actions" xml:space="preserve">
+    <value>Actions</value>
+  </data>
+  <data name="AllCourses" xml:space="preserve">
+    <value>— All courses —</value>
+  </data>
+  <data name="AllGroups" xml:space="preserve">
+    <value>— All groups —</value>
+  </data>
+  <data name="Comment" xml:space="preserve">
+    <value>Comment</value>
+  </data>
+  <data name="Course" xml:space="preserve">
+    <value>Course</value>
+  </data>
+  <data name="Date" xml:space="preserve">
+    <value>Date</value>
+  </data>
+  <data name="DateFrom" xml:space="preserve">
+    <value>Date from</value>
+  </data>
+  <data name="DateTo" xml:space="preserve">
+    <value>Date to</value>
   </data>
   <data name="Edit" xml:space="preserve">
     <value>Edit</value>
   </data>
-  <data name="MarkAttendance" xml:space="preserve">
+  <data name="FilterByCourse" xml:space="preserve">
+    <value>Filter by course</value>
+  </data>
+  <data name="FilterByGroup" xml:space="preserve">
+    <value>Filter by group</value>
+  </data>
+  <data name="Group" xml:space="preserve">
+    <value>Group</value>
+  </data>
+  <data name="NoAttendance" xml:space="preserve">
+    <value>No attendance records</value>
+  </data>
+  <data name="Present" xml:space="preserve">
+    <value>Present</value>
+  </data>
+  <data name="Reset" xml:space="preserve">
+    <value>Reset</value>
+  </data>
+  <data name="ShowStudents" xml:space="preserve">
+    <value>Students</value>
+  </data>
+  <data name="Status" xml:space="preserve">
+    <value>Status</value>
+  </data>
+  <data name="Student" xml:space="preserve">
+    <value>Student</value>
+  </data>
+  <data name="Title" xml:space="preserve">
     <value>Attendance</value>
-  </data>
-  <data name="NextDate" xml:space="preserve">
-    <value>Next</value>
-  </data>
-  <data name="NoDates" xml:space="preserve">
-    <value>No dates</value>
-  </data>
-  <data name="NoLessons" xml:space="preserve">
-    <value>No lessons</value>
-  </data>
-  <data name="Online" xml:space="preserve">
-    <value>Online</value>
-  </data>
-  <data name="PastDates" xml:space="preserve">
-    <value>Past dates</value>
-  </data>
-  <data name="Room" xml:space="preserve">
-    <value>Room</value>
-  </data>
-  <data name="Teacher" xml:space="preserve">
-    <value>Teacher</value>
-  </data>
-  <data name="Time" xml:space="preserve">
-    <value>Time</value>
   </data>
 </root>

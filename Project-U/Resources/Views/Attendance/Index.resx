@@ -117,40 +117,64 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="AllDates" xml:space="preserve">
-    <value>All dates</value>
+  <data name="Absent" xml:space="preserve">
+    <value>Відсутній</value>
   </data>
-  <data name="Back" xml:space="preserve">
-    <value>Back</value>
+  <data name="Actions" xml:space="preserve">
+    <value>Дії</value>
+  </data>
+  <data name="AllCourses" xml:space="preserve">
+    <value>— Всі дисципліни —</value>
+  </data>
+  <data name="AllGroups" xml:space="preserve">
+    <value>— Всі групи —</value>
+  </data>
+  <data name="Comment" xml:space="preserve">
+    <value>Коментар</value>
+  </data>
+  <data name="Course" xml:space="preserve">
+    <value>Дисципліна</value>
+  </data>
+  <data name="Date" xml:space="preserve">
+    <value>Дата</value>
+  </data>
+  <data name="DateFrom" xml:space="preserve">
+    <value>Дата від</value>
+  </data>
+  <data name="DateTo" xml:space="preserve">
+    <value>Дата до</value>
   </data>
   <data name="Edit" xml:space="preserve">
-    <value>Edit</value>
+    <value>Редагувати</value>
   </data>
-  <data name="MarkAttendance" xml:space="preserve">
-    <value>Attendance</value>
+  <data name="FilterByCourse" xml:space="preserve">
+    <value>Фільтр по дисципліні</value>
   </data>
-  <data name="NextDate" xml:space="preserve">
-    <value>Next</value>
+  <data name="FilterByGroup" xml:space="preserve">
+    <value>Фільтр по групі</value>
   </data>
-  <data name="NoDates" xml:space="preserve">
-    <value>No dates</value>
+  <data name="Group" xml:space="preserve">
+    <value>Група</value>
   </data>
-  <data name="NoLessons" xml:space="preserve">
-    <value>No lessons</value>
+  <data name="NoAttendance" xml:space="preserve">
+    <value>Записів відвідуваності немає</value>
   </data>
-  <data name="Online" xml:space="preserve">
-    <value>Online</value>
+  <data name="Present" xml:space="preserve">
+    <value>Присутній</value>
   </data>
-  <data name="PastDates" xml:space="preserve">
-    <value>Past dates</value>
+  <data name="Reset" xml:space="preserve">
+    <value>Скинути</value>
   </data>
-  <data name="Room" xml:space="preserve">
-    <value>Room</value>
+  <data name="ShowStudents" xml:space="preserve">
+    <value>Студенти</value>
   </data>
-  <data name="Teacher" xml:space="preserve">
-    <value>Teacher</value>
+  <data name="Status" xml:space="preserve">
+    <value>Статус</value>
   </data>
-  <data name="Time" xml:space="preserve">
-    <value>Time</value>
+  <data name="Student" xml:space="preserve">
+    <value>Студент</value>
+  </data>
+  <data name="Title" xml:space="preserve">
+    <value>Відвідуваність</value>
   </data>
 </root>

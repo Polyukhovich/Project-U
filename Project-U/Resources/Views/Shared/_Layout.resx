@@ -132,6 +132,9 @@
   <data name="Assignments" xml:space="preserve">
     <value>Завдання</value>
   </data>
+  <data name="Attendance" xml:space="preserve">
+    <value>Відвідуваність</value>
+  </data>
   <data name="Courses" xml:space="preserve">
     <value>Дисципліни</value>
   </data>
