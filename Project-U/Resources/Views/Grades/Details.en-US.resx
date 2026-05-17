@@ -135,11 +135,17 @@
   <data name="Excellent" xml:space="preserve">
     <value>Excellent</value>
   </data>
+  <data name="Failed" xml:space="preserve">
+    <value>Failed</value>
+  </data>
   <data name="Good" xml:space="preserve">
     <value>Good</value>
   </data>
   <data name="LabWork" xml:space="preserve">
     <value>Lab work</value>
+  </data>
+  <data name="Passed" xml:space="preserve">
+    <value>Passed</value>
   </data>
   <data name="Satisfactory" xml:space="preserve">
     <value>Satisfactory</value>

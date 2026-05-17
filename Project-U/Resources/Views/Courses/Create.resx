@@ -132,8 +132,17 @@
   <data name="CourseNamePlaceholder" xml:space="preserve">
     <value>Наприклад: Системне програмування</value>
   </data>
+  <data name="CourseType" xml:space="preserve">
+    <value>Тип дисципліни</value>
+  </data>
   <data name="Create" xml:space="preserve">
     <value>Створити</value>
+  </data>
+  <data name="Credit" xml:space="preserve">
+    <value>Залік</value>
+  </data>
+  <data name="Exam" xml:space="preserve">
+    <value>Екзамен</value>
   </data>
   <data name="Group" xml:space="preserve">
     <value>Група</value>

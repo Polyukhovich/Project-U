@@ -120,7 +120,7 @@ namespace Controllers
         [HttpPost]
         [ValidateAntiForgeryToken]
         [Authorize(Roles = "Admin,Teacher")]
-        public async Task<IActionResult> Create([Bind("Id,Name,TeacherId,GroupId")] Course course, List<string>? additionalTeacherIds)
+        public async Task<IActionResult> Create([Bind("Id,Name,TeacherId,GroupId,CourseType")] Course course, List<string>? additionalTeacherIds)
         {
             if (ModelState.IsValid)
             {
@@ -181,7 +181,7 @@ namespace Controllers
         [HttpPost]
         [ValidateAntiForgeryToken]
         [Authorize(Roles = "Admin,Teacher")]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,Name,TeacherId,GroupId")] Course course, List<string>? additionalTeacherIds)
+        public async Task<IActionResult> Edit(int id, [Bind("Id,Name,TeacherId,GroupId,CourseType")] Course course, List<string>? additionalTeacherIds)
         {
             if (id != course.Id) return NotFound();
 

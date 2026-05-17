@@ -51,15 +51,16 @@ namespace Controllers
                 .ToListAsync();
 
             var grouped = grades
-                .GroupBy(g => g.Course?.Name ?? "—")
-                .Select(g => new
-                {
-                    CourseName = g.Key,
-                    Grades = g.ToList(),
-                    Average = g.Average(x => x.Value)
-                })
-                .OrderBy(g => g.CourseName)
-                .ToList();
+     .GroupBy(g => g.Course?.Name ?? "—")
+     .Select(g => new
+     {
+         CourseName = g.Key,
+         Grades = g.ToList(),
+         Average = g.Average(x => x.Value),
+         CourseType = g.First().Course?.CourseType ?? ProjectU.Core.Models.CourseType.Exam
+     })
+     .OrderBy(g => g.CourseName)
+     .ToList();
 
             // Список курсів для фільтру
             var courses = await _context.Courses.ToListAsync();

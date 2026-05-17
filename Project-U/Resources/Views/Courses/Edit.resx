@@ -129,6 +129,15 @@
   <data name="CourseName" xml:space="preserve">
     <value>Назва дисципліни</value>
   </data>
+  <data name="CourseType" xml:space="preserve">
+    <value>Тип дисципліни</value>
+  </data>
+  <data name="Credit" xml:space="preserve">
+    <value>Залік</value>
+  </data>
+  <data name="Exam" xml:space="preserve">
+    <value>Екзамен</value>
+  </data>
   <data name="Group" xml:space="preserve">
     <value>Група</value>
   </data>

@@ -132,8 +132,17 @@
   <data name="CourseNamePlaceholder" xml:space="preserve">
     <value>For example: System programming</value>
   </data>
+  <data name="CourseType" xml:space="preserve">
+    <value>Course type</value>
+  </data>
   <data name="Create" xml:space="preserve">
     <value>Create</value>
+  </data>
+  <data name="Credit" xml:space="preserve">
+    <value>Credit</value>
+  </data>
+  <data name="Exam" xml:space="preserve">
+    <value>Exam</value>
   </data>
   <data name="Group" xml:space="preserve">
     <value>Group</value>

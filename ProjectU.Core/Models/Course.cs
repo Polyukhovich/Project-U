@@ -3,6 +3,11 @@
 namespace ProjectU.Core.Models
 {
     // Навчальний курс/предмет
+    public enum CourseType
+    {
+        Exam,   // Екзамен
+        Credit  // Залік
+    }
     public class Course
     {
         public int Id { get; set; }
@@ -14,6 +19,9 @@ namespace ProjectU.Core.Models
           ErrorMessageResourceType = typeof(Resources.ModelValidation),
           ErrorMessageResourceName = "StringLength_CourseName")]
         public string Name { get; set; } = string.Empty;
+
+        // Тип дисципліни: Екзамен або Залік
+        public CourseType CourseType { get; set; } = CourseType.Exam;
 
         // Зовнішній ключ до викладача
         [Required(ErrorMessageResourceType = typeof(Resources.ModelValidation),

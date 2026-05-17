@@ -37,7 +37,13 @@
                         </select>
                         <span asp-validation-for="GroupId" class="text-danger"></span>
                     </div>
-
+                    <div class="mb-3">
+                        <label asp-for="CourseType" class="form-label">📋 @Localizer["CourseType"]</label>
+                        <select asp-for="CourseType" class="form-select">
+                            <option value="Exam">🎓 @Localizer["Exam"]</option>
+                            <option value="Credit">✅ @Localizer["Credit"]</option>
+                        </select>
+                    </div>
                     <div class="mb-3">
                         <label class="form-label">👨‍🏫 @Localizer["AdditionalTeachers"]</label>
                         @if (ViewBag.AllTeachers != null)

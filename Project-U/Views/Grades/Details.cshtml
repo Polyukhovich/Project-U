@@ -1,12 +1,21 @@
 ﻿@using Microsoft.AspNetCore.Mvc.Localization
 @inject IViewLocalizer Localizer
-
 @model ProjectU.Core.Models.Grade
 @{
     ViewData["Title"] = Localizer["Title"].Value;
-    var badgeColor = Model.Value >= 90 ? "#00b894" : Model.Value >= 75 ? "#0984e3" : Model.Value >= 60 ? "#fdcb6e" : "#d63031";
-    var emoji = Model.Value >= 90 ? "🏆" : Model.Value >= 75 ? "👍" : Model.Value >= 60 ? "📝" : "❌";
-    var label = Model.Value >= 90 ? Localizer["Excellent"].Value : Model.Value >= 75 ? Localizer["Good"].Value : Model.Value >= 60 ? Localizer["Satisfactory"].Value : Localizer["Unsatisfactory"].Value;
+    var isCredit = Model.Course?.CourseType == ProjectU.Core.Models.CourseType.Credit;
+    var badgeColor = isCredit
+        ? (Model.Value >= 60 ? "#00b894" : "#d63031")
+        : (Model.Value >= 90 ? "#00b894" : Model.Value >= 75 ? "#0984e3" : Model.Value >= 60 ? "#fdcb6e" : "#d63031");
+    var emoji = isCredit
+        ? (Model.Value >= 60 ? "✅" : "❌")
+        : (Model.Value >= 90 ? "🏆" : Model.Value >= 75 ? "👍" : Model.Value >= 60 ? "📝" : "❌");
+    var label = isCredit
+        ? (Model.Value >= 60 ? Localizer["Passed"].Value : Localizer["Failed"].Value)
+        : (Model.Value >= 90 ? Localizer["Excellent"].Value : Model.Value >= 75 ? Localizer["Good"].Value : Model.Value >= 60 ? Localizer["Satisfactory"].Value : Localizer["Unsatisfactory"].Value);
+    var displayValue = isCredit
+        ? (Model.Value >= 60 ? Localizer["Passed"].Value : Localizer["Failed"].Value)
+        : Model.Value.ToString();
 }
 
 <div class="d-flex justify-content-between align-items-center mb-4">
@@ -31,7 +40,7 @@
                         font-weight: bold;
                         color: white;
                         margin: 0 auto 10px;">
-                        @Model.Value
+                        @displayValue
                     </div>
                     <div style="font-size: 1.5rem;">@emoji @label</div>
                     <div class="progress mt-3" style="height: 8px; border-radius: 4px;">

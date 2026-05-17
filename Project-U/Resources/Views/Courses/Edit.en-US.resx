@@ -129,6 +129,15 @@
   <data name="CourseName" xml:space="preserve">
     <value>Course name</value>
   </data>
+  <data name="CourseType" xml:space="preserve">
+    <value>Course type</value>
+  </data>
+  <data name="Credit" xml:space="preserve">
+    <value>Credit</value>
+  </data>
+  <data name="Exam" xml:space="preserve">
+    <value>Exam</value>
+  </data>
   <data name="Group" xml:space="preserve">
     <value>Group</value>
   </data>

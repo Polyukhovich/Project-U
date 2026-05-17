@@ -147,6 +147,9 @@
   <data name="Excellent" xml:space="preserve">
     <value>Відмінно</value>
   </data>
+  <data name="Failed" xml:space="preserve">
+    <value>Не зараховано</value>
+  </data>
   <data name="FilterByCourse" xml:space="preserve">
     <value>Фільтр по дисципліні</value>
   </data>
@@ -161,6 +164,9 @@
   </data>
   <data name="NoGrades" xml:space="preserve">
     <value>Оцінок ще немає</value>
+  </data>
+  <data name="Passed" xml:space="preserve">
+    <value>Зараховано</value>
   </data>
   <data name="Reset" xml:space="preserve">
     <value>Скинути</value>

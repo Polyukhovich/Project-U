@@ -189,6 +189,9 @@
   <data name="Plagiarism" xml:space="preserve">
     <value>Plagiarism</value>
   </data>
+  <data name="Status" xml:space="preserve">
+    <value>Status</value>
+  </data>
   <data name="Student" xml:space="preserve">
     <value>Student</value>
   </data>
@@ -212,6 +215,10 @@
   </data>
   <data name="ViewWork" xml:space="preserve">
     <value>View</value>
+  </data>
+  <assembly alias="System.Windows.Forms" name="System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" />
+  <data name="Waiting" type="System.Resources.ResXNullRef, System.Windows.Forms">
+    <value />
   </data>
   <data name="You" xml:space="preserve">
     <value>You</value>

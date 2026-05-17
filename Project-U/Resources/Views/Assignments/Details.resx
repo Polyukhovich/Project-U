@@ -189,6 +189,9 @@
   <data name="Plagiarism" xml:space="preserve">
     <value>Плагіат</value>
   </data>
+  <data name="Status" xml:space="preserve">
+    <value>Статус</value>
+  </data>
   <data name="Student" xml:space="preserve">
     <value>Студент</value>
   </data>
@@ -212,6 +215,9 @@
   </data>
   <data name="ViewWork" xml:space="preserve">
     <value>Переглянути</value>
+  </data>
+  <data name="Waiting" xml:space="preserve">
+    <value>Очікує</value>
   </data>
   <data name="You" xml:space="preserve">
     <value>Ви</value>

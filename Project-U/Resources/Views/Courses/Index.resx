@@ -126,6 +126,12 @@
   <data name="Courses" xml:space="preserve">
     <value>дисциплін</value>
   </data>
+  <data name="Credit" xml:space="preserve">
+    <value>Залік</value>
+  </data>
+  <data name="Exam" xml:space="preserve">
+    <value>Екзамен</value>
+  </data>
   <data name="NoCourses" xml:space="preserve">
     <value>Курсів ще немає</value>
   </data>

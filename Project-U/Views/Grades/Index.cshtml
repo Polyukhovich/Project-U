@@ -38,6 +38,8 @@
     {
         var avg = (double)group.Average;
         var avgColor = avg >= 90 ? "#00b894" : avg >= 75 ? "#0984e3" : avg >= 60 ? "#fdcb6e" : "#d63031";
+        var courseType = (ProjectU.Core.Models.CourseType)group.CourseType;
+        var isCredit = courseType == ProjectU.Core.Models.CourseType.Credit;
 
         <div class="card mb-4">
             <div class="card-header d-flex justify-content-between align-items-center"
@@ -57,10 +59,19 @@
                 <div class="row">
                     @foreach (ProjectU.Core.Models.Grade item in group.Grades)
                     {
-                        var badgeColor = item.Value >= 90 ? "#00b894" : item.Value >= 75 ? "#0984e3" : item.Value >= 60 ? "#fdcb6e" : "#d63031";
-                        var emoji = item.Value >= 90 ? "🏆" : item.Value >= 75 ? "👍" : item.Value >= 60 ? "📝" : "❌";
+                        var badgeColor = isCredit
+                        ? (item.Value >= 60 ? "#00b894" : "#d63031")
+                        : (item.Value >= 90 ? "#00b894" : item.Value >= 75 ? "#0984e3" : item.Value >= 60 ? "#fdcb6e" : "#d63031");
+                        var emoji = isCredit
+                        ? (item.Value >= 60 ? "✅" : "❌")
+                        : (item.Value >= 90 ? "🏆" : item.Value >= 75 ? "👍" : item.Value >= 60 ? "📝" : "❌");
                         var isAdminOrTeacher = User.IsInRole("Admin") || User.IsInRole("Teacher");
-                        var gradeLabel = item.Value >= 90 ? Localizer["Excellent"].Value : item.Value >= 75 ? Localizer["Good"].Value : item.Value >= 60 ? Localizer["Satisfactory"].Value : Localizer["Unsatisfactory"].Value;
+                        var gradeLabel = isCredit
+                        ? (item.Value >= 60 ? Localizer["Passed"].Value : Localizer["Failed"].Value)
+                        : (item.Value >= 90 ? Localizer["Excellent"].Value : item.Value >= 75 ? Localizer["Good"].Value : item.Value >= 60 ? Localizer["Satisfactory"].Value : Localizer["Unsatisfactory"].Value);
+                        var displayValue = isCredit
+                        ? (item.Value >= 60 ? Localizer["Passed"].Value : Localizer["Failed"].Value)
+                        : item.Value.ToString();
 
                         <div class="col-md-6 col-lg-4 mb-3">
                             @if (isAdminOrTeacher)
@@ -76,7 +87,7 @@
                                             <div class="d-flex justify-content-between align-items-center mt-2">
                                                 <small>@emoji @gradeLabel</small>
                                                 <div style="width:50px;height:50px;border-radius:50%;background:@badgeColor;display:flex;align-items:center;justify-content:center;font-size:1.1rem;font-weight:bold;color:white;">
-                                                    @item.Value
+                                                    @displayValue
                                                 </div>
                                             </div>
                                             <div class="progress mt-2" style="height:5px;border-radius:3px;">
@@ -95,7 +106,7 @@
                                         <div class="d-flex justify-content-between align-items-center mt-2">
                                             <small>@emoji @gradeLabel</small>
                                             <div style="width:50px;height:50px;border-radius:50%;background:@badgeColor;display:flex;align-items:center;justify-content:center;font-size:1.1rem;font-weight:bold;color:white;">
-                                                @item.Value
+                                                @displayValue
                                             </div>
                                         </div>
                                         <div class="progress mt-2" style="height:5px;border-radius:3px;">

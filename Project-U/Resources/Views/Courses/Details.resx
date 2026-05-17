@@ -126,11 +126,20 @@
   <data name="CourseName" xml:space="preserve">
     <value>Назва</value>
   </data>
+  <data name="CourseType" xml:space="preserve">
+    <value>Тип дисципліни</value>
+  </data>
+  <data name="Credit" xml:space="preserve">
+    <value>Залік</value>
+  </data>
   <data name="Date" xml:space="preserve">
     <value>Дата</value>
   </data>
   <data name="Edit" xml:space="preserve">
     <value>Редагувати</value>
+  </data>
+  <data name="Exam" xml:space="preserve">
+    <value>Екзамен</value>
   </data>
   <data name="Graded" xml:space="preserve">
     <value>Оцінено</value>

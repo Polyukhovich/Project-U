@@ -21,6 +21,17 @@
                     <dd class="col-sm-7">@Model.Name</dd>
 
                     <dt class="col-sm-5">@Localizer["Group"]</dt>
+                    <dt class="col-sm-5">@Localizer["CourseType"]</dt>
+                    <dd class="col-sm-7">
+                        @if (Model.CourseType == ProjectU.Core.Models.CourseType.Exam)
+                        {
+                            <span class="badge bg-danger">🎓 @Localizer["Exam"]</span>
+                        }
+                        else
+                        {
+                            <span class="badge bg-success">✅ @Localizer["Credit"]</span>
+                        }
+                    </dd>
                     <dd class="col-sm-7">
                         <span class="badge bg-secondary">@(Model.Group?.Name ?? "—")</span>
                     </dd>

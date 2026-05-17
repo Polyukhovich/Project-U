@@ -126,6 +126,12 @@
   <data name="Courses" xml:space="preserve">
     <value>courses</value>
   </data>
+  <data name="Credit" xml:space="preserve">
+    <value>Credit</value>
+  </data>
+  <data name="Exam" xml:space="preserve">
+    <value>Exam</value>
+  </data>
   <data name="NoCourses" xml:space="preserve">
     <value>No courses yet</value>
   </data>
