@@ -123,5 +123,64 @@
                 }
             </div>
         </div>
+        <!-- Підсумкові бали студентів -->
+        @{
+            var studentSummary = ViewBag.StudentSummary as IEnumerable<dynamic>;
+        }
+            @if (studentSummary != null && studentSummary.Any())
+            
+            {
+                <div class="card mt-4">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <strong>📊 @Localizer["StudentSummary"]</strong>
+                        <span class="badge bg-secondary">@studentSummary.Count() @Localizer["Students"]</span>
+                    </div>
+                    <div class="card-body p-0">
+                        <div class="table-responsive">
+                            <table class="table table-hover mb-0">
+                                <thead class="table-dark">
+                                    <tr>
+                                        <th>👤 @Localizer["Student"]</th>
+                                        <th class="text-center">📊 @Localizer["GradeCount"]</th>
+                                        <th class="text-center">⭐ @Localizer["Average"]</th>
+                                        <th class="text-center">✅ @Localizer["Admission"]</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var item in studentSummary)
+                                    {
+                                        var avg = (double)item.Average;
+                                        var avgColor = avg >= 90 ? "#00b894" : avg >= 75 ? "#0984e3" : avg >= 60 ? "#fdcb6e" : "#d63031";
+                                        <tr>
+                                            <td>@item.Student.FirstName @item.Student.LastName</td>
+                                            <td class="text-center">@item.GradeCount</td>
+                                            <td class="text-center">
+                                                <span class="badge" style="background: @avgColor;">
+                                                    @avg.ToString("F1")
+                                                </span>
+                                            </td>
+                                            <td class="text-center">
+                                                @if (item.IsAdmitted)
+                                                {
+                                                    <span class="badge bg-success">✅ @Localizer["Admitted"]</span>
+                                                }
+                                                else if (item.GradeCount == 0)
+                                                {
+                                                    <span class="badge bg-secondary">— @Localizer["NoGrades"]</span>
+                                                }
+                                                else
+                                                {
+                                                    <span class="badge bg-danger">❌ @Localizer["NotAdmitted"]</span>
+                                                }
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            }
+        
     </div>
 </div>

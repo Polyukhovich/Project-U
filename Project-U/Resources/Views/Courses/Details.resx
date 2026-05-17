@@ -117,8 +117,17 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <data name="Admission" xml:space="preserve">
+    <value>Допуск</value>
+  </data>
+  <data name="Admitted" xml:space="preserve">
+    <value>Допущений</value>
+  </data>
   <data name="Assistant" xml:space="preserve">
     <value>Асистент</value>
+  </data>
+  <data name="Average" xml:space="preserve">
+    <value>Середній бал</value>
   </data>
   <data name="Back" xml:space="preserve">
     <value>Назад</value>
@@ -141,6 +150,9 @@
   <data name="Exam" xml:space="preserve">
     <value>Екзамен</value>
   </data>
+  <data name="GradeCount" xml:space="preserve">
+    <value>Оцінок</value>
+  </data>
   <data name="Graded" xml:space="preserve">
     <value>Оцінено</value>
   </data>
@@ -153,6 +165,12 @@
   <data name="MainTeacher" xml:space="preserve">
     <value>Головний</value>
   </data>
+  <data name="NoGrades" xml:space="preserve">
+    <value>Немає оцінок</value>
+  </data>
+  <data name="NotAdmitted" xml:space="preserve">
+    <value>Не допущений</value>
+  </data>
   <data name="NoWorks" xml:space="preserve">
     <value>Робіт ще немає</value>
   </data>
@@ -161,6 +179,12 @@
   </data>
   <data name="Student" xml:space="preserve">
     <value>Студент</value>
+  </data>
+  <data name="Students" xml:space="preserve">
+    <value>студентів</value>
+  </data>
+  <data name="StudentSummary" xml:space="preserve">
+    <value>Підсумкові бали студентів</value>
   </data>
   <data name="SubmittedWorks" xml:space="preserve">
     <value>Здані роботи</value>

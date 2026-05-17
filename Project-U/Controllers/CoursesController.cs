@@ -96,8 +96,27 @@ namespace Controllers
                 .Include(c => c.LabWorks)
                     .ThenInclude(l => l.Student)
                 .FirstOrDefaultAsync(m => m.Id == id);
-
             if (course == null) return NotFound();
+            // Завантажуємо оцінки по цій дисципліні
+            var grades = await _context.Grades
+                .Where(g => g.CourseId == id)
+                .ToListAsync();
+            // Рахуємо підсумковий бал для кожного студента
+            var studentSummary = course.Group?.Students?.Select(student =>
+            {
+                var studentGrades = grades.Where(g => g.StudentId == student.Id).ToList();
+                var average = studentGrades.Any() ? studentGrades.Average(g => g.Value) : 0;
+                var isAdmitted = average >= 60;
+                return new
+                {
+                    Student = student,
+                    Average = average,
+                    GradeCount = studentGrades.Count,
+                    IsAdmitted = isAdmitted
+                };
+            }).OrderBy(s => s.Student.LastName).ToList();
+
+            ViewBag.StudentSummary = studentSummary;
 
             return View(course);
         }

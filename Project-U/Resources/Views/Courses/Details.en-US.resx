@@ -117,8 +117,17 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <data name="Admission" xml:space="preserve">
+    <value>Admission</value>
+  </data>
+  <data name="Admitted" xml:space="preserve">
+    <value>Admitted</value>
+  </data>
   <data name="Assistant" xml:space="preserve">
     <value>Assistant</value>
+  </data>
+  <data name="Average" xml:space="preserve">
+    <value>Average</value>
   </data>
   <data name="Back" xml:space="preserve">
     <value>Back</value>
@@ -141,6 +150,9 @@
   <data name="Exam" xml:space="preserve">
     <value>Exam</value>
   </data>
+  <data name="GradeCount" xml:space="preserve">
+    <value>Grades</value>
+  </data>
   <data name="Graded" xml:space="preserve">
     <value>Graded</value>
   </data>
@@ -153,6 +165,12 @@
   <data name="MainTeacher" xml:space="preserve">
     <value>Main</value>
   </data>
+  <data name="NoGrades" xml:space="preserve">
+    <value>No grades</value>
+  </data>
+  <data name="NotAdmitted" xml:space="preserve">
+    <value>Not admitted</value>
+  </data>
   <data name="NoWorks" xml:space="preserve">
     <value>No works yet</value>
   </data>
@@ -161,6 +179,12 @@
   </data>
   <data name="Student" xml:space="preserve">
     <value>Student</value>
+  </data>
+  <data name="Students" xml:space="preserve">
+    <value>students</value>
+  </data>
+  <data name="StudentSummary" xml:space="preserve">
+    <value>Student summary</value>
   </data>
   <data name="SubmittedWorks" xml:space="preserve">
     <value>Submitted works</value>
