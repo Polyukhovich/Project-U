@@ -50,6 +50,17 @@ builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options =>
 .AddEntityFrameworkStores<ApplicationDbContext>()
 .AddDefaultTokenProviders();
 
+builder.Services.AddAuthorizationBuilder()
+    .AddPolicy("Admin", policy =>
+    {
+        policy.RequireRole("Admin");
+        var adminEmail = builder.Configuration["AdminUser:Email"];
+        if (!string.IsNullOrEmpty(adminEmail))
+            policy.RequireUserName(adminEmail);
+    })
+    .AddPolicy("Teacher", policy => policy.RequireRole("Teacher"))
+    .AddPolicy("Student", policy => policy.RequireRole("Student"));
+
 builder.Services.ConfigureApplicationCookie(options =>
 {
     options.LoginPath = "/Identity/Account/Login";
@@ -126,7 +137,8 @@ using (var scope = app.Services.CreateScope())
 {
     var userManager = scope.ServiceProvider.GetRequiredService<UserManager<ApplicationUser>>();
     var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
-    await RoleSeeder.SeedAsync(userManager, roleManager);
+    var configuration = scope.ServiceProvider.GetRequiredService<IConfiguration>();
+    await RoleSeeder.SeedAsync(userManager, roleManager, configuration);
 }
 
 app.Run();
