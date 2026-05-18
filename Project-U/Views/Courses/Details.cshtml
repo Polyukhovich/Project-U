@@ -143,7 +143,11 @@
                                         <th>👤 @Localizer["Student"]</th>
                                         <th class="text-center">📊 @Localizer["GradeCount"]</th>
                                         <th class="text-center">⭐ @Localizer["Average"]</th>
-                                        <th class="text-center">✅ @Localizer["Admission"]</th>
+                                    <th class="text-center">✅ @Localizer["Admission"]</th>
+                                    @if (User.IsInRole("Admin") || User.IsInRole("Teacher"))
+                                    {
+                                        <th>⚙️ @Localizer["Actions"]</th>
+                                    }
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -173,6 +177,7 @@
                                                     <span class="badge bg-danger">❌ @Localizer["NotAdmitted"]</span>
                                                 }
                                             </td>
+
                                         </tr>
                                     }
                                 </tbody>

@@ -198,12 +198,21 @@
                                                 {
                                                     @if (!submission.IsGraded)
                                                     {
-                                                        <a asp-action="Grade" asp-route-id="@submission.Id" class="btn btn-sm btn-success">✅ @Localizer["GradeWork"]</a>
+                                                        <a asp-action="Grade" asp-route-id="@submission.Id"
+                                                           class="btn btn-sm btn-success">✅ @Localizer["GradeWork"]</a>
                                                     }
                                                     else
                                                     {
-                                                        <a asp-controller="LabWorks" asp-action="Details" asp-route-id="@submission.Id" class="btn btn-sm btn-outline-info">👁️ @Localizer["ViewWork"]</a>
+                                                        <a asp-controller="LabWorks" asp-action="Details" asp-route-id="@submission.Id"
+                                                           class="btn btn-sm btn-outline-info">👁️ @Localizer["ViewWork"]</a>
                                                     }
+                                                }
+                                                else
+                                                {
+                                                    <a asp-controller="Grades" asp-action="DirectGrade"
+                                                       asp-route-studentId="@student.Id"
+                                                       asp-route-assignmentId="@Model.Id"
+                                                       class="btn btn-sm btn-outline-success">➕ @Localizer["AddGrade"]</a>
                                                 }
                                             </td>
                                         }

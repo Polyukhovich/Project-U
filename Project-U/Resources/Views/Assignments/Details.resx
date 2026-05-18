@@ -120,6 +120,9 @@
   <data name="Actions" xml:space="preserve">
     <value>Дії</value>
   </data>
+  <data name="AddGrade" xml:space="preserve">
+    <value>Оцінити</value>
+  </data>
   <data name="AlreadySubmitted" xml:space="preserve">
     <value>Ви вже здали роботу</value>
   </data>
