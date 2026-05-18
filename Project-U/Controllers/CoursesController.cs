@@ -149,6 +149,11 @@ namespace Controllers
         [Authorize(Roles = "Admin,Teacher")]
         public async Task<IActionResult> Create([Bind("Id,Name,TeacherId,GroupId,CourseType")] Course course, List<string>? additionalTeacherIds)
         {
+            if (User.IsInRole("Admin") && string.IsNullOrEmpty(course.TeacherId))
+            {
+                ModelState.AddModelError("TeacherId", "Оберіть викладача");
+            }
+
             if (ModelState.IsValid)
             {
                 _context.Add(course);

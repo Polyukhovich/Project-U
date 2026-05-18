@@ -25,10 +25,27 @@
                         <span asp-validation-for="Name" class="text-danger"></span>
                     </div>
 
-                    <div class="mb-3">
-                        <label class="form-label">👨‍🏫 @Localizer["MainTeacher"]</label>
-                        <input type="text" class="form-control" value="@ViewBag.CurrentUserName" disabled />
-                    </div>
+                    @if (User.IsInRole("Admin"))
+                    {
+                        <div class="mb-3">
+                            <label class="form-label">👨‍🏫 @Localizer["MainTeacher"]</label>
+                            <select name="TeacherId" class="form-select" required>
+                                <option value="">@Localizer["SelectTeacher"]</option>
+                                @foreach (var teacher in (IList<ProjectU.Core.Models.ApplicationUser>)ViewBag.AllTeachers)
+                                {
+                                    <option value="@teacher.Id">@teacher.FirstName @teacher.LastName</option>
+                                }
+                            </select>
+                        </div>
+                    }
+                    else
+                    {
+                        <input type="hidden" name="TeacherId" value="@ViewBag.CurrentUserId" />
+                        <div class="mb-3">
+                            <label class="form-label">👨‍🏫 @Localizer["MainTeacher"]</label>
+                            <input type="text" class="form-control" value="@ViewBag.CurrentUserName" disabled />
+                        </div>
+                    }
 
                     <div class="mb-3">
                         <label asp-for="GroupId" class="form-label">@Localizer["Group"]</label>
