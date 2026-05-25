@@ -1,0 +1,241 @@
+﻿/* ============================================================
+   ТЕМА: ТЕМНА (theme-dark)
+   Активується класом body.theme-dark
+   ============================================================ */
+
+/* ===== CSS-ЗМІННІ ===== */
+body.theme-dark {
+    --content-bg: #1a1a2e;
+    --topbar-bg: #16213e;
+    --text-color: #ffffff;
+    --border-color: #2d3561;
+    --card-bg: #16213e;
+    --card-shadow: 0 5px 20px rgba(0,0,0,0.3);
+    --input-bg: #0f3460;
+    --table-stripe: rgba(255,255,255,0.05);
+    --table-hover: rgba(255,255,255,0.1);
+}
+
+    /* ===== КАРТКИ ===== */
+    body.theme-dark .card {
+        background: #16213e;
+        color: #ffffff;
+    }
+
+        body.theme-dark .card p,
+        body.theme-dark .card span,
+        body.theme-dark .card div,
+        body.theme-dark .card h1,
+        body.theme-dark .card h2,
+        body.theme-dark .card h3,
+        body.theme-dark .card h4,
+        body.theme-dark .card h5,
+        body.theme-dark .card h6,
+        body.theme-dark .card .fw-bold,
+        body.theme-dark .card .text-muted {
+            color: #ffffff !important;
+        }
+
+    /* ===== ТАБЛИЦІ ===== */
+    body.theme-dark .table {
+        background: #16213e;
+        color: #ffffff;
+    }
+
+        body.theme-dark .table td,
+        body.theme-dark .table th {
+            background: #16213e;
+            color: #ffffff !important;
+            border-color: #2d3561;
+        }
+
+    body.theme-dark .table-striped tbody tr:nth-of-type(odd) td {
+        background-color: #0f3460;
+    }
+
+    body.theme-dark .table-hover tbody tr:hover td {
+        background-color: #1a3a6e;
+    }
+
+    body.theme-dark .table-responsive {
+        background: #16213e;
+    }
+
+    /* ===== АЛЕРТИ ===== */
+    body.theme-dark .alert-warning {
+        background: #3d3000;
+        border-color: #fdcb6e;
+        color: #fdcb6e;
+    }
+
+    body.theme-dark .alert-danger {
+        background: #3d0000;
+        border-color: #d63031;
+        color: #ff7675;
+    }
+
+    body.theme-dark .alert-info {
+        background: #002d3d;
+        border-color: #0984e3;
+        color: #74b9ff;
+    }
+
+    body.theme-dark .alert-success {
+        background: #003d1a;
+        border-color: #00b894;
+        color: #55efc4;
+    }
+
+    /* ===== ФОРМИ ===== */
+    body.theme-dark .form-control:disabled,
+    body.theme-dark .form-control[readonly] {
+        background: #0f3460;
+        color: #ffffff;
+        border-color: #2d3561;
+    }
+
+    body.theme-dark .form-control::placeholder,
+    body.theme-dark .form-select::placeholder {
+        color: rgba(255,255,255,0.4);
+    }
+
+    body.theme-dark textarea.form-control {
+        background: #0f3460;
+        color: #ffffff;
+    }
+
+    /* ===== TOPBAR ===== */
+    body.theme-dark .topbar {
+        color: #ffffff;
+    }
+
+        body.theme-dark .topbar .text-muted {
+            color: rgba(255,255,255,0.7) !important;
+        }
+
+        body.theme-dark .topbar .btn-outline-secondary {
+            color: #ffffff;
+            border-color: rgba(255,255,255,0.3);
+        }
+
+            body.theme-dark .topbar .btn-outline-secondary:hover {
+                background: rgba(255,255,255,0.1);
+                color: #ffffff;
+            }
+
+        body.theme-dark .topbar .btn-outline-success {
+            color: #55efc4;
+            border-color: #55efc4;
+        }
+
+            body.theme-dark .topbar .btn-outline-success:hover {
+                background: #55efc4;
+                color: #000000;
+            }
+
+    /* ===== DROPDOWN СПОВІЩЕНЬ ===== */
+    body.theme-dark .notification-dropdown-header strong {
+        color: #ffffff;
+    }
+
+    body.theme-dark .notification-dropdown-header .btn-outline-success {
+        color: #55efc4;
+        border-color: #55efc4;
+    }
+
+    /* ===== СЕЛЕКТИ КУРСІВ / ГРУП ===== */
+    body.theme-dark #courseSelect,
+    body.theme-dark #groupSelect {
+        background-color: #0f3460;
+        color: #ffffff;
+        border-color: #2d3561;
+    }
+
+        body.theme-dark #courseSelect option,
+        body.theme-dark #groupSelect option {
+            background-color: #0f3460;
+            color: #ffffff;
+        }
+
+    /* ===== FLATPICKR ===== */
+    body.theme-dark .flatpickr-calendar {
+        background: #16213e;
+        border-color: #2d3561;
+        box-shadow: 0 5px 20px rgba(0,0,0,0.5);
+    }
+
+    body.theme-dark .flatpickr-months .flatpickr-month {
+        background: #0f3460;
+        color: white;
+    }
+
+    body.theme-dark .flatpickr-months .flatpickr-prev-month svg,
+    body.theme-dark .flatpickr-months .flatpickr-next-month svg {
+        fill: white;
+    }
+
+    body.theme-dark .flatpickr-current-month input.cur-year {
+        color: white !important;
+    }
+
+    body.theme-dark .flatpickr-current-month .flatpickr-monthDropdown-months {
+        background: #0f3460;
+        color: white;
+    }
+
+        body.theme-dark .flatpickr-current-month .flatpickr-monthDropdown-months option {
+            background: #0f3460;
+            color: white;
+        }
+
+    body.theme-dark .flatpickr-weekdays {
+        background: #0f3460;
+    }
+
+    body.theme-dark .flatpickr-weekday {
+        background: #0f3460 !important;
+        color: rgba(255,255,255,0.6) !important;
+    }
+
+    body.theme-dark .flatpickr-day {
+        color: white;
+    }
+
+        body.theme-dark .flatpickr-day:hover {
+            background: #2d3561;
+            border-color: #2d3561;
+        }
+
+        body.theme-dark .flatpickr-day.selected {
+            background: var(--accent);
+            border-color: var(--accent);
+        }
+
+        body.theme-dark .flatpickr-day.today {
+            border-color: var(--accent);
+        }
+
+        body.theme-dark .flatpickr-day.disabled {
+            color: rgba(255,255,255,0.2);
+        }
+
+    body.theme-dark .numInputWrapper input {
+        background: #0f3460;
+        color: white;
+    }
+
+    body.theme-dark #rangeStart,
+    body.theme-dark #rangeEnd,
+    body.theme-dark #rangeDayOfWeek {
+        background: #0f3460;
+        color: white;
+        border-color: #6c5ce7 !important;
+        border-width: 2px !important;
+    }
+
+        body.theme-dark #rangeStart:focus,
+        body.theme-dark #rangeEnd:focus,
+        body.theme-dark #rangeDayOfWeek:focus {
+            border-color: #a29bfe !important;
+            box-shadow: 0 0 10px rgba(108,92,231,0.3);
+        }

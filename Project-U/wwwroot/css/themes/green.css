@@ -1,0 +1,42 @@
+﻿/* ============================================================
+   ТЕМА: ЗЕЛЕНА (theme-green)
+   Активується класом body.theme-green
+   ============================================================ */
+
+/* ===== CSS-ЗМІННІ ===== */
+body.theme-green {
+    --sidebar-bg: #1a2e1a;
+    --accent: #38a169;
+    --content-bg: #f0fff4;
+    --topbar-bg: #ffffff;
+    --card-bg: #ffffff;
+    --border-color: #9ae6b4;
+    --input-bg: #f0fff4;
+    --table-stripe: rgba(154, 230, 180, 0.2);
+    --table-hover: rgba(154, 230, 180, 0.4);
+}
+
+    /* ===== ТАБЛИЦІ ===== */
+    body.theme-green .table {
+        background: #f0fff4;
+        color: #1a2e1a;
+    }
+
+        body.theme-green .table td,
+        body.theme-green .table th {
+            background: #f0fff4;
+            color: #1a2e1a !important;
+            border-color: #9ae6b4;
+        }
+
+    body.theme-green .table-striped tbody tr:nth-of-type(odd) td {
+        background-color: #c6f6d5;
+    }
+
+    body.theme-green .table-hover tbody tr:hover td {
+        background-color: #9ae6b4;
+    }
+
+    body.theme-green .table-responsive {
+        background: #f0fff4;
+    }

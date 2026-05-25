@@ -1,0 +1,42 @@
+﻿/* ============================================================
+   ТЕМА: СИНЯ (theme-blue)
+   Активується класом body.theme-blue
+   ============================================================ */
+
+/* ===== CSS-ЗМІННІ ===== */
+body.theme-blue {
+    --sidebar-bg: #1a1f2e;
+    --accent: #3182ce;
+    --content-bg: #ebf8ff;
+    --topbar-bg: #ffffff;
+    --card-bg: #ffffff;
+    --border-color: #90cdf4;
+    --input-bg: #ebf8ff;
+    --table-stripe: rgba(144, 205, 244, 0.2);
+    --table-hover: rgba(144, 205, 244, 0.4);
+}
+
+    /* ===== ТАБЛИЦІ ===== */
+    body.theme-blue .table {
+        background: #ebf8ff;
+        color: #1a1f2e;
+    }
+
+        body.theme-blue .table td,
+        body.theme-blue .table th {
+            background: #ebf8ff;
+            color: #1a1f2e !important;
+            border-color: #90cdf4;
+        }
+
+    body.theme-blue .table-striped tbody tr:nth-of-type(odd) td {
+        background-color: #bee3f8;
+    }
+
+    body.theme-blue .table-hover tbody tr:hover td {
+        background-color: #90cdf4;
+    }
+
+    body.theme-blue .table-responsive {
+        background: #ebf8ff;
+    }
