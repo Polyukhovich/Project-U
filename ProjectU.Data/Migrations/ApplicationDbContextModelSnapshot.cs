@@ -602,6 +602,10 @@ namespace ProjectU.Data.Migrations
                     b.Property<int>("GroupId")
                         .HasColumnType("int");
 
+                    b.Property<string>("LessonType")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("Room")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -965,7 +969,7 @@ namespace ProjectU.Data.Migrations
                     b.HasOne("ProjectU.Core.Models.SubTask", "SubTask")
                         .WithMany()
                         .HasForeignKey("SubTaskId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
                     b.Navigation("LabWork");

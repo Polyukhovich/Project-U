@@ -50,6 +50,7 @@ builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options =>
 .AddEntityFrameworkStores<ApplicationDbContext>()
 .AddDefaultTokenProviders();
 
+
 builder.Services.AddAuthorizationBuilder()
     .AddPolicy("Admin", policy =>
     {

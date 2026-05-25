@@ -4,11 +4,47 @@
 @{
     ViewData["Title"] = Localizer["Title"].Value;
 }
+
 <div class="d-flex justify-content-between align-items-center mb-4">
     <h2>📋 @Localizer["Title"]</h2>
     <a asp-action="Index" class="btn btn-outline-secondary">← @Localizer["Back"]</a>
 </div>
+
+<!-- Фільтри -->
+<div class="card mb-4">
+    <div class="card-body">
+        <form method="get" class="row g-2">
+            <div class="col-md-5">
+                <input type="text" name="search" value="@ViewBag.Search"
+                       class="form-control" placeholder="🔍 @Localizer["SearchPlaceholder"]" />
+            </div>
+            <div class="col-md-4">
+                <select name="actionFilter" class="form-select">
+                    <option value="">@Localizer["AllActions"]</option>
+                    @foreach (var a in new[] { "Create", "Edit", "Delete", "Submit", "Grade", "Login", "Logout" })
+                    {
+                        <option value="@a" selected="@(ViewBag.ActionFilter == a)">@a</option>
+                    }
+                </select>
+            </div>
+            <div class="col-md-2">
+                <button type="submit" class="btn btn-primary w-100 h-100">🔍</button>
+            </div>
+            <div class="col-md-1">
+                @if (!string.IsNullOrEmpty(ViewBag.Search as string) || !string.IsNullOrEmpty(ViewBag.ActionFilter as string))
+                {
+                    <a asp-action="AuditLog" class="btn btn-outline-secondary w-100">✕</a>
+                }
+            </div>
+        </form>
+    </div>
+</div>
+
 <div class="card">
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <strong>📋 @Localizer["Title"]</strong>
+        <small class="text-muted">@Localizer["Total"]: @ViewBag.Total</small>
+    </div>
     <div class="card-body p-0">
         <div class="table-responsive">
             <table class="table table-hover mb-0">
@@ -41,9 +77,7 @@
                             <td class="small">
                                 @(log.User != null ? $"{log.User.FirstName} {log.User.LastName}" : "—")
                             </td>
-                            <td>
-                                <span class="badge @badgeColor">@log.Action</span>
-                            </td>
+                            <td><span class="badge @badgeColor">@log.Action</span></td>
                             <td class="small">@(log.EntityType ?? "—")</td>
                             <td class="small">@(log.Details ?? "—")</td>
                             <td class="small text-muted">@(log.IpAddress ?? "—")</td>
@@ -53,4 +87,45 @@
             </table>
         </div>
     </div>
+    @if (ViewBag.TotalPages > 1)
+    {
+        <div class="card-footer d-flex justify-content-between align-items-center">
+            <small class="text-muted">
+                @Localizer["Showing"] @Model.Count() @Localizer["Of"] @ViewBag.Total
+            </small>
+            <nav>
+                <ul class="pagination pagination-sm mb-0">
+                    <li class="page-item @(ViewBag.CurrentPage == 1 ? "disabled" : "")">
+                        <a class="page-link" asp-action="AuditLog"
+                           asp-route-page="@(ViewBag.CurrentPage - 1)"
+                           asp-route-search="@ViewBag.Search"
+                           asp-route-actionFilter="@ViewBag.ActionFilter">←</a>
+                    </li>
+                    @for (int i = 1; i <= ViewBag.TotalPages; i++)
+                    {
+                        if (i == 1 || i == ViewBag.TotalPages ||
+                        (i >= ViewBag.CurrentPage - 2 && i <= ViewBag.CurrentPage + 2))
+                        {
+                            <li class="page-item @(ViewBag.CurrentPage == i ? "active" : "")">
+                                <a class="page-link" asp-action="AuditLog"
+                                   asp-route-page="@i"
+                                   asp-route-search="@ViewBag.Search"
+                                   asp-route-actionFilter="@ViewBag.ActionFilter">@i</a>
+                            </li>
+                        }
+                        else if (i == ViewBag.CurrentPage - 3 || i == ViewBag.CurrentPage + 3)
+                        {
+                            <li class="page-item disabled"><span class="page-link">...</span></li>
+                        }
+                    }
+                    <li class="page-item @(ViewBag.CurrentPage == ViewBag.TotalPages ? "disabled" : "")">
+                        <a class="page-link" asp-action="AuditLog"
+                           asp-route-page="@(ViewBag.CurrentPage + 1)"
+                           asp-route-search="@ViewBag.Search"
+                           asp-route-actionFilter="@ViewBag.ActionFilter">→</a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+    }
 </div>

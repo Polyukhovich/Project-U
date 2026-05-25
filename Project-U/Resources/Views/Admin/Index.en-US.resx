@@ -135,11 +135,17 @@
   <data name="Group" xml:space="preserve">
     <value>Group</value>
   </data>
+  <data name="Of" xml:space="preserve">
+    <value>of</value>
+  </data>
   <data name="Role" xml:space="preserve">
     <value>Role</value>
   </data>
   <data name="SearchPlaceholder" xml:space="preserve">
     <value>Search by name or email...</value>
+  </data>
+  <data name="Showing" xml:space="preserve">
+    <value>Showing</value>
   </data>
   <data name="Students" xml:space="preserve">
     <value>Students</value>

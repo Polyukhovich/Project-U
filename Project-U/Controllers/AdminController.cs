@@ -28,31 +28,48 @@ namespace Project_U.Controllers
         }
 
         // GET: Admin — список всіх користувачів
-        public async Task<IActionResult> Index(string? search)
+        public async Task<IActionResult> Index(string? search, int page = 1)
         {
-            var originalSearch = search; // зберігаємо оригінал
-            var users = await _userManager.Users
+            int pageSize = 10;
+            var originalSearch = search;
+
+            var usersQuery = _userManager.Users
                 .Include(u => u.Group)
-                .ToListAsync();
+                .AsQueryable();
 
             if (!string.IsNullOrEmpty(search))
             {
-                var searchLower = search.ToLower(); // конвертуємо тільки для порівняння
-                users = users.Where(u =>
+                var searchLower = search.ToLower();
+                usersQuery = usersQuery.Where(u =>
                     u.FirstName.ToLower().Contains(searchLower) ||
                     u.LastName.ToLower().Contains(searchLower) ||
-                    $"{u.FirstName} {u.LastName}".ToLower().Contains(searchLower) ||
-                    $"{u.LastName} {u.FirstName}".ToLower().Contains(searchLower) ||
-                    u.Email!.ToLower().Contains(searchLower))
-                    .ToList();
+                    u.Email!.ToLower().Contains(searchLower));
             }
+
+            var totalUsers = await usersQuery.CountAsync();
+            var users = await usersQuery
+                .OrderBy(u => u.LastName)
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
+                .ToListAsync();
 
             var userRoles = new Dictionary<string, IList<string>>();
             foreach (var user in users)
                 userRoles[user.Id] = await _userManager.GetRolesAsync(user);
 
             ViewBag.UserRoles = userRoles;
-            ViewBag.Search = originalSearch; // передаємо оригінал
+            ViewBag.Search = originalSearch;
+            ViewBag.CurrentPage = page;
+            ViewBag.TotalPages = (int)Math.Ceiling(totalUsers / (double)pageSize);
+            ViewBag.TotalUsers = totalUsers;
+
+            var allUsers = await _userManager.Users.ToListAsync();
+            var allRoles = new Dictionary<string, IList<string>>();
+            foreach (var u in allUsers)
+                allRoles[u.Id] = await _userManager.GetRolesAsync(u);
+
+            ViewBag.TotalStudents = allRoles.Values.Count(r => r.Contains("Student"));
+            ViewBag.TotalTeachers = allRoles.Values.Count(r => r.Contains("Teacher"));
             return View(users);
         }
 
@@ -143,16 +160,40 @@ namespace Project_U.Controllers
 
             return RedirectToAction(nameof(Index));
         }
-
         [Authorize(Roles = "Admin")]
-        public async Task<IActionResult> AuditLog()
+        public async Task<IActionResult> AuditLog(string? search, string? actionFilter, int page = 1)
         {
-            var logs = await _context.AuditLogs
+            int pageSize = 20;
+
+            var query = _context.AuditLogs
                 .Include(l => l.User)
+                .AsQueryable();
+
+            if (!string.IsNullOrEmpty(search))
+            {
+                var s = search.ToLower();
+                query = query.Where(l =>
+                    (l.User != null && (l.User.FirstName.ToLower().Contains(s) ||
+                     l.User.LastName.ToLower().Contains(s))) ||
+                    (l.Details != null && l.Details.ToLower().Contains(s)) ||
+                    (l.EntityType != null && l.EntityType.ToLower().Contains(s)));
+            }
+
+            if (!string.IsNullOrEmpty(actionFilter))
+                query = query.Where(l => l.Action == actionFilter);
+
+            var total = await query.CountAsync();
+            var logs = await query
                 .OrderByDescending(l => l.CreatedAt)
-                .Take(200)
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
                 .ToListAsync();
 
+            ViewBag.Search = search;
+            ViewBag.Action = actionFilter;
+            ViewBag.CurrentPage = page;
+            ViewBag.TotalPages = (int)Math.Ceiling(total / (double)pageSize);
+            ViewBag.Total = total;
             return View(logs);
         }
         // GET: Admin/DeleteUser

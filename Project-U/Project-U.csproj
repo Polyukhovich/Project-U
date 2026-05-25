@@ -47,4 +47,9 @@
     </EmbeddedResource>
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="wwwroot\uploads\labworks\" />
+    <Folder Include="wwwroot\uploads\materials\" />
+  </ItemGroup>
+
 </Project>

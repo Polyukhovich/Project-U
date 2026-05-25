@@ -126,6 +126,15 @@
   <data name="Edit" xml:space="preserve">
     <value>Редагувати</value>
   </data>
+  <data name="Lab" xml:space="preserve">
+    <value>Лабораторна</value>
+  </data>
+  <data name="Lecture" xml:space="preserve">
+    <value>Лекція</value>
+  </data>
+  <data name="LessonType" xml:space="preserve">
+    <value>Тип заняття</value>
+  </data>
   <data name="MarkAttendance" xml:space="preserve">
     <value>Відвідуваність</value>
   </data>
@@ -143,6 +152,9 @@
   </data>
   <data name="PastDates" xml:space="preserve">
     <value>Минулі дати</value>
+  </data>
+  <data name="Practice" xml:space="preserve">
+    <value>Практична</value>
   </data>
   <data name="Room" xml:space="preserve">
     <value>Аудиторія</value>

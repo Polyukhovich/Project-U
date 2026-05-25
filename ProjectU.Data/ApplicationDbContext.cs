@@ -67,6 +67,13 @@ namespace ProjectU.Data
                 .WithMany(a => a.Submissions)
                 .HasForeignKey(l => l.AssignmentId)
                 .OnDelete(DeleteBehavior.Restrict);
+
+            // Виправлення cascade paths для SubTaskGrade
+            builder.Entity<SubTaskGrade>()
+                .HasOne(s => s.SubTask)
+                .WithMany()
+                .HasForeignKey(s => s.SubTaskId)
+                .OnDelete(DeleteBehavior.NoAction);
         }
     }
 }

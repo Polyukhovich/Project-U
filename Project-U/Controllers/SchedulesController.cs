@@ -35,28 +35,35 @@ namespace Controllers
 
         // GET: Schedules — всі ролі можуть переглядати
         [Authorize(Roles = "Admin,Teacher,Student")]
-        public async Task<IActionResult> Index(int page = 1)
+        public async Task<IActionResult> Index(int? groupId, bool all = false)
         {
             var currentUser = await _context.Users
                 .Include(u => u.Group)
                 .FirstOrDefaultAsync(u => u.UserName == User.Identity!.Name);
 
-            var schedulesQuery = _context.Schedules
-                .Include(s => s.Course)
-                .Include(s => s.Group)
-                .Include(s => s.Dates)
-                .AsQueryable();
-
-            // Студент бачить тільки свою групу
-            if (User.IsInRole("Student") && currentUser?.GroupId != null)
-            {
-                schedulesQuery = schedulesQuery.Where(s => s.GroupId == currentUser.GroupId);
-            }
-
-            var schedules = await schedulesQuery.ToListAsync();
             var today = DateOnly.FromDateTime(DateTime.Today);
 
-            // Групуємо по днях тижня — показуємо тільки якщо є майбутні дати
+            var schedulesQuery = _context.Schedules
+                .Include(s => s.Course)
+                    .ThenInclude(c => c.Teacher)
+                .Include(s => s.Group)
+                .Include(s => s.Dates.Where(d => d.Date >= today))
+                .AsQueryable();
+
+            // Якщо студент і не натиснув "Весь розклад"
+            if (User.IsInRole("Student") && currentUser?.GroupId != null && !all)
+                schedulesQuery = schedulesQuery.Where(s => s.GroupId == currentUser.GroupId);
+
+            if (User.IsInRole("Teacher"))
+                schedulesQuery = schedulesQuery.Where(s => s.Course.TeacherId == currentUser!.Id);
+
+            if (groupId != null)
+                schedulesQuery = schedulesQuery.Where(s => s.GroupId == groupId);
+
+            var schedules = await schedulesQuery
+                .Where(s => s.Dates.Any(d => d.Date >= today))
+                .ToListAsync();
+
             var days = new (string Name, DayOfWeek Day)[]
             {
         ("Понеділок", DayOfWeek.Monday),
@@ -72,36 +79,52 @@ namespace Controllers
                 Day = d.Name,
                 DayOfWeek = d.Day,
                 Schedules = schedules
-                    .Where(s => s.Dates.Any(date =>
-                        date.Date.DayOfWeek == d.Day &&
-                        date.Date >= today))
+                    .Where(s => s.Dates.Any(date => date.Date.DayOfWeek == d.Day))
                     .OrderBy(s => s.StartTime)
                     .ToList()
             }).ToList();
 
+            var groups = await _context.Groups.ToListAsync();
+            ViewBag.Groups = groups;
+            ViewBag.SelectedGroupId = groupId;
             ViewBag.GroupedSchedules = grouped;
             ViewBag.AllSchedules = schedules;
+            ViewBag.IsAll = all;
+            ViewBag.IsStudent = User.IsInRole("Student");
             return View();
         }
         // GET: Schedules/Create — Admin та Teacher
         [Authorize(Roles = "Admin,Teacher")]
         public async Task<IActionResult> Create()
         {
-            var courses = await _context.Courses.ToListAsync();
-            var groups = await _context.Groups.ToListAsync();
 
-            ViewData["CourseId"] = new SelectList(courses, "Id", "Name");
+            var groups = await _context.Groups.ToListAsync();
             ViewData["GroupId"] = new SelectList(groups, "Id", "Name");
             return View();
         }
 
+        [HttpGet]
+        [Authorize(Roles = "Admin,Teacher")]
+        public async Task<IActionResult> GetCoursesByGroup(int groupId)
+        {
+            var currentUser = await _context.Users
+                .FirstOrDefaultAsync(u => u.UserName == User.Identity!.Name);
+
+            var courses = await _context.Courses
+                .Where(c => c.GroupId == groupId &&
+                    (User.IsInRole("Admin") || c.TeacherId == currentUser!.Id))
+                .Select(c => new { c.Id, c.Name })
+                .ToListAsync();
+
+            return Json(courses);
+        }
         // POST: Schedules/Create
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
         [Authorize(Roles = "Admin,Teacher")]
-        public async Task<IActionResult> Create([Bind("Id,StartTime,EndTime,Room,CourseId,GroupId")] Schedule schedule, string selectedDatesJson)
+        public async Task<IActionResult> Create([Bind("Id,StartTime,EndTime,Room,LessonType,CourseId,GroupId")] Schedule schedule, string selectedDatesJson)
         {
             if (ModelState.IsValid)
             {
@@ -152,10 +175,19 @@ namespace Controllers
 
             if (schedule == null) return NotFound();
 
-            var courses = await _context.Courses.ToListAsync();
             var groups = await _context.Groups.ToListAsync();
-            ViewData["CourseId"] = new SelectList(courses, "Id", "Name", schedule.CourseId);
+
+            // Завантажуємо курси для групи цього розкладу
+            var currentUser = await _context.Users
+                .FirstOrDefaultAsync(u => u.UserName == User.Identity!.Name);
+
+            var courses = await _context.Courses
+                .Where(c => c.GroupId == schedule.GroupId &&
+                    (User.IsInRole("Admin") || c.TeacherId == currentUser!.Id))
+                .ToListAsync();
+
             ViewData["GroupId"] = new SelectList(groups, "Id", "Name", schedule.GroupId);
+            ViewData["CourseId"] = new SelectList(courses, "Id", "Name", schedule.CourseId);
             return View(schedule);
         }
 
@@ -165,7 +197,7 @@ namespace Controllers
         [HttpPost]
         [ValidateAntiForgeryToken]
         [Authorize(Roles = "Admin,Teacher")]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,StartTime,EndTime,Room,CourseId,GroupId")] Schedule schedule, string selectedDatesJson)
+        public async Task<IActionResult> Edit(int id, [Bind("Id,StartTime,EndTime,Room,LessonType,CourseId,GroupId")] Schedule schedule, string selectedDatesJson)
         {
             if (id != schedule.Id) return NotFound();
 

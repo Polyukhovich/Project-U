@@ -33,7 +33,7 @@ namespace Project_U.Controllers
                 .Include(s => s.Course)
                 .ThenInclude(c => c.Teacher)
                 .Include(s => s.Group)
-                .Include(s => s.Dates)
+                .Include(s => s.Dates.Where(d => d.Date == today))
                 .Where(s => s.Dates.Any(d => d.Date == today));
 
             // Студент бачить тільки свою групу

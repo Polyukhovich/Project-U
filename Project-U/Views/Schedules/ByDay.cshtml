@@ -36,6 +36,15 @@
                 <div class="card" style="border-top: 4px solid var(--accent);">
                     <div class="card-header d-flex justify-content-between align-items-center">
                         <strong>📚 @(schedule.Course?.Name ?? "—")</strong>
+                        @{
+                            var lessonBadge = schedule.LessonType switch
+                            {
+                                "Lab" => ("bg-success", "🔬"),
+                                "Practice" => ("bg-warning", "📝"),
+                                _ => ("bg-info", "📖")
+                            };
+                        }
+                        <span class="badge @lessonBadge.Item1">@lessonBadge.Item2 @Localizer[schedule.LessonType ?? "Lecture"]</span>
                         <span class="badge bg-secondary">@(schedule.Group?.Name ?? "—")</span>
                     </div>
                     <div class="card-body">

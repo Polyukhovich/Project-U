@@ -1,6 +1,6 @@
 {
-  "name": "Project U — Навчальна платформа",
-  "short_name": "Project U",
+  "name": "AcademiX — Навчальна платформа",
+  "short_name": "AcademiX",
   "description": "Веб-платформа управління навчальним процесом",
   "start_url": "/",
   "display": "standalone",

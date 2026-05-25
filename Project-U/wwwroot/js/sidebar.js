@@ -9,6 +9,10 @@
     } else {
         sidebar.classList.toggle('collapsed');
         mainContent.classList.toggle('expanded');
+        // desktop-стан керується через клас body — без інлайнових стилів,
+        // щоб не ламати мобільний режим при ресайзі вікна
+        document.body.classList.toggle('sidebar-collapsed',
+            sidebar.classList.contains('collapsed'));
     }
 }
 
@@ -33,8 +37,15 @@ document.querySelectorAll('.sidebar .nav-link').forEach(link => {
 
 window.addEventListener('resize', function () {
     if (window.innerWidth > 991) {
+        // при поверненні на десктоп прибираємо мобільні стани
         document.getElementById('sidebar').classList.remove('mobile-open');
         document.getElementById('sidebarOverlay').classList.remove('active');
         document.body.classList.remove('no-scroll');
+    } else {
+        // при переході на мобільний — скидаємо десктопні стани,
+        // інакше sidebar може опинитися з класом 'collapsed' разом з 'mobile-open'
+        document.getElementById('sidebar').classList.remove('collapsed');
+        document.getElementById('mainContent').classList.remove('expanded');
+        document.body.classList.remove('sidebar-collapsed');
     }
 });

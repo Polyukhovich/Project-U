@@ -135,11 +135,17 @@
   <data name="Group" xml:space="preserve">
     <value>Група</value>
   </data>
+  <data name="Of" xml:space="preserve">
+    <value>з</value>
+  </data>
   <data name="Role" xml:space="preserve">
     <value>Роль</value>
   </data>
   <data name="SearchPlaceholder" xml:space="preserve">
     <value>Пошук по імені або email...</value>
+  </data>
+  <data name="Showing" xml:space="preserve">
+    <value>Показано</value>
   </data>
   <data name="Students" xml:space="preserve">
     <value>Студентів</value>

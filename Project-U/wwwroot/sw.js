@@ -1,4 +1,4 @@
-const CACHE_NAME = 'projectu-v3';
+const CACHE_NAME = 'academix-v1';
 
 const STATIC_ASSETS = [
     '/',

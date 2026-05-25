@@ -153,11 +153,23 @@
   <data name="Group" xml:space="preserve">
     <value>Group</value>
   </data>
+  <data name="Lab" xml:space="preserve">
+    <value>Lab</value>
+  </data>
+  <data name="Lecture" xml:space="preserve">
+    <value>Lecture</value>
+  </data>
+  <data name="LessonType" xml:space="preserve">
+    <value>Lesson type</value>
+  </data>
   <data name="Monday" xml:space="preserve">
     <value>Monday</value>
   </data>
   <data name="Pair" xml:space="preserve">
     <value>Pair</value>
+  </data>
+  <data name="Practice" xml:space="preserve">
+    <value>Practice</value>
   </data>
   <data name="QuickSelect" xml:space="preserve">
     <value>Quick select</value>
@@ -179,6 +191,9 @@
   </data>
   <data name="SelectGroup" xml:space="preserve">
     <value>— Select group —</value>
+  </data>
+  <data name="SelectGroupFirst" xml:space="preserve">
+    <value>Select group first</value>
   </data>
   <data name="SelectPair " xml:space="preserve">
     <value>— Select pair —</value>

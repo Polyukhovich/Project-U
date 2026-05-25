@@ -120,6 +120,9 @@
   <data name="Action" xml:space="preserve">
     <value>Дія</value>
   </data>
+  <data name="AllActions" xml:space="preserve">
+    <value>— Всі дії —</value>
+  </data>
   <data name="Back" xml:space="preserve">
     <value>Назад</value>
   </data>
@@ -132,11 +135,23 @@
   <data name="Object" xml:space="preserve">
     <value>Об'єкт</value>
   </data>
+  <data name="Of" xml:space="preserve">
+    <value>з</value>
+  </data>
+  <data name="SearchPlaceholder" xml:space="preserve">
+    <value>Пошук по користувачу, деталях...</value>
+  </data>
+  <data name="Showing" xml:space="preserve">
+    <value>показано</value>
+  </data>
   <data name="Time" xml:space="preserve">
     <value>Час</value>
   </data>
   <data name="Title" xml:space="preserve">
     <value>Журнал дій</value>
+  </data>
+  <data name="Total" xml:space="preserve">
+    <value>Всього записів</value>
   </data>
   <data name="User" xml:space="preserve">
     <value>Користувач</value>

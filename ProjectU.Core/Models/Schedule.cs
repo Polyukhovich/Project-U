@@ -19,6 +19,8 @@ namespace ProjectU.Core.Models
 
         // Аудиторія або посилання (необов'язково)
         public string Room { get; set; } = string.Empty;
+        // Тип заняття: Lecture, Lab, Practice
+        public string LessonType { get; set; } = "Lecture";
 
         // Зовнішній ключ до курсу
         [Required(ErrorMessageResourceType = typeof(Resources.ModelValidation),

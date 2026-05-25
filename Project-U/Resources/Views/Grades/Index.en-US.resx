@@ -168,6 +168,9 @@
   <data name="Passed" xml:space="preserve">
     <value>Passed</value>
   </data>
+  <data name="Points" xml:space="preserve">
+    <value>points</value>
+  </data>
   <data name="Reset" xml:space="preserve">
     <value>Reset</value>
   </data>

@@ -12,8 +12,8 @@ using ProjectU.Data;
 namespace ProjectU.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20260504093615_AddAssignmentsTable")]
-    partial class AddAssignmentsTable
+    [Migration("20260521195906_AddLessonType")]
+    partial class AddLessonType
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -179,14 +179,16 @@ namespace ProjectU.Data.Migrations
 
                     b.Property<string>("FirstName")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
 
                     b.Property<int?>("GroupId")
                         .HasColumnType("int");
 
                     b.Property<string>("LastName")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
 
                     b.Property<bool>("LockoutEnabled")
                         .HasColumnType("bit");
@@ -210,6 +212,11 @@ namespace ProjectU.Data.Migrations
 
                     b.Property<bool>("PhoneNumberConfirmed")
                         .HasColumnType("bit");
+
+                    b.Property<string>("PreferredLanguage")
+                        .IsRequired()
+                        .HasMaxLength(10)
+                        .HasColumnType("nvarchar(10)");
 
                     b.Property<string>("SecurityStamp")
                         .HasColumnType("nvarchar(max)");
@@ -244,6 +251,9 @@ namespace ProjectU.Data.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
+                    b.Property<bool>("AllowDownload")
+                        .HasColumnType("bit");
+
                     b.Property<int>("CourseId")
                         .HasColumnType("int");
 
@@ -257,15 +267,102 @@ namespace ProjectU.Data.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("Title")
+                    b.Property<string>("MaterialFileName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("MaterialFilePath")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("MaterialType")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("MaterialUrl")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
 
                     b.HasKey("Id");
 
                     b.HasIndex("CourseId");
 
                     b.ToTable("Assignments");
+                });
+
+            modelBuilder.Entity("ProjectU.Core.Models.Attendance", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Comment")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateOnly>("Date")
+                        .HasColumnType("date");
+
+                    b.Property<bool>("IsPresent")
+                        .HasColumnType("bit");
+
+                    b.Property<int>("ScheduleId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("StudentId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ScheduleId");
+
+                    b.HasIndex("StudentId");
+
+                    b.ToTable("Attendances");
+                });
+
+            modelBuilder.Entity("ProjectU.Core.Models.AuditLog", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Action")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Details")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("EntityId")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("EntityType")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("IpAddress")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("UserId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("AuditLogs");
                 });
 
             modelBuilder.Entity("ProjectU.Core.Models.Course", b =>
@@ -276,12 +373,16 @@ namespace ProjectU.Data.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
+                    b.Property<int>("CourseType")
+                        .HasColumnType("int");
+
                     b.Property<int>("GroupId")
                         .HasColumnType("int");
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
 
                     b.Property<string>("TeacherId")
                         .IsRequired()
@@ -294,6 +395,34 @@ namespace ProjectU.Data.Migrations
                     b.HasIndex("TeacherId");
 
                     b.ToTable("Courses");
+                });
+
+            modelBuilder.Entity("ProjectU.Core.Models.CourseTeacher", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("CourseId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Role")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("TeacherId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CourseId");
+
+                    b.HasIndex("TeacherId");
+
+                    b.ToTable("CourseTeachers");
                 });
 
             modelBuilder.Entity("ProjectU.Core.Models.Grade", b =>
@@ -341,7 +470,8 @@ namespace ProjectU.Data.Migrations
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
 
                     b.HasKey("Id");
 
@@ -383,7 +513,8 @@ namespace ProjectU.Data.Migrations
 
                     b.Property<string>("Title")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
 
                     b.Property<DateTime>("UploadedAt")
                         .HasColumnType("datetime2");
@@ -468,15 +599,15 @@ namespace ProjectU.Data.Migrations
                     b.Property<int>("CourseId")
                         .HasColumnType("int");
 
-                    b.Property<string>("DayOfWeek")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<TimeOnly>("EndTime")
                         .HasColumnType("time");
 
                     b.Property<int>("GroupId")
                         .HasColumnType("int");
+
+                    b.Property<string>("LessonType")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Room")
                         .IsRequired()
@@ -492,6 +623,82 @@ namespace ProjectU.Data.Migrations
                     b.HasIndex("GroupId");
 
                     b.ToTable("Schedules");
+                });
+
+            modelBuilder.Entity("ProjectU.Core.Models.ScheduleDate", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateOnly>("Date")
+                        .HasColumnType("date");
+
+                    b.Property<int>("ScheduleId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ScheduleId");
+
+                    b.ToTable("ScheduleDates");
+                });
+
+            modelBuilder.Entity("ProjectU.Core.Models.SubTask", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("AssignmentId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Description")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("MaxScore")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("AssignmentId");
+
+                    b.ToTable("SubTasks");
+                });
+
+            modelBuilder.Entity("ProjectU.Core.Models.SubTaskGrade", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("LabWorkId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("SubTaskId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Value")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("LabWorkId");
+
+                    b.HasIndex("SubTaskId");
+
+                    b.ToTable("SubTaskGrades");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
@@ -565,6 +772,34 @@ namespace ProjectU.Data.Migrations
                     b.Navigation("Course");
                 });
 
+            modelBuilder.Entity("ProjectU.Core.Models.Attendance", b =>
+                {
+                    b.HasOne("ProjectU.Core.Models.Schedule", "Schedule")
+                        .WithMany()
+                        .HasForeignKey("ScheduleId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("ProjectU.Core.Models.ApplicationUser", "Student")
+                        .WithMany()
+                        .HasForeignKey("StudentId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Schedule");
+
+                    b.Navigation("Student");
+                });
+
+            modelBuilder.Entity("ProjectU.Core.Models.AuditLog", b =>
+                {
+                    b.HasOne("ProjectU.Core.Models.ApplicationUser", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId");
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("ProjectU.Core.Models.Course", b =>
                 {
                     b.HasOne("ProjectU.Core.Models.Group", "Group")
@@ -580,6 +815,25 @@ namespace ProjectU.Data.Migrations
                         .IsRequired();
 
                     b.Navigation("Group");
+
+                    b.Navigation("Teacher");
+                });
+
+            modelBuilder.Entity("ProjectU.Core.Models.CourseTeacher", b =>
+                {
+                    b.HasOne("ProjectU.Core.Models.Course", "Course")
+                        .WithMany("CourseTeachers")
+                        .HasForeignKey("CourseId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("ProjectU.Core.Models.ApplicationUser", "Teacher")
+                        .WithMany()
+                        .HasForeignKey("TeacherId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Course");
 
                     b.Navigation("Teacher");
                 });
@@ -685,13 +939,58 @@ namespace ProjectU.Data.Migrations
                     b.Navigation("Group");
                 });
 
+            modelBuilder.Entity("ProjectU.Core.Models.ScheduleDate", b =>
+                {
+                    b.HasOne("ProjectU.Core.Models.Schedule", "Schedule")
+                        .WithMany("Dates")
+                        .HasForeignKey("ScheduleId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Schedule");
+                });
+
+            modelBuilder.Entity("ProjectU.Core.Models.SubTask", b =>
+                {
+                    b.HasOne("ProjectU.Core.Models.Assignment", "Assignment")
+                        .WithMany("SubTasks")
+                        .HasForeignKey("AssignmentId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Assignment");
+                });
+
+            modelBuilder.Entity("ProjectU.Core.Models.SubTaskGrade", b =>
+                {
+                    b.HasOne("ProjectU.Core.Models.LabWork", "LabWork")
+                        .WithMany("SubTaskGrades")
+                        .HasForeignKey("LabWorkId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("ProjectU.Core.Models.SubTask", "SubTask")
+                        .WithMany()
+                        .HasForeignKey("SubTaskId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.Navigation("LabWork");
+
+                    b.Navigation("SubTask");
+                });
+
             modelBuilder.Entity("ProjectU.Core.Models.Assignment", b =>
                 {
+                    b.Navigation("SubTasks");
+
                     b.Navigation("Submissions");
                 });
 
             modelBuilder.Entity("ProjectU.Core.Models.Course", b =>
                 {
+                    b.Navigation("CourseTeachers");
+
                     b.Navigation("Grades");
 
                     b.Navigation("LabWorks");
@@ -709,6 +1008,13 @@ namespace ProjectU.Data.Migrations
             modelBuilder.Entity("ProjectU.Core.Models.LabWork", b =>
                 {
                     b.Navigation("PlagiarismResults");
+
+                    b.Navigation("SubTaskGrades");
+                });
+
+            modelBuilder.Entity("ProjectU.Core.Models.Schedule", b =>
+                {
+                    b.Navigation("Dates");
                 });
 #pragma warning restore 612, 618
         }

@@ -35,25 +35,21 @@
     <div class="col-md-4 mb-3">
         <div class="card text-center p-3" style="border-top: 3px solid #6c5ce7;">
             <div style="font-size: 2rem;">👥</div>
-            <div class="fw-bold fs-4">@Model.Count()</div>
+            <div class="fw-bold fs-4">@ViewBag.TotalUsers</div>
             <div class="text-muted small">@Localizer["TotalUsers"]</div>
         </div>
     </div>
     <div class="col-md-4 mb-3">
         <div class="card text-center p-3" style="border-top: 3px solid #00b894;">
             <div style="font-size: 2rem;">👨‍🎓</div>
-            <div class="fw-bold fs-4">
-                @Model.Count(u => userRoles != null && userRoles.ContainsKey(u.Id) && userRoles[u.Id].Contains("Student"))
-            </div>
+            <div class="fw-bold fs-4">@ViewBag.TotalStudents</div>
             <div class="text-muted small">@Localizer["Students"]</div>
         </div>
     </div>
     <div class="col-md-4 mb-3">
         <div class="card text-center p-3" style="border-top: 3px solid #0984e3;">
             <div style="font-size: 2rem;">👨‍🏫</div>
-            <div class="fw-bold fs-4">
-                @Model.Count(u => userRoles != null && userRoles.ContainsKey(u.Id) && userRoles[u.Id].Contains("Teacher"))
-            </div>
+            <div class="fw-bold fs-4">@ViewBag.TotalTeachers</div>
             <div class="text-muted small">@Localizer["Teachers"]</div>
         </div>
     </div>
@@ -117,4 +113,34 @@
             </table>
         </div>
     </div>
+    @if (ViewBag.TotalPages > 1)
+    {
+        <div class="card-footer d-flex justify-content-between align-items-center">
+            <small class="text-muted">
+                @Localizer["Showing"] @Model.Count() @Localizer["Of"] @ViewBag.TotalUsers
+            </small>
+            <nav>
+                <ul class="pagination pagination-sm mb-0">
+                    <li class="page-item @(ViewBag.CurrentPage == 1 ? "disabled" : "")">
+                        <a class="page-link" asp-action="Index"
+                           asp-route-page="@(ViewBag.CurrentPage - 1)"
+                           asp-route-search="@ViewBag.Search">←</a>
+                    </li>
+                    @for (int i = 1; i <= ViewBag.TotalPages; i++)
+                    {
+                        <li class="page-item @(ViewBag.CurrentPage == i ? "active" : "")">
+                            <a class="page-link" asp-action="Index"
+                               asp-route-page="@i"
+                               asp-route-search="@ViewBag.Search">@i</a>
+                        </li>
+                    }
+                    <li class="page-item @(ViewBag.CurrentPage == ViewBag.TotalPages ? "disabled" : "")">
+                        <a class="page-link" asp-action="Index"
+                           asp-route-page="@(ViewBag.CurrentPage + 1)"
+                           asp-route-search="@ViewBag.Search">→</a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+    }
 </div>

@@ -49,21 +49,29 @@
                         <label asp-for="Room" class="form-label">@Localizer["Room"]</label>
                         <input asp-for="Room" class="form-control" placeholder="@Localizer["RoomPlaceholder"]" />
                     </div>
-
                     <div class="mb-3">
-                        <label asp-for="CourseId" class="form-label">@Localizer["Course"]</label>
-                        <select asp-for="CourseId" asp-items="@(ViewData["CourseId"] as SelectList)" class="form-select">
-                            <option value="">@Localizer["SelectCourse"]</option>
+                        <label asp-for="LessonType" class="form-label">📖 @Localizer["LessonType"]</label>
+                        <select asp-for="LessonType" class="form-select">
+                            <option value="Lecture">📖 @Localizer["Lecture"]</option>
+                            <option value="Lab">🔬 @Localizer["Lab"]</option>
+                            <option value="Practice">📝 @Localizer["Practice"]</option>
                         </select>
-                        <span asp-validation-for="CourseId" class="text-danger"></span>
                     </div>
-
                     <div class="mb-3">
                         <label asp-for="GroupId" class="form-label">@Localizer["Group"]</label>
-                        <select asp-for="GroupId" asp-items="@(ViewData["GroupId"] as SelectList)" class="form-select">
+                        <select asp-for="GroupId" asp-items="@(ViewData["GroupId"] as SelectList)"
+                                class="form-select" id="groupSelect" onchange="loadCourses(this.value)">
                             <option value="">@Localizer["SelectGroup"]</option>
                         </select>
                         <span asp-validation-for="GroupId" class="text-danger"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="CourseId" class="form-label">@Localizer["Course"]</label>
+                        <select asp-for="CourseId" class="form-select" id="courseSelect" disabled>
+                            <option value="">@Localizer["SelectGroupFirst"]</option>
+                        </select>
+                        <span asp-validation-for="CourseId" class="text-danger"></span>
                     </div>
 
                     <div class="card mb-3 p-3" style="background: var(--input-bg);">
@@ -142,7 +150,12 @@
                     return '<span class="badge bg-primary">' + formatted + '</span>';
                 }).join('');
                 document.getElementById('selectedDatesJson').value =
-                    dates.map(d => d.toISOString().split('T')[0]).join(',');
+                           dates.map(d => {
+            const year = d.getFullYear();
+            const month = String(d.getMonth() + 1).padStart(2, '0');
+            const day = String(d.getDate()).padStart(2, '0');
+            return `${year}-${month}-${day}`;
+        }).join(',');
             }
         });
 
@@ -185,6 +198,25 @@
                 alert('@Localizer["SelectDate"]');
             }
         });
+                async function loadCourses(groupId) {
+            const courseSelect = document.getElementById('courseSelect');
+            courseSelect.disabled = true;
+            courseSelect.innerHTML = '<option value="">Завантаження...</option>';
+
+            if (!groupId) {
+                courseSelect.innerHTML = '<option value="">@Localizer["SelectGroupFirst"]</option>';
+                return;
+            }
+
+            const response = await fetch(`/Schedules/GetCoursesByGroup?groupId=${groupId}`);
+            const courses = await response.json();
+
+            courseSelect.innerHTML = '<option value="">@Localizer["SelectCourse"]</option>';
+            courses.forEach(c => {
+                courseSelect.innerHTML += `<option value="${c.id}">${c.name}</option>`;
+            });
+            courseSelect.disabled = false;
+        }
     </script>
 
     @{

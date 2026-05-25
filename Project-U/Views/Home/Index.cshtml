@@ -1,10 +1,8 @@
 ﻿@using Microsoft.AspNetCore.Mvc.Localization
 @inject IViewLocalizer Localizer
-
 @{
     ViewData["Title"] = Localizer["Title"].Value;
 }
-
 <!-- Привітання -->
 <div class="card mb-4" style="border-top: 4px solid var(--accent);">
     <div class="card-body p-4">
@@ -12,7 +10,6 @@
         <p class="text-muted mb-0">📅 @ViewBag.Today</p>
     </div>
 </div>
-
 <!-- Розклад на сьогодні -->
 <div class="card">
     <div class="card-header d-flex justify-content-between align-items-center">
@@ -28,27 +25,81 @@
                 @foreach (var schedule in (List<ProjectU.Core.Models.Schedule>)ViewBag.TodaySchedules)
                 {
                     <div class="col-md-6">
-                        <div class="card h-100" style="border-left: 4px solid var(--accent);">
-                            <div class="card-body p-3">
-                                <div class="fw-bold">@(schedule.Course?.Name ?? "—")</div>
-                                <div class="small text-muted mt-1">
-                                    ⏰ @schedule.StartTime.ToString("HH:mm") — @schedule.EndTime.ToString("HH:mm")
-                                </div>
-                                @if (!string.IsNullOrEmpty(schedule.Room))
-                                {
-                                    <div class="mt-2">
-                                        @if (schedule.Room.StartsWith("http"))
-                                        {
-                                            <a href="@schedule.Room" target="_blank" class="btn btn-sm btn-outline-info w-100">🔗 @Localizer["JoinOnline"]</a>
+                        @if (User.IsInRole("Admin") || User.IsInRole("Teacher"))
+                        {
+                            <a asp-controller="Attendance" asp-action="Mark"
+                               asp-route-scheduleId="@schedule.Id"
+                               asp-route-date="@DateTime.Today.ToString("yyyy-MM-dd")"
+                               class="text-decoration-none d-block h-100">
+                                <div class="card h-100" style="border-left: 4px solid var(--accent); cursor: pointer; transition: transform 0.2s;">
+                                    <div class="card-body p-3">
+                                        <div class="fw-bold">@(schedule.Course?.Name ?? "—")</div>
+                                        <span class="badge bg-primary mt-1">👥 @(schedule.Group?.Name ?? "—")</span>
+                                        @{
+                                            var lessonBadge = schedule.LessonType switch
+                                            {
+                                                "Lab" => ("bg-success", "🔬"),
+                                                "Practice" => ("bg-warning", "📝"),
+                                                _ => ("bg-info", "📖")
+                                            };
                                         }
-                                        else
+                                        <span class="badge @lessonBadge.Item1 mt-1">@lessonBadge.Item2 @Localizer[schedule.LessonType ?? "Lecture"]</span>
+                                        <div class="small text-muted mt-1">
+                                            ⏰ @schedule.StartTime.ToString("HH:mm") — @schedule.EndTime.ToString("HH:mm")
+                                        </div>
+                                        @if (!string.IsNullOrEmpty(schedule.Room))
                                         {
-                                            <span class="small">🏫 @schedule.Room</span>
+                                            <div class="mt-2">
+                                                @if (schedule.Room.StartsWith("http"))
+                                                {
+                                                    <span class="btn btn-sm btn-outline-info w-100">🔗 @Localizer["JoinOnline"]</span>
+                                                }
+                                                else
+                                                {
+                                                    <span class="small">🏫 @schedule.Room</span>
+                                                }
+                                            </div>
                                         }
+                                        <div class="mt-2">
+                                            <small class="text-muted">📋 @Localizer["MarkAttendance"]</small>
+                                        </div>
                                     </div>
-                                }
+                                </div>
+                            </a>
+                        }
+                        else
+                        {
+                            <div class="card h-100" style="border-left: 4px solid var(--accent);">
+                                <div class="card-body p-3">
+                                    <div class="fw-bold">@(schedule.Course?.Name ?? "—")</div>
+                                    @{
+                                        var lessonBadge = schedule.LessonType switch
+                                        {
+                                            "Lab" => ("bg-success", "🔬"),
+                                            "Practice" => ("bg-warning", "📝"),
+                                            _ => ("bg-info", "📖")
+                                        };
+                                    }
+                                    <span class="badge @lessonBadge.Item1 mt-1">@lessonBadge.Item2 @Localizer[schedule.LessonType ?? "Lecture"]</span>
+                                    <div class="small text-muted mt-1">
+                                        ⏰ @schedule.StartTime.ToString("HH:mm") — @schedule.EndTime.ToString("HH:mm")
+                                    </div>
+                                    @if (!string.IsNullOrEmpty(schedule.Room))
+                                    {
+                                        <div class="mt-2">
+                                            @if (schedule.Room.StartsWith("http"))
+                                            {
+                                                <a href="@schedule.Room" target="_blank" class="btn btn-sm btn-outline-info w-100">🔗 @Localizer["JoinOnline"]</a>
+                                            }
+                                            else
+                                            {
+                                                <span class="small">🏫 @schedule.Room</span>
+                                            }
+                                        </div>
+                                    }
+                                </div>
                             </div>
-                        </div>
+                        }
                     </div>
                 }
             </div>

@@ -17,7 +17,6 @@
             <div class="card-body">
                 <form asp-action="Create" method="post">
                     <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
-                    <input type="hidden" name="TeacherId" value="@ViewBag.CurrentUserId" />
 
                     <div class="mb-3">
                         <label asp-for="Name" class="form-label">@Localizer["CourseName"]</label>
@@ -54,6 +53,7 @@
                         </select>
                         <span asp-validation-for="GroupId" class="text-danger"></span>
                     </div>
+
                     <div class="mb-3">
                         <label asp-for="CourseType" class="form-label">📋 @Localizer["CourseType"]</label>
                         <select asp-for="CourseType" class="form-select">
@@ -61,6 +61,7 @@
                             <option value="Credit">✅ @Localizer["Credit"]</option>
                         </select>
                     </div>
+
                     <div class="mb-3">
                         <label class="form-label">👨‍🏫 @Localizer["AdditionalTeachers"]</label>
                         @if (ViewBag.AllTeachers != null)

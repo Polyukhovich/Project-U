@@ -11,12 +11,45 @@
     <div class="d-flex gap-2">
         @if (User.IsInRole("Admin") || User.IsInRole("Teacher"))
         {
-            <a asp-action="All" class="btn btn-outline-secondary">🌍 @Localizer["AllSchedules"]</a>
-
             <a asp-action="Create" class="btn btn-primary">➕ @Localizer["AddLesson"]</a>
+        }
+        else if (User.IsInRole("Student"))
+        {
+            @if (ViewBag.IsAll == true)
+            {
+                <a asp-action="Index" class="btn btn-outline-secondary">📅 @Localizer["MySchedule"]</a>
+            }
+            else
+            {
+                <a asp-action="Index" asp-route-all="true" class="btn btn-outline-secondary">🌍 @Localizer["AllSchedules"]</a>
+            }
         }
     </div>
 </div>
+
+@if (User.IsInRole("Admin") || User.IsInRole("Teacher"))
+{
+    <div class="card mb-4">
+        <div class="card-body">
+            <form method="get" class="d-flex gap-2 align-items-center">
+                <label class="form-label mb-0">👥 @Localizer["FilterByGroup"]:</label>
+                <select name="groupId" class="form-select" style="max-width: 200px;" onchange="this.form.submit()">
+                    <option value="">@Localizer["AllGroups"]</option>
+                    @foreach (var group in ViewBag.Groups as List<ProjectU.Core.Models.Group>)
+                    {
+                        <option value="@group.Id" selected="@(ViewBag.SelectedGroupId != null && ViewBag.SelectedGroupId.ToString() == group.Id.ToString())">
+                            @group.Name
+                        </option>
+                    }
+                </select>
+                @if (ViewBag.SelectedGroupId != null)
+                {
+                    <a asp-action="Index" class="btn btn-outline-secondary btn-sm">✕</a>
+                }
+            </form>
+        </div>
+    </div>
+}
 
 @if (grouped != null)
 {
@@ -84,9 +117,28 @@
                                     <div class="d-flex justify-content-between align-items-start">
                                         <div>
                                             <div class="fw-bold">@(schedule.Course?.Name ?? "—")</div>
+                                            @if (!User.IsInRole("Student"))
+                                            {
+                                                <div class="fw-bold text-muted small mt-1">👥 @(schedule.Group?.Name ?? "—")</div>
+                                            }
+                                            @{
+                                                var lessonBadge = schedule.LessonType switch
+                                                {
+                                                    "Lab" => ("bg-success", "🔬"),
+                                                    "Practice" => ("bg-warning", "📝"),
+                                                    _ => ("bg-info", "📖")
+                                                };
+                                            }
+                                            <span class="badge @lessonBadge.Item1">@lessonBadge.Item2 @Localizer[schedule.LessonType ?? "Lecture"]</span>
                                             <div class="small text-muted">
                                                 ⏰ @schedule.StartTime.ToString("HH:mm") — @schedule.EndTime.ToString("HH:mm")
                                             </div>
+                                            @if (schedule.Course?.Teacher != null)
+                                            {
+                                                <div class="small text-muted">
+                                                    👨‍🏫 @schedule.Course.Teacher.FirstName @schedule.Course.Teacher.LastName
+                                                </div>
+                                            }
                                             @if (!string.IsNullOrEmpty(schedule.Room))
                                             {
                                                 @if (schedule.Room.StartsWith("http"))

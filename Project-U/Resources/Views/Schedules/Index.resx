@@ -120,8 +120,26 @@
   <data name="AddLesson" xml:space="preserve">
     <value>Додати заняття</value>
   </data>
+  <data name="AllGroups" xml:space="preserve">
+    <value>— Всі групи —</value>
+  </data>
   <data name="AllSchedules" xml:space="preserve">
     <value>Загальний розклад</value>
+  </data>
+  <data name="FilterByGroup" xml:space="preserve">
+    <value>Фільтр по групі</value>
+  </data>
+  <data name="Lab" xml:space="preserve">
+    <value>Лабораторна</value>
+  </data>
+  <data name="Lecture" xml:space="preserve">
+    <value>Лекція</value>
+  </data>
+  <data name="LessonType" xml:space="preserve">
+    <value>Тип заняття</value>
+  </data>
+  <data name="MySchedule" xml:space="preserve">
+    <value>Мій розклад</value>
   </data>
   <data name="NoLessons" xml:space="preserve">
     <value>Занять немає</value>
@@ -131,6 +149,9 @@
   </data>
   <data name="Online" xml:space="preserve">
     <value>Онлайн</value>
+  </data>
+  <data name="Practice" xml:space="preserve">
+    <value>Практична</value>
   </data>
   <data name="Title" xml:space="preserve">
     <value>Розклад</value>

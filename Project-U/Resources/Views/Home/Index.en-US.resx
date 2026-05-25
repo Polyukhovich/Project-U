@@ -138,4 +138,16 @@
   <data name="JoinOnline" xml:space="preserve">
     <value>Join online</value>
   </data>
+  <data name="Lecture" xml:space="preserve">
+    <value>Lecture</value>
+  </data>
+  <data name="Lab" xml:space="preserve">
+    <value>Lab</value>
+  </data>
+  <data name="Practice" xml:space="preserve">
+    <value>Practice</value>
+  </data>
+  <data name="MarkAttendance" xml:space="preserve">
+    <value>Click to mark attendance</value>
+  </data>
 </root>

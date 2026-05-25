@@ -138,4 +138,16 @@
   <data name="JoinOnline" xml:space="preserve">
     <value>Приєднатись онлайн</value>
   </data>
+  <data name="Lecture" xml:space="preserve">
+    <value>Лекція</value>
+  </data>
+  <data name="Lab" xml:space="preserve">
+    <value>Лабораторна</value>
+  </data>
+  <data name="Practice" xml:space="preserve">
+    <value>Практична</value>
+  </data>
+  <data name="MarkAttendance" xml:space="preserve">
+    <value>Натисніть для відмітки відвідуваності</value>
+  </data>
 </root>

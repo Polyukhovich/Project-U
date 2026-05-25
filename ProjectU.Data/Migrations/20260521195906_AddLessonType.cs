@@ -5,16 +5,15 @@
 namespace ProjectU.Data.Migrations
 {
     /// <inheritdoc />
-    public partial class AddPreferredLanguage : Migration
+    public partial class AddLessonType : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.AddColumn<string>(
-                name: "PreferredLanguage",
-                table: "AspNetUsers",
-                type: "nvarchar(10)",
-                maxLength: 10,
+                name: "LessonType",
+                table: "Schedules",
+                type: "nvarchar(max)",
                 nullable: false,
                 defaultValue: "");
         }
@@ -23,8 +22,8 @@ namespace ProjectU.Data.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropColumn(
-                name: "PreferredLanguage",
-                table: "AspNetUsers");
+                name: "LessonType",
+                table: "Schedules");
         }
     }
 }

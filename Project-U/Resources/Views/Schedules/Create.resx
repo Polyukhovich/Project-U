@@ -156,11 +156,23 @@
   <data name="Group" xml:space="preserve">
     <value>Група</value>
   </data>
+  <data name="Lab" xml:space="preserve">
+    <value>Лабораторна</value>
+  </data>
+  <data name="Lecture" xml:space="preserve">
+    <value>Лекція</value>
+  </data>
+  <data name="LessonType" xml:space="preserve">
+    <value>Тип заняття</value>
+  </data>
   <data name="Monday" xml:space="preserve">
     <value>Понеділок</value>
   </data>
   <data name="Pair" xml:space="preserve">
     <value>Пара</value>
+  </data>
+  <data name="Practice" xml:space="preserve">
+    <value>Практична</value>
   </data>
   <data name="QuickSelect" xml:space="preserve">
     <value>Швидкий вибір</value>
@@ -182,6 +194,9 @@
   </data>
   <data name="SelectGroup" xml:space="preserve">
     <value>— Оберіть групу —</value>
+  </data>
+  <data name="SelectGroupFirst" xml:space="preserve">
+    <value>Спочатку оберіть групу</value>
   </data>
   <data name="SelectPair" xml:space="preserve">
     <value>— Оберіть пару —</value>
